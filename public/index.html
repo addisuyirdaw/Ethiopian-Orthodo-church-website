@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OrthodoxConnect Portal</title>
+  <!-- Modern Premium Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Premium Modern Color Palette & CSS Variables */
+    :root {
+      --bg-dark: #0f0d0e;
+      --bg-card: #1c181a;
+      --bg-card-hover: #262124;
+      --burgundy: #4a0e17;
+      --burgundy-glow: #701c27;
+      --gold: #d4af37;
+      --gold-dark: #aa851c;
+      --gold-glow: rgba(212, 175, 55, 0.2);
+      --text-white: #f5f5f5;
+      --text-gray: #a69c9e;
+      --accent-green: #2ecc71;
+      --accent-red: #e74c3c;
+      --border-color: rgba(212, 175, 55, 0.15);
+      --transition-speed: 0.3s;
+      --font-primary: 'Outfit', sans-serif;
+      --font-serif: 'Playfair Display', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+      font-family: var(--font-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Elegant Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--burgundy);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--gold);
+    }
+
+    /* Ambient Background Effects */
+    .ambient-glow-1 {
+      position: fixed;
+      top: -10%;
+      right: -10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(74, 14, 23, 0.4) 0%, rgba(0,0,0,0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .ambient-glow-2 {
+      position: fixed;
+      bottom: -10%;
+      left: -10%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, rgba(0,0,0,0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Layout Wrapper */
+    .app-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header Design */
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 2rem;
+    }
+
+    .logo-area {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cross-icon {
+      font-size: 2.2rem;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+      filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+    }
+
+    h1 {
+      font-family: var(--font-serif);
+      font-size: 3rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--text-white) 30%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+      margin-bottom: 0.2rem;
+    }
+
+    .subtitle {
+      color: var(--text-gray);
+      font-size: 1.1rem;
+      font-weight: 300;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* Section Tabs */
+    .tabs-nav {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .tab-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-gray);
+      padding: 1rem 0.5rem;
+      font-family: var(--font-primary);
+      font-size: 0.95rem;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .tab-btn i {
+      font-size: 1.3rem;
+    }
+
+    .tab-btn:hover {
+      background: var(--bg-card-hover);
+      color: var(--gold);
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    .tab-btn.active {
+      background: var(--burgundy);
+      color: var(--gold);
+      border-color: var(--gold);
+      box-shadow: 0 4px 15px rgba(74, 14, 23, 0.4);
+    }
+
+    /* Dashboard Layout Sections */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out forwards;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* General Panel Styling */
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-title {
+      font-family: var(--font-serif);
+      font-size: 1.8rem;
+      color: var(--gold);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    /* Buttons */
+    .btn {
+      background: linear-gradient(135deg, var(--burgundy) 0%, var(--burgundy-glow) 100%);
+      color: var(--text-white);
+      border: 1px solid var(--gold);
+      padding: 0.85rem 2rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font-primary);
+      transition: all var(--transition-speed) ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      box-shadow: 0 4px 10px rgba(74, 14, 23, 0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(212, 175, 55, 0.25);
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+      color: var(--bg-dark);
+      border-color: var(--gold);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+    }
+    .btn-secondary:hover {
+      background: rgba(212, 175, 55, 0.1);
+      color: var(--gold);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    label {
+      display: block;
+      color: var(--text-gray);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      color: var(--text-white);
+      padding: 0.85rem 1rem;
+      border-radius: 6px;
+      font-family: var(--font-primary);
+      font-size: 1rem;
+      transition: all var(--transition-speed) ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-badge.online {
+      background: rgba(46, 204, 113, 0.1);
+      color: var(--accent-green);
+      border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+
+    .status-badge.offline {
+      background: rgba(231, 76, 60, 0.1);
+      color: var(--accent-red);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+    }
+
+    /* Logs & Terminal output */
+    .console-output {
+      background: #080607;
+      border: 1px solid rgba(212, 175, 55, 0.1);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      color: #00ff66;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+      margin-top: 1.5rem;
+    }
+
+    .console-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+      padding-bottom: 0.5rem;
+    }
+
+    .console-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--gold);
+    }
+
+    /* Tree View Styling */
+    .tree-container {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 2rem;
+      overflow-x: auto;
+      margin-top: 1.5rem;
+    }
+
+    .tree-node {
+      margin-left: 2rem;
+      position: relative;
+      border-left: 1px dashed var(--border-color);
+      padding-left: 1.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .tree-node::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 15px;
+      width: 15px;
+      height: 1px;
+      border-top: 1px dashed var(--border-color);
+    }
+
+    .tree-node:last-child {
+      border-left: none;
+    }
+    
+    .tree-node:last-child::before {
+      border-left: 1px dashed var(--border-color);
+      height: 15px;
+      top: 0;
+    }
+
+    .tree-node-content {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      padding: 0.75rem 1.25rem;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all var(--transition-speed) ease;
+    }
+
+    .tree-node-content:hover {
+      border-color: var(--gold);
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+      transform: translateX(3px);
+    }
+
+    .node-type {
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--burgundy);
+      color: var(--gold);
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .node-name {
+      font-weight: 500;
+    }
+
+    /* Live Session Info Box */
+    .session-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      background: rgba(74, 14, 23, 0.15);
+      border: 1px solid var(--border-color);
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      align-items: center;
+    }
+
+    .session-info-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .session-info-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-gray);
+      letter-spacing: 0.5px;
+    }
+
+    .session-info-value {
+      font-weight: 500;
+      color: var(--gold);
+    }
+
+    /* Splits Layout Card */
+    .splits-card {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .splits-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .split-item {
+      background: var(--bg-dark);
+      border: 1px solid rgba(212, 175, 55, 0.1);
+      padding: 1rem;
+      border-radius: 6px;
+      text-align: center;
+      transition: all var(--transition-speed) ease;
+    }
+
+    .split-item:hover {
+      border-color: var(--gold);
+    }
+
+    .split-institution {
+      font-size: 0.8rem;
+      color: var(--text-gray);
+      margin-bottom: 0.5rem;
+    }
+
+    .split-amount {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .split-percentage {
+      font-size: 0.75rem;
+      color: var(--accent-green);
+    }
+
+    /* Verification Status Banner */
+    .verification-banner {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      background: rgba(46, 204, 113, 0.05);
+    }
+
+    .verification-icon {
+      font-size: 2.5rem;
+      color: var(--accent-green);
+    }
+
+    .verification-seal-code {
+      font-family: monospace;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 0.5rem;
+      border-radius: 4px;
+      word-break: break-all;
+      font-size: 0.85rem;
+      border: 1px solid rgba(212, 175, 55, 0.1);
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <div class="app-container">
+
+    <header>
+      <div class="logo-area">
+        <span class="cross-icon">☩</span>
+        <h1>OrthodoxConnect</h1>
+        <span class="subtitle">Jurisdictional Governance & FinTech Registry</span>
+      </div>
+    </header>
+
+    <!-- Session State Info Box -->
+    <div class="session-info">
+      <div class="session-info-item">
+        <span class="session-info-label">Active Session</span>
+        <span class="session-info-value" id="session-user">Guest (Not Authenticated)</span>
+      </div>
+      <div class="session-info-item">
+        <span class="session-info-label">Canonical Role</span>
+        <span class="session-info-value" id="session-role">-</span>
+      </div>
+      <div class="session-info-item">
+        <span class="session-info-label">Institution Scope</span>
+        <span class="session-info-value" id="session-institution">-</span>
+      </div>
+      <div style="margin-left: auto;">
+        <button id="logout-btn" class="btn btn-secondary" style="padding: 0.5rem 1.25rem; display: none;" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('db-panel')">
+        <i>⚙️</i>
+        <span>DB Control</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('identity-panel')">
+        <i>👤</i>
+        <span>Identity Sim</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('hierarchy-panel')">
+        <i>🌿</i>
+        <span>Jurisdictions</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('sacraments-panel')">
+        <i>📜</i>
+        <span>Sacraments</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('fintech-panel')">
+        <i>💳</i>
+        <span>FinTech Split</span>
+      </button>
+    </nav>
+
+    <!-- Tab Section A: Database Control Panel -->
+    <section id="db-panel" class="tab-content active">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">⚙️ Database Setup & Seeding</div>
+          <span class="status-badge online">Development Mode</span>
+        </div>
+        <p style="color: var(--text-gray); margin-bottom: 2rem;">
+          Initialize the complete database structure, construct the canonical hierarchy, and populate the system with pre-configured users (Patriarch, Metropolitan, Bishops, and celebrant priests).
+        </p>
+
+        <button class="btn" id="db-init-btn" onclick="initializeDatabase()">
+          🔄 Initialize & Seed Canonical Database
+        </button>
+
+        <div class="console-header" style="margin-top: 2rem;">
+          <span class="console-title">Database Output Logs</span>
+          <button class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="clearConsole('db-console')">Clear</button>
+        </div>
+        <div class="console-output" id="db-console">Waiting for initialization...</div>
+      </div>
+    </section>
+
+    <!-- Tab Section B: Identity Provider Simulator -->
+    <section id="identity-panel" class="tab-content">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">👤 Ecclesiastical Identity Provider</div>
+        </div>
+        <p style="color: var(--text-gray); margin-bottom: 2rem;">
+          Select one of the 5 canonical seed accounts to simulate multi-tenant institutional logins. Logging in generates a JWT containing claims that govern data access.
+        </p>
+
+        <div class="form-group" style="max-width: 500px;">
+          <label for="user-select">Select Ecclesiastical User</label>
+          <select id="user-select" style="margin-bottom: 1.5rem;">
+            <option value="patriarch@orthodoxconnect.org">His Holiness Patriarch (patriarch@orthodoxconnect.org) [PATRIARCHATE Scope]</option>
+            <option value="archbishop@orthodoxconnect.org">Archbishop of Addis Ababa (archbishop@orthodoxconnect.org) [ARCHDIOCESE Scope]</option>
+            <option value="bishop@orthodoxconnect.org">Bishop of Debre Birhan (bishop@orthodoxconnect.org) [DIOCESE Scope]</option>
+            <option value="priest.aa@orthodoxconnect.org">Priest of Holy Trinity AA (priest.aa@orthodoxconnect.org) [PARISH AA Scope]</option>
+            <option value="priest.db@orthodoxconnect.org">Priest of Debre Berhan (priest.db@orthodoxconnect.org) [PARISH DB Scope]</option>
+          </select>
+          <button class="btn" id="login-btn" onclick="login()">Login as Selected User</button>
+        </div>
+
+        <div class="console-header" style="margin-top: 2rem;">
+          <span class="console-title">Auth Token Claims & Response</span>
+          <button class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="clearConsole('auth-console')">Clear</button>
+        </div>
+        <div class="console-output" id="auth-console">Not authenticated. Login to view token details.</div>
+      </div>
+    </section>
+
+    <!-- Tab Section C: Hierarchical Tree Viewer -->
+    <section id="hierarchy-panel" class="tab-content">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🌿 Canonical Jurisdiction Hierarchy</div>
+        </div>
+        <p style="color: var(--text-gray); margin-bottom: 2rem;">
+          Fetches the institution hierarchy visible under your current ecclesiastical claims. Users with higher jurisdiction (e.g., Patriarch, Archbishop) can visualize downstream branches.
+        </p>
+
+        <button class="btn" id="fetch-tree-btn" onclick="fetchHierarchy()">Fetch Jurisdiction Tree</button>
+
+        <div id="tree-root" class="tree-container" style="display: none;">
+          <!-- Hierarchy tree will be injected here -->
+        </div>
+
+        <div class="console-header" style="margin-top: 2rem;">
+          <span class="console-title">Raw Hierarchy Response</span>
+          <button class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="clearConsole('tree-console')">Clear</button>
+        </div>
+        <div class="console-output" id="tree-console">Fetch the tree to display JSON payload.</div>
+      </div>
+    </section>
+
+    <!-- Tab Section D: Sacramental Registry Wizard -->
+    <section id="sacraments-panel" class="tab-content">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📜 Sacramental Registry Wizard</div>
+        </div>
+        <p style="color: var(--text-gray); margin-bottom: 2rem;">
+          Register a canonical baptism or marriage record. Registrations require celebrant authorization, verifying the priest holds an active decree on the event date.
+        </p>
+
+        <form id="sacrament-form" onsubmit="registerSacrament(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="sacrament-type">Sacrament Type</label>
+              <select id="sacrament-type">
+                <option value="BAPTISM">BAPTISM</option>
+                <option value="CHRISMATION">CHRISMATION</option>
+                <option value="MARRIAGE">MARRIAGE</option>
+                <option value="FUNERAL">FUNERAL</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="christian-name">Christian Name</label>
+              <input type="text" id="christian-name" placeholder="e.g., Haile Selassie" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="celebrant-priest-id">Celebrant Priest UUID</label>
+              <input type="text" id="celebrant-priest-id" placeholder="Auto-filled from active session" required>
+            </div>
+            <div class="form-group">
+              <label for="sponsor-name">Sponsor Name</label>
+              <input type="text" id="sponsor-name" placeholder="e.g., Kidane Mehret">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="event-date">Event Date (Gregorian)</label>
+              <input type="date" id="event-date" required>
+            </div>
+            <div class="form-group">
+              <label for="canonical-verify">Enforce Canonical Check</label>
+              <select id="canonical-verify">
+                <option value="false">No (Save Record Only)</option>
+                <option value="true">Yes (Assert active clergy decree on date)</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn" id="reg-sac-btn">Register Sacramental Record</button>
+        </form>
+
+        <div id="verify-section" style="display: none;">
+          <div class="verification-banner">
+            <div class="verification-icon">🛡️</div>
+            <div>
+              <h4 style="color: var(--gold); margin-bottom: 0.25rem;">Cryptographically Sealed Record</h4>
+              <p style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 0.5rem;">
+                Successfully verified against the holy Synod registry. SHA-256 seal:
+              </p>
+              <div class="verification-seal-code" id="verification-seal">seal-code-here</div>
+              <div style="margin-top: 0.5rem; font-size: 0.85rem;" id="verification-dates">
+                <!-- Dual calendars will go here -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="console-header" style="margin-top: 2rem;">
+          <span class="console-title">Sacramental Registry Console</span>
+          <button class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="clearConsole('sacrament-console')">Clear</button>
+        </div>
+        <div class="console-output" id="sacrament-console">Fill the form and register a sacrament record.</div>
+      </div>
+    </section>
+
+    <!-- Tab Section E: FinTech Ledger Real-time Tester -->
+    <section id="fintech-panel" class="tab-content">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">💳 Real-time FinTech Ledger & Split Simulator</div>
+        </div>
+        <p style="color: var(--text-gray); margin-bottom: 2rem;">
+          Simulate incoming tithes or donations. The system automatically splits contributions down the hierarchy (Parish 90%, Diocese 7%, Patriarchate 3%) atomically in a database transaction.
+        </p>
+
+        <form id="ledger-form" onsubmit="processContribution(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contrib-amount">Amount</label>
+              <input type="number" id="contrib-amount" placeholder="e.g., 1000" min="1" step="any" required>
+            </div>
+            <div class="form-group">
+              <label for="contrib-currency">Currency</label>
+              <select id="contrib-currency">
+                <option value="ETB">ETB (Ethiopian Birr)</option>
+                <option value="USD">USD (US Dollar)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contrib-type">Transaction Type</label>
+              <select id="contrib-type">
+                <option value="TITHE">TITHE</option>
+                <option value="ALMS">ALMS</option>
+                <option value="DONATION">DONATION</option>
+                <option value="SACRAMENTAL_FEES">SACRAMENTAL FEES</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="contrib-gateway">Payment Gateway</label>
+              <select id="contrib-gateway">
+                <option value="TELEBIRR">TELEBIRR</option>
+                <option value="CBE_BIRR">CBE_BIRR</option>
+                <option value="STRIPE">STRIPE</option>
+                <option value="MANUAL_CASH">MANUAL_CASH</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="contrib-ref">Reference ID (Must be unique)</label>
+            <input type="text" id="contrib-ref" placeholder="e.g., TXN-99482939" required>
+          </div>
+
+          <button type="submit" class="btn" id="fintech-btn">Submit Contribution & Split Funds</button>
+        </form>
+
+        <div id="splits-section" style="display: none;">
+          <div class="splits-card">
+            <h4 style="color: var(--gold); margin-bottom: 1rem;">Atomic Ledger Splits Generated</h4>
+            <div class="splits-grid" id="splits-container">
+              <!-- Split cards injected here -->
+            </div>
+          </div>
+        </div>
+
+        <div class="console-header" style="margin-top: 2rem;">
+          <span class="console-title">FinTech Ledger Console</span>
+          <button class="btn btn-secondary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="clearConsole('fintech-console')">Clear</button>
+        </div>
+        <div class="console-output" id="fintech-console">Submit a contribution to view real-time ledger distributions.</div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // --- Global Configuration ---
+    const BASE_URL = window.location.origin; // Same origin (HTTPS)
+    
+    // Default form helper variables
+    let currentToken = localStorage.getItem('token') || '';
+    let currentUserData = null;
+
+    // Set default event date to today
+    document.getElementById('event-date').valueAsDate = new Date();
+    // Set random ref for fintech contribution
+    document.getElementById('contrib-ref').value = 'REF-' + Math.floor(Math.random() * 10000000);
+
+    // Initial state check
+    window.addEventListener('load', () => {
+      loadSession();
+    });
+
+    function loadSession() {
+      const stored = localStorage.getItem('userData');
+      if (stored) {
+        currentUserData = JSON.parse(stored);
+        currentToken = localStorage.getItem('token');
+        
+        document.getElementById('session-user').innerText = currentUserData.email;
+        document.getElementById('session-role').innerText = currentUserData.ecclesiastical_role;
+        document.getElementById('session-institution').innerText = currentUserData.institution_id;
+        document.getElementById('logout-btn').style.display = 'inline-block';
+        
+        // Auto populate priest UUID in form if user is a priest
+        document.getElementById('celebrant-priest-id').value = currentUserData.id;
+      } else {
+        document.getElementById('session-user').innerText = 'Guest (Not Authenticated)';
+        document.getElementById('session-role').innerText = '-';
+        document.getElementById('session-institution').innerText = '-';
+        document.getElementById('logout-btn').style.display = 'none';
+        document.getElementById('celebrant-priest-id').value = '';
+      }
+    }
+
+    // Switch Dashboard Tabs
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+      
+      // Find the tab button that matches the tab ID
+      const btnIndex = ['db-panel', 'identity-panel', 'hierarchy-panel', 'sacraments-panel', 'fintech-panel'].indexOf(tabId);
+      if (btnIndex !== -1) {
+        document.querySelectorAll('.tab-btn')[btnIndex].classList.add('active');
+      }
+    }
+
+    function clearConsole(consoleId) {
+      document.getElementById(consoleId).innerText = '';
+    }
+
+    function logToConsole(consoleId, text, isError = false) {
+      const consoleEl = document.getElementById(consoleId);
+      const formattedText = typeof text === 'object' ? JSON.stringify(text, null, 2) : text;
+      
+      if (isError) {
+        consoleEl.innerHTML += `\n<span style="color: var(--accent-red)">[ERROR] ${formattedText}</span>`;
+      } else {
+        consoleEl.innerHTML += `\n<span>${formattedText}</span>`;
+      }
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    // --- Section A: Database Initialization ---
+    async function initializeDatabase() {
+      const btn = document.getElementById('db-init-btn');
+      const consoleId = 'db-console';
+      btn.disabled = true;
+      btn.innerText = '⚙️ Initializing Database...';
+      
+      clearConsole(consoleId);
+      logToConsole(consoleId, 'Initializing database setup & migration...');
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/v1/dev/init-db`);
+        const data = await res.json();
+
+        if (res.ok) {
+          logToConsole(consoleId, '✅ Database initialized and seeded successfully.');
+          logToConsole(consoleId, data);
+        } else {
+          logToConsole(consoleId, '❌ Initialization failed.', true);
+          logToConsole(consoleId, data, true);
+        }
+      } catch (err) {
+        logToConsole(consoleId, '❌ Connection error or database offline.', true);
+        logToConsole(consoleId, err.message, true);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = '🔄 Initialize & Seed Canonical Database';
+      }
+    }
+
+    // --- Section B: Identity Provider Simulation ---
+    async function login() {
+      const email = document.getElementById('user-select').value;
+      const consoleId = 'auth-console';
+      
+      clearConsole(consoleId);
+      logToConsole(consoleId, `Authenticating as ${email}...`);
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/v1/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password: 'orthodox123' })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          currentToken = data.data.token;
+          currentUserData = data.data.user;
+          
+          localStorage.setItem('token', currentToken);
+          localStorage.setItem('userData', JSON.stringify(currentUserData));
+          
+          logToConsole(consoleId, '✅ Authentication successful.');
+          logToConsole(consoleId, data);
+          loadSession();
+        } else {
+          logToConsole(consoleId, '❌ Authentication failed.', true);
+          logToConsole(consoleId, data, true);
+        }
+      } catch (err) {
+        logToConsole(consoleId, '❌ Login error.', true);
+        logToConsole(consoleId, err.message, true);
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userData');
+      currentToken = '';
+      currentUserData = null;
+      loadSession();
+      switchTab('identity-panel');
+      logToConsole('auth-console', 'Session cleared. Logged out.');
+    }
+
+    // --- Section C: Hierarchy Tree Viewer ---
+    async function fetchHierarchy() {
+      const consoleId = 'tree-console';
+      const treeRoot = document.getElementById('tree-root');
+      
+      clearConsole(consoleId);
+      treeRoot.innerHTML = '';
+      treeRoot.style.display = 'none';
+
+      if (!currentToken) {
+        logToConsole(consoleId, '❌ Authentication token required. Log in under the Identity Sim tab first.', true);
+        return;
+      }
+
+      logToConsole(consoleId, 'Fetching hierarchical jurisdiction tree...');
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/v1/institutions/hierarchy`, {
+          headers: { 'Authorization': `Bearer ${currentToken}` }
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          logToConsole(consoleId, '✅ Hierarchy retrieved successfully.');
+          logToConsole(consoleId, data);
+          
+          renderTree(data.data, treeRoot);
+          treeRoot.style.display = 'block';
+        } else {
+          logToConsole(consoleId, '❌ Failed to fetch hierarchy.', true);
+          logToConsole(consoleId, data, true);
+        }
+      } catch (err) {
+        logToConsole(consoleId, '❌ Network error fetching hierarchy.', true);
+        logToConsole(consoleId, err.message, true);
+      }
+    }
+
+    function renderTree(node, container) {
+      const div = document.createElement('div');
+      div.className = 'tree-node-content';
+      
+      const typeSpan = document.createElement('span');
+      typeSpan.className = 'node-type';
+      typeSpan.innerText = node.type;
+      
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'node-name';
+      nameSpan.innerText = node.name;
+      
+      div.appendChild(typeSpan);
+      div.appendChild(nameSpan);
+      
+      container.appendChild(div);
+
+      if (node.children && node.children.length > 0) {
+        const childrenContainer = document.createElement('div');
+        childrenContainer.className = 'tree-node';
+        container.appendChild(childrenContainer);
+        
+        node.children.forEach(child => {
+          renderTree(child, childrenContainer);
+        });
+      }
+    }
+
+    // --- Section D: Sacramental Registry Wizard ---
+    async function registerSacrament(event) {
+      event.preventDefault();
+      const consoleId = 'sacrament-console';
+      const verifySection = document.getElementById('verify-section');
+      
+      clearConsole(consoleId);
+      verifySection.style.display = 'none';
+
+      if (!currentToken) {
+        logToConsole(consoleId, '❌ Authentication required. Please log in first.', true);
+        return;
+      }
+
+      const type = document.getElementById('sacrament-type').value;
+      const christianName = document.getElementById('christian-name').value;
+      const celebrantPriestId = document.getElementById('celebrant-priest-id').value;
+      const sponsorName = document.getElementById('sponsor-name').value;
+      const eventDate = document.getElementById('event-date').value;
+      const canonicalVerify = document.getElementById('canonical-verify').value === 'true';
+
+      const payload = {
+        type,
+        christianName,
+        celebrantPriestId,
+        sponsorName: sponsorName || null,
+        eventDateUtc: new Date(eventDate).toISOString(),
+        calendarMetadata: {
+          gregorian: eventDate
+        },
+        isCanonicalVerified: canonicalVerify
+      };
+
+      logToConsole(consoleId, 'Submitting sacramental record...');
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/v1/sacraments`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentToken}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          logToConsole(consoleId, '✅ Sacramental record created successfully.');
+          logToConsole(consoleId, data);
+
+          // Now fetch cryptographic verification details if record created successfully
+          await verifyRecord(data.data.id);
+        } else {
+          logToConsole(consoleId, '❌ Failed to create sacramental record.', true);
+          logToConsole(consoleId, data, true);
+        }
+      } catch (err) {
+        logToConsole(consoleId, '❌ Network error during registration.', true);
+        logToConsole(consoleId, err.message, true);
+      }
+    }
+
+    async function verifyRecord(recordId) {
+      const consoleId = 'sacrament-console';
+      const verifySection = document.getElementById('verify-section');
+      
+      logToConsole(consoleId, `Requesting cryptographic seal for record ID: ${recordId}...`);
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/v1/sacraments/${recordId}/verify`, {
+          headers: { 'Authorization': `Bearer ${currentToken}` }
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          logToConsole(consoleId, '🛡️ Verification seal retrieved.');
+          logToConsole(consoleId, data);
+          
+          document.getElementById('verification-seal').innerText = data.data.cryptographicSeal;
+          
+          const meta = data.data.canonicalMetadata;
+          const verifiedStatus = meta.celebrantVerified ? '<span style="color: var(--accent-green)">Celebrant Canonical Authority Verified</span>' : '<span style="color: var(--accent-red)">Celebrant Canonical Authority Not Verified</span>';
+          
+          document.getElementById('verification-dates').innerHTML = `
+            <div><strong>Status:</strong> ${verifiedStatus}</div>
+            <div style="margin-top:0.25rem;"><strong>Gregorian:</strong> ${meta.calendars.gregorian}</div>
+            <div><strong>Ethiopic:</strong> ${meta.calendars.ethiopic}</div>
+          `;
+          
+          verifySection.style.display = 'block';
+        } else {
+          logToConsole(consoleId, '❌ Failed to retrieve cryptographic seal.', true);
+          logToConsole(consoleId, data, true);
+        }
+      } catch (err) {
+        logToConsole(consoleId, '❌ Network error during verification.', true);
+        logToConsole(consoleId, err.message, true);
+      }
+    }
+
+    // --- Section E: FinTech Split Simulator ---
+    async function processContribution(event) {
+      event.preventDefault();
+      const consoleId = 'fintech-console';
+      const splitsSection = document.getElementById('splits-section');
+      
+      clearConsole(consoleId);
+      splitsSection.style.display = 'none';
+
+      if (!currentToken) {
+        logToConsole(consoleId, '❌ Authentication required. Please log in first.', true);
+        return;
+      }
+
+      const amount = parseFloat(document.getElementById('contrib-amount').value);
+      const currency = document.getElementById('contrib-currency').value;
+      const type = document.getElementById('contrib-type').value;
+      const gateway = document.getElementById('contrib-gateway').value;
+      const referenceId = document.getElementById('contrib-ref').value;
+
+      const payload = {
+        amount,
+        currency,
+        type,
+        gateway,
+        referenceId
+      };
+
+      logToConsole(consoleId, 'Processing transaction contributions and splits...');
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/v1/financials/contribute`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentToken}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          logToConsole(consoleId, '✅ Contribution accepted and splits posted.');
+          logToConsole(consoleId, data);
+          
+          // Render splits visually
+          const container = document.getElementById('splits-container');
+          container.innerHTML = '';
+          
+          data.data.splits.forEach(split => {
+            const card = document.createElement('div');
+            card.className = 'split-item';
+            
+            // Format percentage beautifully
+            const pct = (parseFloat(split.percentageApplied) * 100).toFixed(0);
+            
+            // Map known destinations to names for visual aid
+            let name = split.destinationInstitutionId;
+            if (currentUserData) {
+              // Guess names of typical institutions for presentation
+              if (split.percentageApplied === "0.0300") name = "Patriarchate (3%)";
+              else if (split.percentageApplied === "0.0700") name = "Diocese / Archdiocese (7%)";
+              else if (split.percentageApplied === "0.9000") name = "Parish (90%)";
+              else if (split.percentageApplied === "0.9700") name = "Regional Authority (97%)";
+              else if (split.percentageApplied === "1.0000") name = "Synod Treasury (100%)";
+            }
+            
+            card.innerHTML = `
+              <div class="split-institution">${name}</div>
+              <div class="split-amount">${parseFloat(split.splitAmount).toFixed(2)} ${currency}</div>
+              <div class="split-percentage">${pct}% Allocation</div>
+            `;
+            container.appendChild(card);
+          });
+          
+          splitsSection.style.display = 'block';
+          
+          // Regenerate new unique reference id
+          document.getElementById('contrib-ref').value = 'REF-' + Math.floor(Math.random() * 10000000);
+        } else {
+          logToConsole(consoleId, '❌ Failed to process contribution.', true);
+          logToConsole(consoleId, data, true);
+        }
+      } catch (err) {
+        logToConsole(consoleId, '❌ Network error processing contribution.', true);
+        logToConsole(consoleId, err.message, true);
+      }
+    }
+  </script>
+
+</body>
+</html>

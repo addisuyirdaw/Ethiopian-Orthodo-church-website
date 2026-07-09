@@ -1,0 +1,243 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum InstitutionType {
+  PATRIARCHATE
+  ARCHDIOCESE
+  DIOCESE
+  PARISH
+  MONASTERY
+}
+
+enum EcclesiasticalRole {
+  PATRIARCH
+  ARCHBISHOP
+  METROPOLITAN
+  BISHOP
+  PRIEST
+  DEACON
+  LAITY
+}
+
+enum SacramentalType {
+  BAPTISM
+  CHRISMATION
+  MARRIAGE
+  FUNERAL
+}
+
+enum TransactionType {
+  TITHE
+  ALMS
+  DONATION
+  SACRAMENTAL_FEES
+}
+
+enum PaymentGateway {
+  TELEBIRR
+  CBE_BIRR
+  STRIPE
+  MANUAL_CASH
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum CalendarTradition {
+  ETHIOPIAN_TEWAHEDO
+  JULIAN_ORTHODOX
+  REVISED_JULIAN
+}
+
+enum FastingTier {
+  STRICT
+  MODERATE
+  WINE_OIL
+  FISH_ALLOWED
+  NONE
+}
+
+enum LiturgicalColor {
+  GOLD
+  WHITE
+  RED
+  GREEN
+  BLUE
+  PURPLE
+  BLACK
+}
+
+model Institution {
+  id                  String            @id @default(uuid())
+  name                String
+  type                InstitutionType
+  calendarTradition   CalendarTradition @default(ETHIOPIAN_TEWAHEDO) @map("calendar_tradition")
+  parentInstitutionId String?           @map("parent_institution_id")
+  hierarchyPath       String            @map("hierarchy_path")
+  deletedAt           DateTime?         @map("deleted_at")
+  createdAt           DateTime          @default(now()) @map("created_at")
+  updatedAt           DateTime          @updatedAt @map("updated_at")
+
+  parentInstitution       Institution?           @relation("InstitutionHierarchy", fields: [parentInstitutionId], references: [id])
+  childInstitutions       Institution[]          @relation("InstitutionHierarchy")
+  users                   User[]
+  sacramentalRecords      SacramentalRecord[]
+  auditLogs               AuditLog[]
+  financialTransactions   FinancialTransaction[]
+  ledgerSplitDestinations LedgerSplitRecord[]    @relation("SplitDestination")
+  clergyAssignments       ClergyAssignment[]
+
+  @@index([parentInstitutionId, deletedAt])
+  @@index([hierarchyPath])
+  @@map("institutions")
+}
+
+model User {
+  id                 String             @id @default(uuid())
+  email              String             @unique
+  passwordHash       String             @map("password_hash")
+  fullName           String             @map("full_name")
+  ecclesiasticalRole EcclesiasticalRole @map("ecclesiastical_role")
+  institutionId      String             @map("institution_id")
+  deletedAt          DateTime?          @map("deleted_at")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+
+  institution          Institution         @relation(fields: [institutionId], references: [id])
+  sacramentalRecords   SacramentalRecord[] @relation("SacramentTarget")
+  celebratedSacraments SacramentalRecord[] @relation("SacramentCelebrant")
+  auditLogs            AuditLog[]          @relation("AuditActor")
+  clergyAssignments    ClergyAssignment[]
+
+  @@index([institutionId, deletedAt])
+  @@map("users")
+}
+
+model SacramentalRecord {
+  id                  String          @id @default(uuid())
+  institutionId       String          @map("institution_id")
+  type                SacramentalType
+  targetUserId        String?         @map("target_user_id")
+  christianName       String          @map("christian_name")
+  celebrantPriestId   String          @map("celebrant_priest_id")
+  sponsorName         String?         @map("sponsor_name")
+  eventDateUtc        DateTime        @map("event_date_utc")
+  calendarMetadata    Json            @map("calendar_metadata")
+  isCanonicalVerified Boolean         @default(false) @map("is_canonical_verified")
+  deletedAt           DateTime?       @map("deleted_at")
+  createdAt           DateTime        @default(now()) @map("created_at")
+  updatedAt           DateTime        @updatedAt @map("updated_at")
+
+  institution     Institution @relation(fields: [institutionId], references: [id])
+  targetUser      User?       @relation("SacramentTarget", fields: [targetUserId], references: [id])
+  celebrantPriest User        @relation("SacramentCelebrant", fields: [celebrantPriestId], references: [id])
+
+  @@index([institutionId, deletedAt])
+  @@index([type, institutionId])
+  @@map("sacramental_records")
+}
+
+model AuditLog {
+  id            String    @id @default(uuid())
+  actorId       String    @map("actor_id")
+  institutionId String    @map("institution_id")
+  action        String
+  tableName     String    @map("table_name")
+  recordId      String    @map("record_id")
+  changes       Json
+  timestamp     DateTime  @default(now())
+  deletedAt     DateTime? @map("deleted_at")
+
+  actor       User        @relation("AuditActor", fields: [actorId], references: [id])
+  institution Institution @relation(fields: [institutionId], references: [id])
+
+  @@index([institutionId, deletedAt])
+  @@index([actorId, timestamp])
+  @@index([tableName, recordId])
+  @@map("audit_logs")
+}
+
+model FinancialTransaction {
+  id            String            @id @default(uuid())
+  institutionId String            @map("institution_id")
+  amount        Decimal           @db.Decimal(19, 4)
+  currency      String
+  type          TransactionType
+  gateway       PaymentGateway
+  referenceId   String            @unique @map("reference_id")
+  status        TransactionStatus
+  deletedAt     DateTime?         @map("deleted_at")
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+
+  institution  Institution         @relation(fields: [institutionId], references: [id])
+  ledgerSplits LedgerSplitRecord[]
+
+  @@index([institutionId, deletedAt])
+  @@index([status, institutionId])
+  @@map("financial_transactions")
+}
+
+model LedgerSplitRecord {
+  id                       String   @id @default(uuid())
+  financialTransactionId   String   @map("financial_transaction_id")
+  destinationInstitutionId String   @map("destination_institution_id")
+  splitAmount              Decimal  @map("split_amount") @db.Decimal(19, 4)
+  percentageApplied        Decimal  @map("percentage_applied") @db.Decimal(8, 4)
+  createdAt                DateTime @default(now()) @map("created_at")
+
+  financialTransaction   FinancialTransaction @relation(fields: [financialTransactionId], references: [id])
+  destinationInstitution Institution          @relation("SplitDestination", fields: [destinationInstitutionId], references: [id])
+
+  @@index([destinationInstitutionId])
+  @@index([financialTransactionId])
+  @@map("ledger_split_records")
+}
+
+model LiturgicalDay {
+  id                String            @id @default(uuid())
+  calendarTradition CalendarTradition @map("calendar_tradition")
+  solarMonth        Int?              @map("solar_month")
+  solarDay          Int?              @map("solar_day")
+  paschalOffset     Int?              @map("paschal_offset")
+  fastingTier       FastingTier       @map("fasting_tier")
+  liturgicalColor   LiturgicalColor   @map("liturgical_color")
+  titleI18n         Json              @map("title_i18n")
+  readingsI18n      Json              @map("readings_i18n")
+  deletedAt         DateTime?         @map("deleted_at")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  @@index([calendarTradition, paschalOffset, deletedAt])
+  @@index([calendarTradition, solarMonth, solarDay, deletedAt])
+  @@map("liturgical_days")
+}
+
+model ClergyAssignment {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  institutionId String    @map("institution_id")
+  roleTitle     String    @map("role_title")
+  decreeNumber  String    @map("decree_number")
+  assignedAt    DateTime  @map("assigned_at")
+  releasedAt    DateTime? @map("released_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  user        User        @relation(fields: [userId], references: [id])
+  institution Institution @relation(fields: [institutionId], references: [id])
+
+  @@index([userId])
+  @@index([institutionId])
+  @@index([userId, institutionId, assignedAt])
+  @@map("clergy_assignments")
+}
