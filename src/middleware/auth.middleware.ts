@@ -51,6 +51,7 @@ export function authenticateJwt(
       institutionId: decoded.institution_id,
       hierarchyPath: decoded.hierarchy_path,
       ecclesiasticalRole: decoded.ecclesiastical_role,
+      isSuperAdmin: decoded.isSuperAdmin || decoded.ecclesiastical_role === 'PATRIARCH',
     } satisfies AuthenticatedUser;
 
     next();
@@ -63,3 +64,38 @@ export function authenticateJwt(
 }
 
 export { JWT_SECRET };
+
+export function requireEpiscopalRole(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
+  const user = req.user;
+
+  if (!user) {
+    res.status(401).json({
+      error: 'Unauthorized',
+      message: 'Authentication required.',
+    });
+    return;
+  }
+
+  const isEpiscopal = (
+    [
+      EcclesiasticalRole.BISHOP,
+      EcclesiasticalRole.METROPOLITAN,
+      EcclesiasticalRole.ARCHBISHOP,
+      EcclesiasticalRole.PATRIARCH,
+    ] as EcclesiasticalRole[]
+  ).includes(user.ecclesiasticalRole);
+
+  if (!isEpiscopal) {
+    res.status(403).json({
+      error: 'Forbidden',
+      message: 'Canonical jurisdiction violation: Access denied.',
+    });
+    return;
+  }
+
+  next();
+}

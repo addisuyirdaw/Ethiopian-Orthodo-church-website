@@ -9,10 +9,10 @@ type InstitutionClient = Pick<PrismaClient, 'institution'>;
  */
 export async function assignHierarchyPath(
   institutionId: string,
-  parentInstitutionId: string | null,
+  parentId: string | null,
   client: InstitutionClient = prisma,
 ): Promise<string> {
-  if (!parentInstitutionId) {
+  if (!parentId) {
     const path = `/${institutionId}/`;
     await client.institution.update({
       where: { id: institutionId },
@@ -22,7 +22,7 @@ export async function assignHierarchyPath(
   }
 
   const parent = await client.institution.findFirst({
-    where: { id: parentInstitutionId, deletedAt: null },
+    where: { id: parentId, deletedAt: null },
   });
 
   if (!parent) {
@@ -59,8 +59,8 @@ export function buildHierarchyTreeFromFlat(
   for (const node of allNodes) {
     if (node.id === root.id) continue;
     const current = nodeMap.get(node.id)!;
-    const parent = node.parentInstitutionId
-      ? nodeMap.get(node.parentInstitutionId)
+    const parent = node.parentId
+      ? nodeMap.get(node.parentId)
       : undefined;
     if (parent) {
       parent.children.push(current);

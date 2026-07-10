@@ -2,6 +2,18 @@ import express, { Application, Request, Response } from 'express';
 import path from 'path';
 import apiRoutes from './routes';
 import { errorHandler } from './middleware/error-handler.middleware';
+import { localeMiddleware } from './middleware/locale.middleware';
+import prisma from './lib/prisma';
+
+// Augment Express Request to carry the raw body Buffer for HMAC verification
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Express {
+    interface Request {
+      rawBody?: Buffer;
+    }
+  }
+}
 
 export function createApp(): Application {
   const app = express();
@@ -18,7 +30,16 @@ export function createApp(): Application {
     next();
   });
 
-  app.use(express.json());
+  // Capture the raw request body before JSON parsing so that the clearinghouse
+  // webhook route can verify the HMAC-SHA256 signature over the original bytes.
+  app.use(
+    express.json({
+      verify: (req: Request, _res, buf) => {
+        req.rawBody = buf;
+      },
+    }),
+  );
+  app.use(localeMiddleware);
 
   // Serve static files from 'public' directory
   app.use(express.static(path.join(process.cwd(), 'public')));
@@ -47,8 +68,17 @@ export function createApp(): Application {
     });
   });
 
-  app.get('/health', (_req: Request, res: Response) => {
-    res.status(200).json({ status: 'ok', service: 'OrthodoxConnect API' });
+  app.get('/health', async (_req: Request, res: Response) => {
+    try {
+      const count = await prisma.institution.count();
+      if (count === 0) {
+        res.status(200).json({ status: 'pending', service: 'OrthodoxConnect API', message: 'Seeding pending.' });
+        return;
+      }
+      res.status(200).json({ status: 'ok', service: 'OrthodoxConnect API' });
+    } catch (err: any) {
+      res.status(200).json({ status: 'pending', service: 'OrthodoxConnect API', error: err.message || String(err) });
+    }
   });
 
   app.use('/api/v1', apiRoutes);

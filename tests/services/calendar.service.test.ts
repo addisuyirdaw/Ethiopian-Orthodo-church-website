@@ -83,6 +83,47 @@ describe('CalendarService', () => {
     );
   });
 
+  it('returns Ge\'ez localized liturgical context when accept-language is gez', async () => {
+    mockInstitutionFindById.mockResolvedValue({
+      id: 'inst-parish-aa',
+      type: InstitutionType.PARISH,
+      calendarTradition: CalendarTradition.ETHIOPIAN_TEWAHEDO,
+      hierarchyPath: '/inst-patriarchate/inst-archdiocese/inst-parish-aa/',
+    });
+    mockFindByPaschalOffset.mockResolvedValue(null);
+    mockFindBySolarMarker.mockResolvedValue({
+      fastingTier: FastingTier.STRICT,
+      liturgicalColor: LiturgicalColor.GOLD,
+      titleI18n: {
+        en: "Apostles' Fast",
+        am: 'የሐዋርያት ጾም',
+        gez: 'ጾመ ሐዋርያት',
+      },
+      readingsI18n: {
+        en: {
+          epistle: 'Romans 8:28-39',
+          gospel: 'Matthew 10:16-22',
+        },
+        gez: {
+          epistle: 'ሮሜ 8:28-39',
+          gospel: 'ማቴዎስ 10:16-22',
+        },
+      },
+    });
+
+    const result = await service.getDailyLiturgicalContext(
+      'inst-parish-aa',
+      '2026-07-09',
+      'gez',
+    );
+
+    expect(result.calendars.gregorian).toBe('2026-07-09');
+    expect(result.calendars.ethiopic).toBe('2018-11-02');
+    expect(result.fasting.title).toBe('ጾመ ሐዋርያት');
+    expect(result.liturgical.readings.gospel).toBe('ማቴዎስ 10:16-22');
+    expect(result.meta.locale).toBe('gez');
+  });
+
   it('prefers paschal offset matches over solar markers', async () => {
     mockInstitutionFindById.mockResolvedValue({
       id: 'inst-parish',

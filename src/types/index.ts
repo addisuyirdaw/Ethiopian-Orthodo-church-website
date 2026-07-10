@@ -5,6 +5,7 @@ export interface JwtPayload {
   institution_id: string;
   hierarchy_path: string;
   ecclesiastical_role: EcclesiasticalRole;
+  isSuperAdmin?: boolean;
   iat?: number;
   exp?: number;
 }
@@ -14,6 +15,7 @@ export interface AuthenticatedUser {
   institutionId: string;
   hierarchyPath: string;
   ecclesiasticalRole: EcclesiasticalRole;
+  isSuperAdmin?: boolean;
 }
 
 export interface CalendarMetadata {
@@ -27,6 +29,9 @@ export interface CalendarMetadata {
 export interface HierarchyNode {
   id: string;
   name: string;
+  nameEn?: string | null;
+  nameAm?: string | null;
+  nameGez?: string | null;
   type: string;
   hierarchyPath: string;
   children: HierarchyNode[];

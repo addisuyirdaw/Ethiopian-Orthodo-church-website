@@ -21,7 +21,7 @@ export class InstitutionRepository {
   async findDirectChildren(parentId: string): Promise<Institution[]> {
     return prisma.institution.findMany({
       where: {
-        parentInstitutionId: parentId,
+        parentId: parentId,
         deletedAt: null,
       },
       orderBy: { name: 'asc' },

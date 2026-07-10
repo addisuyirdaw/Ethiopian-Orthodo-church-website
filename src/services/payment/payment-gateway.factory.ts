@@ -39,6 +39,19 @@ export class PaymentGatewayFactory {
             },
           }),
         };
+      case PaymentGateway.CHAPA:
+        return {
+          initiatePayment: async (amount, currency, referenceId) => ({
+            gatewayUrl: `https://api.chapa.co/v1/transaction/initialize?reference=${referenceId}&amt=${amount}&cur=${currency}`,
+            rawResponse: {
+              provider: PaymentGateway.CHAPA,
+              status: 'INITIATED',
+              referenceId,
+              amount,
+              currency,
+            },
+          }),
+        };
       default: {
         const exhaustiveCheck: never = gateway;
         throw new Error(`Unsupported payment gateway: ${exhaustiveCheck}`);

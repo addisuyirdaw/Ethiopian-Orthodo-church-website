@@ -41,6 +41,36 @@ export class CanonicalValidationError extends AppError {
   }
 }
 
+export class CanonicalStatusException extends AppError {
+  constructor(message = 'የቀኖናዊ አቋም ችግር፡ የአገልጋዩ ደረጃ ንቁ አይደለም።') {
+    super(422, message, 'CanonicalStatusException');
+    this.name = 'CanonicalStatusException';
+  }
+}
+
+export class ConflictError extends AppError {
+  constructor(message = 'A conflicting resource already exists.') {
+    super(409, message, 'Conflict');
+    this.name = 'ConflictError';
+  }
+}
+
+/**
+ * Thrown when a mutation is attempted on a SacramentalRecord that has an
+ * active SacramentSeal. The record is permanently locked and cannot be
+ * modified or deleted.
+ */
+export class SealedRecordError extends AppError {
+  constructor(recordId: string) {
+    super(
+      409,
+      `Record ${recordId} is cryptographically sealed and cannot be mutated.`,
+      'SealedRecordError',
+    );
+    this.name = 'SealedRecordError';
+  }
+}
+
 interface ErrorLogMetadata {
   method: string;
   path: string;

@@ -1,20 +1,48 @@
 import { AuthenticatedUser } from '../types';
 import { assertInstitutionAccess } from '../middleware/tenant-rbac.middleware';
-import { ForbiddenError, NotFoundError } from '../middleware/error-handler.middleware';
+import {
+  ForbiddenError,
+  NotFoundError,
+  CanonicalValidationError,
+  SealedRecordError,
+} from '../middleware/error-handler.middleware';
 import { sacramentalRecordRepository } from '../repositories/sacramental-record.repository';
 import { auditLogRepository } from '../repositories/audit-log.repository';
 import { institutionRepository } from '../repositories/institution.repository';
 import prisma from '../lib/prisma';
-import { Prisma } from '@prisma/client';
+import { Prisma, FastingTier, SacramentalType } from '@prisma/client';
 import {
   CreateSacramentInput,
   ListSacramentsQuery,
 } from '../validators/sacrament.validator';
 import { isAdministrativeRole } from '../types';
+import { calendarService } from './calendar.service';
+import { clergyLedgerService } from './clergy/clergy-ledger.service';
+
+/**
+ * Checks whether a SacramentalRecord has an active cryptographic seal.
+ * If a seal exists, throws SealedRecordError — the record is immutable.
+ * Call this guard before any UPDATE or DELETE operation on a record.
+ */
+async function guardAgainstSealed(recordId: string): Promise<void> {
+  const seal = await prisma.sacramentSeal.findUnique({
+    where: { sacramentalRecordId: recordId },
+    select: { id: true },
+  });
+  if (seal) {
+    throw new SealedRecordError(recordId);
+  }
+}
+
 
 export class SacramentalRecordService {
   async create(user: AuthenticatedUser, input: CreateSacramentInput) {
     const institutionId = user.institutionId;
+
+    // ── Step 1: Verify clergy canonical status ────────────────────────────
+    // Must run before any DB writes. Throws CanonicalStatusException with
+    // Amharic-first error payload when the celebrant is not in active standing.
+    await clergyLedgerService.verifyClergySacramentalAuthority(input.celebrantPriestId);
 
     const institution = await institutionRepository.findById(institutionId);
     if (!institution) {
@@ -31,6 +59,17 @@ export class SacramentalRecordService {
 
     if (!celebrant) {
       throw new NotFoundError('Celebrant priest not found in this institution.');
+    }
+
+    if (input.type === SacramentalType.MARRIAGE) {
+      const eventDateIso = input.eventDateUtc.slice(0, 10);
+      const liturgicalContext = await calendarService.getDailyLiturgicalContext(
+        institutionId,
+        eventDateIso,
+      );
+      if (liturgicalContext.fasting.tier !== FastingTier.NONE) {
+        throw new CanonicalValidationError('Marriage is not permitted during fasting periods.');
+      }
     }
 
     if (input.targetUserId) {

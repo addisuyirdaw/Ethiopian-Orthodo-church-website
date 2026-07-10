@@ -5,6 +5,8 @@ import {
   CalendarTradition,
   FastingTier,
   LiturgicalColor,
+  OrdinationRank,
+  CanonicalStatus,
 } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { assignHierarchyPath } from '../src/lib/hierarchy';
@@ -97,10 +99,15 @@ const USERS: SeedUserSpec[] = [
 async function clearDatabase(): Promise<void> {
   console.log('Clearing existing records in reverse dependency order...');
 
+  await prisma.marriageRegistry.deleteMany();
+  await prisma.sacramentalProfile.deleteMany();
+  await prisma.financialClearingLog.deleteMany();
   await prisma.ledgerSplitRecord.deleteMany();
   await prisma.financialTransaction.deleteMany();
   await prisma.liturgicalDay.deleteMany();
   await prisma.auditLog.deleteMany();
+  await prisma.clergyAssignmentHistory.deleteMany();
+  await prisma.clergyProfile.deleteMany();
   await prisma.sacramentalRecord.deleteMany();
   await prisma.user.deleteMany();
 
@@ -108,7 +115,7 @@ async function clearDatabase(): Promise<void> {
   while (remaining > 0) {
     const deleted = await prisma.institution.deleteMany({
       where: {
-        childInstitutions: { none: {} },
+        children: { none: {} },
       },
     });
 
@@ -132,7 +139,8 @@ async function createInstitution(
     data: {
       name: spec.name,
       type: spec.type,
-      parentInstitutionId: parentId,
+      institutionType: spec.type,
+      parentId: parentId,
       hierarchyPath: '/pending/',
     },
   });
@@ -164,7 +172,7 @@ async function seedUsers(institutionIds: Map<string, string>): Promise<void> {
       throw new Error(`Institution key not found for user ${spec.email}: ${spec.institutionKey}`);
     }
 
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         email: spec.email,
         passwordHash,
@@ -173,6 +181,25 @@ async function seedUsers(institutionIds: Map<string, string>): Promise<void> {
         institutionId,
       },
     });
+
+    let rank: OrdinationRank | null = null;
+    if (spec.role === EcclesiasticalRole.PATRIARCH) rank = OrdinationRank.PATRIARCH;
+    else if (spec.role === EcclesiasticalRole.ARCHBISHOP) rank = OrdinationRank.METROPOLITAN;
+    else if (spec.role === EcclesiasticalRole.BISHOP) rank = OrdinationRank.BISHOP;
+    else if (spec.role === EcclesiasticalRole.PRIEST) rank = OrdinationRank.PRIEST;
+    else if (spec.role === EcclesiasticalRole.DEACON) rank = OrdinationRank.DEACON;
+
+    if (rank) {
+      await prisma.clergyProfile.create({
+        data: {
+          userId: user.id,
+          ordinationRank: rank,
+          canonicalStatus: CanonicalStatus.ACTIVE_GOOD_STANDING,
+          ordinationDate: new Date('2018-09-11T00:00:00Z'),
+          currentAssignmentId: institutionId,
+        },
+      });
+    }
 
     console.log(`  Created ${spec.role}: ${spec.email}`);
   }
@@ -192,6 +219,7 @@ async function seedLiturgicalDays(): Promise<void> {
         titleI18n: {
           en: "Apostles' Fast",
           am: 'የሐዋርያት ጾም',
+          gez: 'ጾመ ሐዋርያት',
         },
         readingsI18n: {
           en: {
@@ -199,6 +227,10 @@ async function seedLiturgicalDays(): Promise<void> {
             gospel: 'Matthew 10:16-22',
           },
           am: {
+            epistle: 'ሮሜ 8:28-39',
+            gospel: 'ማቴዎስ 10:16-22',
+          },
+          gez: {
             epistle: 'ሮሜ 8:28-39',
             gospel: 'ማቴዎስ 10:16-22',
           },
@@ -212,11 +244,16 @@ async function seedLiturgicalDays(): Promise<void> {
         titleI18n: {
           en: 'Holy Pascha',
           el: 'Άγιο Πάσχα',
+          gez: 'ብርሃነ ፋሲካ',
         },
         readingsI18n: {
           en: {
             epistle: 'Acts 1:1-8',
             gospel: 'John 1:1-17',
+          },
+          gez: {
+            epistle: 'ግብረ ሐዋርያት 1:1-8',
+            gospel: 'ዮሐንስ 1:1-17',
           },
         },
       },
@@ -227,11 +264,16 @@ async function seedLiturgicalDays(): Promise<void> {
         liturgicalColor: LiturgicalColor.WHITE,
         titleI18n: {
           en: 'Bright Week',
+          gez: 'ሰሙነ ትንሣኤ',
         },
         readingsI18n: {
           en: {
             epistle: 'Acts 2:14-21',
             gospel: 'John 20:19-31',
+          },
+          gez: {
+            epistle: 'ግብረ ሐዋርያት 2:14-21',
+            gospel: 'ዮሐንስ 20:19-31',
           },
         },
       },

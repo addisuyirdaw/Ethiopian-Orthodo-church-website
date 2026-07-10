@@ -24,6 +24,9 @@ export class InstitutionService {
       nodeMap.set(node.id, {
         id: node.id,
         name: node.name,
+        nameEn: node.nameEn,
+        nameAm: node.nameAm,
+        nameGez: node.nameGez,
         type: node.type,
         hierarchyPath: node.hierarchyPath,
         children: [],
@@ -36,8 +39,8 @@ export class InstitutionService {
       if (node.id === root.id) continue;
 
       const current = nodeMap.get(node.id)!;
-      const parent = node.parentInstitutionId
-        ? nodeMap.get(node.parentInstitutionId)
+      const parent = node.parentId
+        ? nodeMap.get(node.parentId)
         : undefined;
 
       if (parent) {

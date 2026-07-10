@@ -45,6 +45,7 @@ enum PaymentGateway {
   CBE_BIRR
   STRIPE
   MANUAL_CASH
+  CHAPA
 }
 
 enum TransactionStatus {
@@ -80,25 +81,48 @@ enum LiturgicalColor {
 model Institution {
   id                  String            @id @default(uuid())
   name                String
+  nameEn              String?           @map("name_en")
+  nameAm              String?           @map("name_am")
+  nameGez             String?           @map("name_gez")
   type                InstitutionType
   calendarTradition   CalendarTradition @default(ETHIOPIAN_TEWAHEDO) @map("calendar_tradition")
-  parentInstitutionId String?           @map("parent_institution_id")
+  parentId            String?           @map("parent_institution_id")
   hierarchyPath       String            @map("hierarchy_path")
   deletedAt           DateTime?         @map("deleted_at")
   createdAt           DateTime          @default(now()) @map("created_at")
   updatedAt           DateTime          @updatedAt @map("updated_at")
+  institutionType     InstitutionType   @default(PARISH) @map("institution_type")
 
-  parentInstitution       Institution?           @relation("InstitutionHierarchy", fields: [parentInstitutionId], references: [id])
-  childInstitutions       Institution[]          @relation("InstitutionHierarchy")
-  users                   User[]
-  sacramentalRecords      SacramentalRecord[]
-  auditLogs               AuditLog[]
-  financialTransactions   FinancialTransaction[]
-  ledgerSplitDestinations LedgerSplitRecord[]    @relation("SplitDestination")
-  clergyAssignments       ClergyAssignment[]
+  parent                    Institution?              @relation("InstitutionHierarchy", fields: [parentId], references: [id])
+  children                  Institution[]             @relation("InstitutionHierarchy")
+  users                     User[]
+  sacramentalRecords        SacramentalRecord[]
+  auditLogs                 AuditLog[]
+  financialTransactions     FinancialTransaction[]
+  ledgerSplitDestinations   LedgerSplitRecord[]       @relation("SplitDestination")
+  clergyAssignments         ClergyAssignment[]
+  fromInstitutionHistories  ClergyAssignmentHistory[] @relation("FromInstitutionHistories")
+  toInstitutionHistories    ClergyAssignmentHistory[] @relation("ToInstitutionHistories")
+  assignedClergy            ClergyProfile[]           @relation("CurrentAssignment")
+  contributions             EcclesiasticalTransaction[]
+  supplyBatches             SupplyBatch[]
+  outgoingTransfers         SupplyTransfer[]          @relation("OutgoingTransfers")
+  incomingTransfers         SupplyTransfer[]          @relation("IncomingTransfers")
+  // Module 10 — Pastoral CRM
+  spiritualRosters          SpiritualRoster[]         @relation("TenantRosters")
+  catechumens               CatechumenRecord[]        @relation("TenantCatechumens")
+  // Module 11 — Hymnology
+  choirRosters              ChoirRoster[]             @relation("TenantChoirRosters")
+  // Module 13 — Ecclesiastical Court
+  canonicalCases            CanonicalCase[]           @relation("TenantCanonicalCases")
+  // Module 16 — Liturgical Alert Engine
+  alertSubscription         LiturgicalAlertSubscription? @relation("TenantAlertSubscription")
 
-  @@index([parentInstitutionId, deletedAt])
+  @@index([parentId, deletedAt])
+  @@index([parentId, institutionType])
   @@index([hierarchyPath])
+  @@index([id, nameAm])
+  @@index([id, nameGez])
   @@map("institutions")
 }
 
@@ -107,6 +131,12 @@ model User {
   email              String             @unique
   passwordHash       String             @map("password_hash")
   fullName           String             @map("full_name")
+  titleEn            String?            @map("title_en")
+  titleAm            String?            @map("title_am")
+  titleGez           String?            @map("title_gez")
+  nameEn             String?            @map("name_en")
+  nameAm             String?            @map("name_am")
+  nameGez            String?            @map("name_gez")
   ecclesiasticalRole EcclesiasticalRole @map("ecclesiastical_role")
   institutionId      String             @map("institution_id")
   deletedAt          DateTime?          @map("deleted_at")
@@ -118,8 +148,29 @@ model User {
   celebratedSacraments SacramentalRecord[] @relation("SacramentCelebrant")
   auditLogs            AuditLog[]          @relation("AuditActor")
   clergyAssignments    ClergyAssignment[]
+  authorizedSeals      SacramentSeal[]     @relation("SealAuthorizer")
+  clergyProfile        ClergyProfile?
+  contributions        EcclesiasticalTransaction[]
+  sentTransfers        SupplyTransfer[]    @relation("SentTransfers")
+  receivedTransfers    SupplyTransfer[]    @relation("ReceivedTransfers")
+  // Module 10 — Pastoral CRM
+  priestRosters        SpiritualRoster[]   @relation("PriestRosters")
+  spiritualChildRosters SpiritualRoster[]  @relation("SpiritualChildRosters")
+  catechumenRecords    CatechumenRecord[]  @relation("CatechumenRecords")
+  assignedCatechumens  CatechumenRecord[]  @relation("AssignedPriestRecords")
+  // Module 11 — Hymnology
+  choirMemberships     ChoirRoster[]       @relation("ChoirRosterMemberships")
+  // Module 12 — Synodal Analytics & Clergy Transfer
+  clergyUserHistories     ClergyAssignmentHistory[] @relation("ClergyUserHistories")
+  authorizedUserHistories ClergyAssignmentHistory[] @relation("AuthorizedUserHistories")
+  // Module 13 — Ecclesiastical Court
+  mediatorCases           CanonicalCase[]           @relation("MediatorCases")
+  targetStatusLogs        CanonicalStatusLog[]      @relation("TargetStatusLogs")
+  authorizedStatusLogs    CanonicalStatusLog[]      @relation("AuthorizedStatusLogs")
 
   @@index([institutionId, deletedAt])
+  @@index([id, nameAm])
+  @@index([id, nameGez])
   @@map("users")
 }
 
@@ -141,6 +192,7 @@ model SacramentalRecord {
   institution     Institution @relation(fields: [institutionId], references: [id])
   targetUser      User?       @relation("SacramentTarget", fields: [targetUserId], references: [id])
   celebrantPriest User        @relation("SacramentCelebrant", fields: [celebrantPriestId], references: [id])
+  seal            SacramentSeal?
 
   @@index([institutionId, deletedAt])
   @@index([type, institutionId])
@@ -241,3 +293,555 @@ model ClergyAssignment {
   @@index([userId, institutionId, assignedAt])
   @@map("clergy_assignments")
 }
+
+// ── Cryptographic Notarial Vault ──────────────────────────────────────────────
+
+/// Immutable cryptographic proof seal for a SacramentalRecord.
+/// Once created, it permanently locks the parent record against mutation.
+model SacramentSeal {
+  id                  String   @id @default(uuid())
+  sacramentalRecordId String   @unique @map("sacramental_record_id")
+  payloadHash         String   @map("payload_hash")
+  signature           String   @map("signature")
+  algorithm           String   @default("RSA-PSS-SHA256") @map("algorithm")
+  authorizedById      String   @map("authorized_by_id")
+  sealedAt            DateTime @default(now()) @map("sealed_at")
+
+  sacramentalRecord SacramentalRecord @relation(fields: [sacramentalRecordId], references: [id])
+  authorizedBy      User              @relation("SealAuthorizer", fields: [authorizedById], references: [id])
+
+  @@index([sacramentalRecordId])
+  @@index([authorizedById])
+  @@map("sacrament_seals")
+}
+
+// ── Clergy Placement & Canonical Status Ledger ───────────────────────────────
+
+enum OrdinationRank {
+  DEACON
+  PRIEST
+  ARCHPRIEST
+  BISHOP
+  METROPOLITAN
+  PATRIARCH
+}
+
+enum CanonicalStatus {
+  ACTIVE_GOOD_STANDING
+  SUSPENDED
+  RETIRED
+  LAICIZED
+}
+
+model ClergyProfile {
+  id                  String                    @id @default(uuid())
+  userId              String                    @unique @map("user_id")
+  ordinationRank      OrdinationRank            @map("ordination_rank")
+  canonicalStatus     CanonicalStatus           @map("canonical_status")
+  ordinationDate      DateTime                  @map("ordination_date")
+  ordainedByClergyId  String?                   @map("ordained_by_clergy_id")
+  currentAssignmentId String?                   @map("current_assignment_id")
+  titleEn             String?                   @map("title_en")
+  titleAm             String?                   @map("title_am")
+  titleGez            String?                   @map("title_gez")
+  nameEn              String?                   @map("name_en")
+  nameAm              String?                   @map("name_am")
+  nameGez             String?                   @map("name_gez")
+  createdAt           DateTime                  @default(now()) @map("created_at")
+  updatedAt           DateTime                  @updatedAt @map("updated_at")
+
+  user              User                      @relation(fields: [userId], references: [id])
+  ordainedBy        ClergyProfile?            @relation("OrdinationLineage", fields: [ordainedByClergyId], references: [id])
+  ordinations       ClergyProfile[]           @relation("OrdinationLineage")
+  currentAssignment Institution?              @relation("CurrentAssignment", fields: [currentAssignmentId], references: [id])
+  synodBallots      SynodBallot[]
+
+  @@index([id, nameAm])
+  @@index([id, nameGez])
+  @@map("clergy_profiles")
+}
+
+model ClergyAssignmentHistory {
+  id                 String    @id @default(uuid())
+  clergyUserId       String    @map("clergy_user_id")
+  fromInstitutionId  String?   @map("from_institution_id")
+  toInstitutionId    String    @map("to_institution_id")
+  startDate          DateTime  @map("start_date")
+  endDate            DateTime? @map("end_date")
+  authorizedByUserId String    @map("authorized_by_user_id")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  clergyUser       User         @relation("ClergyUserHistories", fields: [clergyUserId], references: [id])
+  fromInstitution  Institution? @relation("FromInstitutionHistories", fields: [fromInstitutionId], references: [id])
+  toInstitution    Institution  @relation("ToInstitutionHistories", fields: [toInstitutionId], references: [id])
+  authorizedByUser User         @relation("AuthorizedUserHistories", fields: [authorizedByUserId], references: [id])
+
+  @@map("clergy_assignment_histories")
+}
+
+enum DecreeStatus {
+  DRAFT
+  ACTIVE_VOTING
+  PASSED
+  REJECTED
+  RESCINDED
+}
+
+enum BallotChoice {
+  APPROVE
+  REJECT
+  ABSTAIN
+}
+
+model SynodDecree {
+  id                String         @id @default(uuid())
+  title             String
+  content           String
+  status            DecreeStatus   @default(DRAFT)
+  quorumRequired    Int            @default(3) @map("quorum_required")
+  passingPercentage Int            @default(50) @map("passing_percentage")
+  expiresAt         DateTime       @map("expires_at")
+  createdAt         DateTime       @default(now()) @map("created_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+  ballots           SynodBallot[]
+
+  @@map("synod_decrees")
+}
+
+model SynodBallot {
+  id        String       @id @default(uuid())
+  decreeId  String       @map("decree_id")
+  clerkId   String       @map("clerk_id")
+  choice    BallotChoice
+  castAt    DateTime     @default(now()) @map("cast_at")
+  decree    SynodDecree  @relation(fields: [decreeId], references: [id], onDelete: Cascade)
+  clerk     ClergyProfile @relation(fields: [clerkId], references: [id], onDelete: Restrict)
+
+  @@unique([decreeId, clerkId])
+  @@map("synod_ballots")
+}
+
+// ── Alms, Tithes & Votive Offerings FinTech Engine ───────────────────────────
+
+enum OfferingCategory {
+  TITHE
+  FIRST_FRUITS
+  VOTIVE_VOW
+  ALMS_POOR
+  MONASTERY_SPONSORSHIP
+  GENERAL_OFFERING
+}
+
+/// Extended status enum for ecclesiastical contributions.
+/// Named ContributionStatus to avoid collision with the legacy TransactionStatus.
+enum ContributionStatus {
+  PENDING
+  SETTLED
+  FAILED
+  REFUNDED
+}
+
+model EcclesiasticalTransaction {
+  id               String             @id @default(uuid())
+  tenantId         String             @map("tenant_id")
+  donorUserId      String?            @map("donor_user_id")
+  amount           Decimal            @db.Decimal(19, 4)
+  currency         String             @default("ETB")
+  category         OfferingCategory
+  paymentGateway   String             @map("payment_gateway")
+  gatewayReference String             @unique @map("gateway_reference")
+  status           ContributionStatus @default(PENDING)
+  vowDetails       String?            @map("vow_details") @db.Text
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+
+  tenant           Institution        @relation(fields: [tenantId], references: [id])
+  donor            User?              @relation(fields: [donorUserId], references: [id])
+
+  @@index([tenantId, category, status])
+  @@map("ecclesiastical_transactions")
+}
+
+// ── Holy Muron & Sacrament Supply Chain ──────────────────────────────────────
+
+enum SupplyType {
+  HOLY_MURON
+  LITURGICAL_OIL
+  INCENSE
+  COMMUNION_BREAD
+  ALTAR_WINE
+  BAPTISMAL_WATER
+  SACRAMENTAL_CANDLES
+}
+
+enum TransferStatus {
+  REQUESTED
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+}
+
+/// A batch of sacramental supplies held by an institution.
+/// quantity tracks available stock; reservedQuantity holds the portion
+/// currently allocated to in-transit outgoing transfers.
+model SupplyBatch {
+  id              String      @id @default(uuid())
+  institutionId   String      @map("institution_id")
+  supplyType      SupplyType  @map("supply_type")
+  batchCode       String      @unique @map("batch_code")
+  quantity        Int
+  reservedQuantity Int        @default(0) @map("reserved_quantity")
+  unitOfMeasure   String      @map("unit_of_measure")
+  blessedAt       DateTime?   @map("blessed_at")
+  expiresAt       DateTime?   @map("expires_at")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  institution Institution    @relation(fields: [institutionId], references: [id])
+  outgoing    SupplyTransfer[] @relation("SourceBatch")
+
+  @@index([institutionId, supplyType])
+  @@index([batchCode])
+  @@map("supply_batches")
+}
+
+/// A tracked movement of sacramental supplies between two institutions.
+/// References the originating SupplyBatch and records sender/receiver user actors.
+model SupplyTransfer {
+  id                  String         @id @default(uuid())
+  batchId             String         @map("batch_id")
+  fromInstitutionId   String         @map("from_institution_id")
+  toInstitutionId     String         @map("to_institution_id")
+  senderUserId        String         @map("sender_user_id")
+  receiverUserId      String?        @map("receiver_user_id")
+  quantityTransferred Int            @map("quantity_transferred")
+  status              TransferStatus @default(REQUESTED)
+  transferNote        String?        @map("transfer_note") @db.Text
+  dispatchedAt        DateTime?      @map("dispatched_at")
+  deliveredAt         DateTime?      @map("delivered_at")
+  createdAt           DateTime       @default(now()) @map("created_at")
+  updatedAt           DateTime       @updatedAt @map("updated_at")
+
+  batch           SupplyBatch  @relation("SourceBatch", fields: [batchId], references: [id])
+  fromInstitution Institution  @relation("OutgoingTransfers", fields: [fromInstitutionId], references: [id])
+  toInstitution   Institution  @relation("IncomingTransfers", fields: [toInstitutionId], references: [id])
+  sender          User         @relation("SentTransfers", fields: [senderUserId], references: [id])
+  receiver        User?        @relation("ReceivedTransfers", fields: [receiverUserId], references: [id])
+
+  @@index([batchId])
+  @@index([fromInstitutionId, status])
+  @@index([toInstitutionId, status])
+  @@map("supply_transfers")
+}
+
+// ── Spiritual Fatherhood & Catechumen Discipleship CRM (Module 10) ────────────
+
+enum CatechismStatus {
+  ENROLLED
+  INSTRUCTION
+  EXAMINATION
+  READY_FOR_BAPTISM
+  BAPTIZED
+}
+
+enum CounselingType {
+  INTRODUCTORY
+  REGULAR_CONFESSION
+  CANONICAL_REVIEW
+  PRE_MARITAL
+}
+
+/// Maps a one-to-one spiritual-father/child relationship within a tenant.
+/// The composite unique constraint prevents duplicate assignments.
+model SpiritualRoster {
+  id                    String   @id @default(uuid())
+  tenantId              String   @map("tenant_id")
+  priestUserId          String   @map("priest_user_id")
+  spiritualChildUserId  String   @map("spiritual_child_user_id")
+  establishedAt         DateTime @default(now()) @map("established_at")
+
+  tenant         Institution           @relation("TenantRosters", fields: [tenantId], references: [id])
+  priest         User                  @relation("PriestRosters", fields: [priestUserId], references: [id])
+  spiritualChild User                  @relation("SpiritualChildRosters", fields: [spiritualChildUserId], references: [id])
+  counselingLogs PastoralCounselingLog[]
+
+  @@unique([priestUserId, spiritualChildUserId])
+  @@index([tenantId, priestUserId])
+  @@map("spiritual_rosters")
+}
+
+/// Privacy-first confession metadata log scoped to a SpiritualRoster.
+/// Sensitive pastoral content is stored encrypted in encryptedNextSteps.
+model PastoralCounselingLog {
+  id                 String         @id @default(uuid())
+  rosterId           String         @map("roster_id")
+  date               DateTime
+  type               CounselingType
+  isCanonFulfilled   Boolean        @default(true) @map("is_canon_fulfilled")
+  encryptedNextSteps String?        @map("encrypted_next_steps") @db.Text
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+
+  roster SpiritualRoster @relation(fields: [rosterId], references: [id])
+
+  @@index([rosterId, date])
+  @@map("pastoral_counseling_logs")
+}
+
+/// Tracks a convert's journey through the catechumenate programme.
+model CatechumenRecord {
+  id                  String          @id @default(uuid())
+  tenantId            String          @map("tenant_id")
+  userId              String          @map("user_id")
+  status              CatechismStatus @default(ENROLLED)
+  assignedPriestId    String?         @map("assigned_priest_id")
+  instructorNotes     String?         @map("instructor_notes") @db.Text
+  expectedBaptismDate DateTime?       @map("expected_baptism_date")
+  createdAt           DateTime        @default(now()) @map("created_at")
+  updatedAt           DateTime        @updatedAt @map("updated_at")
+
+  tenant         Institution @relation("TenantCatechumens", fields: [tenantId], references: [id])
+  catechumen     User        @relation("CatechumenRecords", fields: [userId], references: [id])
+  assignedPriest User?       @relation("AssignedPriestRecords", fields: [assignedPriestId], references: [id])
+
+  @@index([tenantId, status])
+  @@index([userId])
+  @@map("catechumen_records")
+}
+
+// ── Sacred Music, Chant & Hymnology Archive (Module 11) ──────────────────────
+
+enum MelodicMode {
+  GEEZ
+  EZL
+  ARARAY
+  MULTIPLE
+}
+
+enum HymnCategory {
+  MAHLET
+  WEREB
+  KEDASSE
+  SUNDAY_SCHOOL_HYMN
+}
+
+/// A canonical Saint Yared chant or sacred composition stored in the archive.
+/// lyricsGeez is the authoritative Ge'ez source text; all other fields are optional metadata.
+model SacredComposition {
+  id              String       @id @default(uuid())
+  titleAmharic    String       @map("title_amharic")
+  titleEnglish    String?      @map("title_english")
+  lyricsGeez      String       @map("lyrics_geez") @db.Text
+  mode            MelodicMode
+  category        HymnCategory
+  audioUrl        String?      @map("audio_url")
+  notationUrl     String?      @map("notation_url")
+  associatedFeast String?      @map("associated_feast")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  @@index([category, mode])
+  @@index([associatedFeast])
+  @@map("sacred_compositions")
+}
+
+/// Maps a User to a parish choir roster within a tenant.
+/// Composite unique prevents duplicate user registrations per choir.
+model ChoirRoster {
+  id          String   @id @default(uuid())
+  tenantId    String   @map("tenant_id")
+  userId      String   @map("user_id")
+  choirPart   String   @map("choir_part")
+  role        String   @default("MEMBER")
+  joinedAt    DateTime @default(now()) @map("joined_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  tenant Institution @relation("TenantChoirRosters", fields: [tenantId], references: [id])
+  member User        @relation("ChoirRosterMemberships", fields: [userId], references: [id])
+
+  @@unique([tenantId, userId])
+  @@index([tenantId, role])
+  @@map("choir_rosters")
+}
+
+// ── Ecclesiastical Court & Canonical Mediation (Module 13) ───────────────────
+
+enum CaseType {
+  MATRIMONIAL_DISPUTE
+  PROPERTY_ARBITRATION
+  CLERGY_DISCIPLINARY
+  GENERAL_MEDIATION
+}
+
+enum CaseStatus {
+  FILED
+  UNDER_MEDIATION
+  ESCALATED_TO_DIOCESE
+  RESOLVED
+  ARCHIVED
+}
+
+enum CanonicalStanding {
+  ACTIVE_GOOD_STANDING
+  SUSPENDED_TEMPORARY
+  LAICIZED
+  UNDER_INVESTIGATION
+}
+
+/// An Ecclesiastical Court canonical case.
+/// Sensitive details (partiesInvolvedEncrypted) must be stored encrypted.
+model CanonicalCase {
+  id                      String     @id @default(uuid())
+  tenantId                String     @map("tenant_id")
+  caseNumber              String     @unique @map("case_number")
+  caseType                CaseType   @map("case_type")
+  currentStatus           CaseStatus @default(FILED) @map("current_status")
+  partiesInvolvedEncrypted String     @map("parties_involved_encrypted") @db.Text
+  assignedMediatorUserId  String?    @map("assigned_mediator_user_id")
+  createdAt               DateTime   @default(now()) @map("created_at")
+  updatedAt               DateTime   @updatedAt @map("updated_at")
+
+  tenant           Institution @relation("TenantCanonicalCases", fields: [tenantId], references: [id])
+  assignedMediator User?       @relation("MediatorCases", fields: [assignedMediatorUserId], references: [id])
+
+  @@index([tenantId, caseType, currentStatus])
+  @@map("canonical_cases")
+}
+
+/// Tracks the canonical standing status changes of ecclesiastical personnel.
+model CanonicalStatusLog {
+  id                 String            @id @default(uuid())
+  targetUserId       String            @unique @map("target_user_id")
+  standingType       CanonicalStanding @map("standing_type")
+  canonicalReason    String            @map("canonical_reason") @db.Text
+  authorizedByUserId String            @map("authorized_by_user_id")
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+
+  targetUser       User @relation("TargetStatusLogs", fields: [targetUserId], references: [id])
+  authorizedByUser User @relation("AuthorizedStatusLogs", fields: [authorizedByUserId], references: [id])
+
+  @@map("canonical_status_logs")
+}
+
+// ── Centralized Split-Fee Clearinghouse (Module 14) ───────────────────────────
+
+/// Lifecycle states for a clearinghouse settlement record.
+enum ClearingStatus {
+  PENDING
+  SETTLED
+  FAILED
+}
+
+/// Immutable settlement record produced by the clearinghouse engine for each
+/// inbound payment webhook. Stores the four-way split breakdown with full
+/// Decimal(19,4) precision so that no cent is ever lost to rounding.
+model FinancialClearingLog {
+  id                String         @id @default(uuid())
+  tenantId          String         @map("tenant_id")
+  referenceNumber   String         @unique @map("reference_number")
+  totalAmount       Decimal        @map("total_amount") @db.Decimal(19, 4)
+  currency          String
+  gateway           PaymentGateway
+  parishShare       Decimal        @map("parish_share") @db.Decimal(19, 4)
+  dioceseShare      Decimal        @map("diocese_share") @db.Decimal(19, 4)
+  patriarchateShare Decimal        @map("patriarchate_share") @db.Decimal(19, 4)
+  platformFee       Decimal        @map("platform_fee") @db.Decimal(19, 4)
+  status            ClearingStatus @default(PENDING)
+  createdAt         DateTime       @default(now()) @map("created_at")
+
+  @@index([tenantId, status, createdAt])
+  @@map("financial_clearing_logs")
+}
+
+// ── Sacramental Traceability Matrix (Module 15) ────────────────────────────────
+
+/// Canonical civil and ecclesiastical status of a baptized individual.
+/// Drives the marriage eligibility guard in verifyAndRegisterMarriage.
+enum CanonicalProfileStatus {
+  SINGLE
+  MARRIED
+  CLERGY
+  WIDOWED
+  MONASTIC
+}
+
+/// Permanent baptismal identity record for every Orthodox Christian
+/// registered in the OrthodoxConnect network.
+/// `sacramentalId` is a deterministic system-generated reference (OC-REG-YEAR-RANDOM)
+/// that serves as the canonical cross-parish identity token.
+model SacramentalProfile {
+  id                  String                @id @default(uuid())
+  sacramentalId       String                @unique @map("sacramental_id")
+  firstName           String                @map("first_name")
+  lastName            String                @map("last_name")
+  firstNameAm         String?               @map("first_name_am")
+  lastNameAm          String?               @map("last_name_am")
+  firstNameGez        String?               @map("first_name_gez")
+  lastNameGez         String?               @map("last_name_gez")
+  christianName       String                @map("christian_name")
+  baptismDate         DateTime              @map("baptism_date")
+  baptizingPriestId   String                @map("baptizing_priest_id")
+  parishId            String                @map("parish_id")
+  canonicalStatus     CanonicalProfileStatus @default(SINGLE) @map("canonical_status")
+  createdAt           DateTime              @default(now()) @map("created_at")
+
+  // Marriage relations — a profile can appear as husband OR wife in at most one active registry
+  marriageAsHusband MarriageRegistry? @relation("HusbandProfile")
+  marriageAsWife    MarriageRegistry? @relation("WifeProfile")
+
+  @@index([sacramentalId, canonicalStatus])
+  @@index([parishId, canonicalStatus])
+  @@map("sacramental_profiles")
+}
+
+/// Ecclesiastical marriage registration linking two SacramentalProfile records.
+/// Both profile sides are unique — enforcing one-active-marriage-per-person at
+/// the database level, independently of the service-layer canonical guard.
+model MarriageRegistry {
+  id                  String    @id @default(uuid())
+  husbandProfileId    String    @unique @map("husband_profile_id")
+  wifeProfileId       String    @unique @map("wife_profile_id")
+  marriageDate        DateTime  @map("marriage_date")
+  officiatingPriestId String    @map("officiating_priest_id")
+  parishId            String    @map("parish_id")
+  witnessNames        String[]  @map("witness_names")
+  createdAt           DateTime  @default(now()) @map("created_at")
+
+  husbandProfile SacramentalProfile @relation("HusbandProfile", fields: [husbandProfileId], references: [id])
+  wifeProfile    SacramentalProfile @relation("WifeProfile",   fields: [wifeProfileId],   references: [id])
+
+  @@index([parishId, marriageDate])
+  @@map("marriage_registries")
+}
+
+// ── Canonical Feast Day Notification & Liturgical Alert Engine (Module 16) ────
+
+/// Minimum fasting tier required to include a day in a tenant's alert digest.
+/// ANY = all feast / fasting days; MODERATE_AND_ABOVE = excludes WINE_OIL and
+/// FISH_ALLOWED; STRICT_ONLY = only the most severe fasting observances.
+enum AlertFastingThreshold {
+  ANY
+  MODERATE_AND_ABOVE
+  STRICT_ONLY
+}
+
+/// Per-tenant subscription record controlling which feast days trigger alerts
+/// and how far ahead the engine looks when building the digest.
+/// One row per institution (@@unique on tenantId).
+model LiturgicalAlertSubscription {
+  id                String                 @id @default(uuid())
+  tenantId          String                 @unique @map("tenant_id")
+  lookAheadDays     Int                    @default(7) @map("look_ahead_days")
+  fastingThreshold  AlertFastingThreshold  @default(ANY) @map("fasting_threshold")
+  isEnabled         Boolean                @default(true) @map("is_enabled")
+  createdAt         DateTime               @default(now()) @map("created_at")
+  updatedAt         DateTime               @updatedAt @map("updated_at")
+
+  tenant Institution @relation("TenantAlertSubscription", fields: [tenantId], references: [id])
+
+  @@index([tenantId, isEnabled])
+  @@map("liturgical_alert_subscriptions")
+}
+

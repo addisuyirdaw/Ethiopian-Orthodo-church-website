@@ -6,6 +6,12 @@ export interface UserWithInstitution {
   email: string;
   passwordHash: string;
   fullName: string;
+  titleEn: string | null;
+  titleAm: string | null;
+  titleGez: string | null;
+  nameEn: string | null;
+  nameAm: string | null;
+  nameGez: string | null;
   ecclesiasticalRole: EcclesiasticalRole;
   institutionId: string;
   institution: {
@@ -13,6 +19,9 @@ export interface UserWithInstitution {
     hierarchyPath: string;
     type: InstitutionType;
     deletedAt: Date | null;
+    nameEn: string | null;
+    nameAm: string | null;
+    nameGez: string | null;
   };
 }
 
@@ -28,6 +37,12 @@ export class UserRepository {
         email: true,
         passwordHash: true,
         fullName: true,
+        titleEn: true,
+        titleAm: true,
+        titleGez: true,
+        nameEn: true,
+        nameAm: true,
+        nameGez: true,
         ecclesiasticalRole: true,
         institutionId: true,
         institution: {
@@ -36,10 +51,13 @@ export class UserRepository {
             hierarchyPath: true,
             type: true,
             deletedAt: true,
+            nameEn: true,
+            nameAm: true,
+            nameGez: true,
           },
         },
       },
-    });
+    }) as Promise<UserWithInstitution | null>;
   }
 }
 

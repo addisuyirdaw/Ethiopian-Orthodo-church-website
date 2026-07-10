@@ -1,4 +1,4 @@
-import { EcclesiasticalRole, SacramentalType } from '@prisma/client';
+import { EcclesiasticalRole, SacramentalType, FastingTier } from '@prisma/client';
 import { SacramentalRecordService } from '../../src/services/sacramental-record.service';
 import { sacramentalRecordRepository } from '../../src/repositories/sacramental-record.repository';
 import { auditLogRepository } from '../../src/repositories/audit-log.repository';
@@ -6,6 +6,20 @@ import { institutionRepository } from '../../src/repositories/institution.reposi
 import prisma from '../../src/lib/prisma';
 import { AuthenticatedUser } from '../../src/types';
 import { CreateSacramentInput } from '../../src/validators/sacrament.validator';
+import { calendarService } from '../../src/services/calendar.service';
+import { clergyLedgerService } from '../../src/services/clergy/clergy-ledger.service';
+
+jest.mock('../../src/services/calendar.service', () => ({
+  calendarService: {
+    getDailyLiturgicalContext: jest.fn(),
+  },
+}));
+
+jest.mock('../../src/services/clergy/clergy-ledger.service', () => ({
+  clergyLedgerService: {
+    verifyClergySacramentalAuthority: jest.fn(),
+  },
+}));
 
 jest.mock('../../src/lib/prisma', () => ({
   __esModule: true,
@@ -41,6 +55,8 @@ const mockUserFindFirst = prisma.user.findFirst as jest.Mock;
 const mockSacramentCreate = sacramentalRecordRepository.create as jest.Mock;
 const mockAuditCreate = auditLogRepository.create as jest.Mock;
 const mockInstitutionFindById = institutionRepository.findById as jest.Mock;
+const mockGetDailyLiturgicalContext = calendarService.getDailyLiturgicalContext as jest.Mock;
+const mockVerifyClergySacramentalAuthority = clergyLedgerService.verifyClergySacramentalAuthority as jest.Mock;
 
 describe('SacramentalRecordService', () => {
   let service: SacramentalRecordService;
@@ -85,6 +101,7 @@ describe('SacramentalRecordService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockVerifyClergySacramentalAuthority.mockResolvedValue(true);
     service = new SacramentalRecordService();
   });
 
@@ -152,6 +169,76 @@ describe('SacramentalRecordService', () => {
         name: 'NotFoundError',
         message: 'Celebrant priest not found in this institution.',
       });
+    });
+
+    it('throws CanonicalValidationError when registering a marriage during a fasting period', async () => {
+      mockInstitutionFindById.mockResolvedValue({ id: 'inst-parish-12' });
+      mockUserFindFirst.mockResolvedValue({ id: 'priest-user-1', institutionId: 'inst-parish-12' });
+      mockGetDailyLiturgicalContext.mockResolvedValue({
+        fasting: {
+          tier: FastingTier.STRICT,
+          title: "Apostles' Fast",
+        },
+      });
+
+      const marriageInput: CreateSacramentInput = {
+        ...validInput,
+        type: SacramentalType.MARRIAGE,
+      };
+
+      await expect(service.create(priestUser, marriageInput)).rejects.toMatchObject({
+        name: 'CanonicalValidationError',
+        statusCode: 422,
+        message: 'Marriage is not permitted during fasting periods.',
+      });
+    });
+
+    it('allows registering a marriage when it is not a fasting period', async () => {
+      mockInstitutionFindById.mockResolvedValue({ id: 'inst-parish-12' });
+      mockUserFindFirst.mockResolvedValue({ id: 'priest-user-1', institutionId: 'inst-parish-12' });
+      mockGetDailyLiturgicalContext.mockResolvedValue({
+        fasting: {
+          tier: FastingTier.NONE,
+          title: 'Ordinary Time',
+        },
+      });
+      mockTransaction.mockImplementation(async (callback) => {
+        mockSacramentCreate.mockResolvedValue({
+          ...createdRecord,
+          type: SacramentalType.MARRIAGE,
+        });
+        mockAuditCreate.mockResolvedValue({ id: 'audit-1' });
+        return callback({});
+      });
+
+      const marriageInput: CreateSacramentInput = {
+        ...validInput,
+        type: SacramentalType.MARRIAGE,
+      };
+
+      const result = await service.create(priestUser, marriageInput);
+      expect(result.type).toBe(SacramentalType.MARRIAGE);
+      expect(mockSacramentCreate).toHaveBeenCalledTimes(1);
+    });
+
+    it('allows registering a non-marriage sacrament during a fasting period', async () => {
+      mockInstitutionFindById.mockResolvedValue({ id: 'inst-parish-12' });
+      mockUserFindFirst.mockResolvedValue({ id: 'priest-user-1', institutionId: 'inst-parish-12' });
+      mockGetDailyLiturgicalContext.mockResolvedValue({
+        fasting: {
+          tier: FastingTier.STRICT,
+          title: "Apostles' Fast",
+        },
+      });
+      mockTransaction.mockImplementation(async (callback) => {
+        mockSacramentCreate.mockResolvedValue(createdRecord);
+        mockAuditCreate.mockResolvedValue({ id: 'audit-1' });
+        return callback({});
+      });
+
+      const result = await service.create(priestUser, validInput);
+      expect(result.type).toBe(SacramentalType.BAPTISM);
+      expect(mockSacramentCreate).toHaveBeenCalledTimes(1);
     });
   });
 

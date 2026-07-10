@@ -14,6 +14,22 @@ export interface LoginResult {
     email: string;
     ecclesiastical_role: string;
     institution_id: string;
+    fullName: string;
+    isSuperAdmin?: boolean;
+    titleEn?: string | null;
+    titleAm?: string | null;
+    titleGez?: string | null;
+    nameEn?: string | null;
+    nameAm?: string | null;
+    nameGez?: string | null;
+    institution?: {
+      id: string;
+      hierarchyPath: string;
+      type: string;
+      nameEn?: string | null;
+      nameAm?: string | null;
+      nameGez?: string | null;
+    };
   };
 }
 
@@ -39,6 +55,7 @@ export class AuthService {
       institution_id: user.institutionId,
       hierarchy_path: user.institution.hierarchyPath,
       ecclesiastical_role: user.ecclesiasticalRole,
+      isSuperAdmin: user.ecclesiasticalRole === 'PATRIARCH',
     };
 
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRY });
@@ -50,6 +67,22 @@ export class AuthService {
         email: user.email,
         ecclesiastical_role: user.ecclesiasticalRole,
         institution_id: user.institutionId,
+        fullName: user.fullName,
+        isSuperAdmin: user.ecclesiasticalRole === 'PATRIARCH',
+        titleEn: user.titleEn,
+        titleAm: user.titleAm,
+        titleGez: user.titleGez,
+        nameEn: user.nameEn,
+        nameAm: user.nameAm,
+        nameGez: user.nameGez,
+        institution: {
+          id: user.institution.id,
+          hierarchyPath: user.institution.hierarchyPath,
+          type: user.institution.type,
+          nameEn: user.institution.nameEn,
+          nameAm: user.institution.nameAm,
+          nameGez: user.institution.nameGez,
+        },
       },
     };
   }
