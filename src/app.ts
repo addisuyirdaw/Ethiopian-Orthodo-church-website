@@ -42,11 +42,11 @@ export function createApp(): Application {
   app.use(localeMiddleware);
 
   // Serve static files from 'public' directory
-  app.use(express.static(path.join(process.cwd(), 'public')));
+  app.use(express.static(path.join(__dirname, '..', 'public')));
 
   // Render index.html at /dashboard
   app.get('/dashboard', (_req: Request, res: Response) => {
-    res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
   });
 
   // Root welcome route redirects or shows API welcome page
