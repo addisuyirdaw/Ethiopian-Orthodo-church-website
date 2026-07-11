@@ -117,6 +117,10 @@ model Institution {
   canonicalCases            CanonicalCase[]           @relation("TenantCanonicalCases")
   // Module 16 — Liturgical Alert Engine
   alertSubscription         LiturgicalAlertSubscription? @relation("TenantAlertSubscription")
+  // Module 16 — Monastic Estates & Sacred Artifacts Ledger
+  artifacts                 Artifact[]                @relation("InstitutionArtifacts")
+  monasticEstates           MonasticEstate[]           @relation("InstitutionMonasticEstates")
+  mimens                    Mimen[]                   @relation("TenantMimens")
 
   @@index([parentId, deletedAt])
   @@index([parentId, institutionType])
@@ -167,6 +171,10 @@ model User {
   mediatorCases           CanonicalCase[]           @relation("MediatorCases")
   targetStatusLogs        CanonicalStatusLog[]      @relation("TargetStatusLogs")
   authorizedStatusLogs    CanonicalStatusLog[]      @relation("AuthorizedStatusLogs")
+  // Module 16 — Monastic Estates & Sacred Artifacts Ledger
+  artifactInspections     ArtifactAuditLog[]        @relation("ArtifactInspections")
+  mimenChildren           Mimen[]                   @relation("PriestMimens")
+
 
   @@index([institutionId, deletedAt])
   @@index([id, nameAm])
@@ -845,3 +853,120 @@ model LiturgicalAlertSubscription {
   @@map("liturgical_alert_subscriptions")
 }
 
+// ── Monastic Estates & Sacred Artifacts Ledger (Module 16) ────────────────────
+
+enum ArtifactCategory {
+  MANUSCRIPT
+  CROSS
+  VESTMENT
+  LITURGICAL_VESSEL
+}
+
+enum StructuralCondition {
+  EXCELLENT
+  GOOD
+  NEEDS_RESTORATION
+  CRITICAL
+}
+
+/// A historic sacred artifact (manuscript, cross, vestment, liturgical vessel)
+/// registered under a specific institution and tracked across inspections.
+model Artifact {
+  id                 String             @id @default(uuid())
+  institutionId      String             @map("institution_id")
+  nameEn             String             @map("name_en")
+  nameAm             String?            @map("name_am")
+  nameGez            String?            @map("name_gez")
+  category           ArtifactCategory
+  structuralCondition StructuralCondition @map("structural_condition")
+  estimatedAge       Int?               @map("estimated_age")
+  storageLocation    String             @map("storage_location")
+  isActive           Boolean            @default(true) @map("is_active")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+
+  institution        Institution        @relation("InstitutionArtifacts", fields: [institutionId], references: [id])
+  inspectionLogs     ArtifactAuditLog[]
+
+  @@index([institutionId, category])
+  @@index([institutionId, structuralCondition])
+  @@index([institutionId, isActive])
+  @@map("artifacts")
+}
+
+/// Tracks physical condition inspections of a registered Artifact over time.
+/// Each row is an immutable snapshot of one inspection event.
+model ArtifactAuditLog {
+  id                    String             @id @default(uuid())
+  artifactId            String             @map("artifact_id")
+  inspectedByUserId     String             @map("inspected_by_user_id")
+  conditionAtInspection StructuralCondition @map("condition_at_inspection")
+  inspectionNotes       String?            @map("inspection_notes") @db.Text
+  inspectedAt           DateTime           @map("inspected_at")
+  createdAt             DateTime           @default(now()) @map("created_at")
+
+  artifact              Artifact           @relation(fields: [artifactId], references: [id])
+  inspectedBy           User               @relation("ArtifactInspections", fields: [inspectedByUserId], references: [id])
+
+  @@index([artifactId, inspectedAt])
+  @@index([inspectedByUserId])
+  @@map("artifact_audit_logs")
+}
+
+/// A GPS-bounded monastic land holding registered under an institution.
+/// Legal deed status and utilization notes are free-text to accommodate
+/// varied Ethiopian land-tenure documentation formats.
+model MonasticEstate {
+  id                 String   @id @default(uuid())
+  institutionId      String   @map("institution_id")
+  estateName         String   @map("estate_name")
+  landAreaHectares   Decimal  @map("land_area_hectares") @db.Decimal(12, 4)
+  gpsLatitude        Decimal  @map("gps_latitude") @db.Decimal(10, 7)
+  gpsLongitude       Decimal  @map("gps_longitude") @db.Decimal(10, 7)
+  legalDeedStatus    String   @map("legal_deed_status")
+  currentUtilization String   @map("current_utilization") @db.Text
+  isActive           Boolean  @default(true) @map("is_active")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  institution        Institution @relation("InstitutionMonasticEstates", fields: [institutionId], references: [id])
+
+  @@index([institutionId, isActive])
+  @@map("monastic_estates")
+}
+
+model Mimen {
+  id               String          @id @default(uuid())
+  phone            String          @unique
+  fullName         String          @map("full_name")
+  christianName    String?         @map("christian_name")
+  passwordHash     String          @map("password_hash")
+  tenantId         String          @map("tenant_id")
+  assignedPriestId String?         @map("assigned_priest_id")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+
+  tenant           Institution     @relation("TenantMimens", fields: [tenantId], references: [id])
+  assignedPriest   User?           @relation("PriestMimens", fields: [assignedPriestId], references: [id])
+  payments         PaymentLedger[]
+
+  @@index([tenantId])
+  @@index([assignedPriestId])
+  @@map("mimens")
+}
+
+model PaymentLedger {
+  id          String   @id @default(uuid())
+  mimenId     String   @map("mimen_id")
+  amount      Decimal  @db.Decimal(19, 4)
+  currency    String   @default("ETB")
+  referenceId String   @unique @map("reference_id")
+  category    String   // e.g. "አሥራት" (Tithe) or "ስእለት" (Vow)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  mimen       Mimen    @relation(fields: [mimenId], references: [id], onDelete: Cascade)
+
+  @@index([mimenId])
+  @@map("payment_ledgers")
+}

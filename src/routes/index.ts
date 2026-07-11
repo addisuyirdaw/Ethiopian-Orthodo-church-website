@@ -10,6 +10,7 @@ import clergyRoutes from './clergy.routes';
 import synodRoutes from './synod.routes';
 import financeRoutes from './finance.routes';
 import logisticsRoutes from './logistics.routes';
+import artifactsEstatesRoutes from './artifacts-estates.routes';
 import pastoralRoutes from './pastoral.routes';
 import hymnologyRoutes from './hymnology.routes';
 import synodalRoutes from './synodal.routes';
@@ -17,6 +18,8 @@ import courtRoutes from './court.routes';
 import clearinghouseRoutes from './clearinghouse.routes';
 import sacramentalRoutes from './sacramental-profile.routes';
 import liturgicalAlertRoutes from './liturgical-alert.routes';
+import publicPaymentRoutes from './public-payment.routes';
+
 
 const router = Router();
 
@@ -37,6 +40,8 @@ router.use('/canonical-court', courtRoutes);
 router.use('/fintech/clearing', clearinghouseRoutes);
 router.use('/sacramental', sacramentalRoutes);
 router.use('/liturgical', liturgicalAlertRoutes);
+router.use('/logistics', artifactsEstatesRoutes);
+router.use('/public', publicPaymentRoutes);
 router.use('/dev', devRoutes);
 
 export default router;

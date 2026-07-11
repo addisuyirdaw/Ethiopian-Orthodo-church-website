@@ -1588,6 +1588,98 @@
     /* Sacrament elevation card */
     .sacrament-elevation-card { background: linear-gradient(135deg,#25070c 0%,#440d16 100%); border: 1px solid var(--gold); border-radius: var(--radius-md); padding: 2rem; box-shadow: 0 10px 30px rgba(74,14,23,0.4); margin-bottom: 2rem; }
 
+    /* ── Module 16 Custom CSS ── */
+    .ledger-table-container {
+      overflow-x: auto;
+      margin-top: 1.5rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.25);
+    }
+    .ledger-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    .ledger-table th {
+      background: rgba(74, 14, 23, 0.5);
+      color: var(--gold);
+      padding: 1rem;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+      font-family: var(--font-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .ledger-table td {
+      padding: 1rem;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.08);
+      color: var(--text-white);
+      vertical-align: middle;
+      font-family: var(--font-primary);
+    }
+    .ledger-table tr:hover {
+      background: rgba(212, 175, 55, 0.02);
+    }
+    .lock-overlay-container {
+      position: relative;
+      min-height: 380px;
+    }
+    .lock-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(10, 8, 9, 0.93);
+      backdrop-filter: blur(5px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--gold);
+      padding: 2rem;
+      text-align: center;
+      transition: all var(--transition-mid) ease;
+    }
+    .lock-overlay-icon {
+      font-size: 3.2rem;
+      margin-bottom: 1.25rem;
+      filter: drop-shadow(0 0 10px var(--gold));
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
+    .lock-overlay-title {
+      font-family: var(--font-serif);
+      color: var(--gold);
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .lock-overlay-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      max-width: 340px;
+      line-height: 1.6;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px var(--gold)); }
+      50% { transform: scale(1.05); filter: drop-shadow(0 0 18px var(--gold-light)); }
+    }
+    .dashboard-grid-m16 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+    }
+    @media (max-width: 1024px) {
+      .dashboard-grid-m16 {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* Responsive nav collapse */
     @media (max-width: 768px) {
       .nav-links { display: none; }
@@ -1596,6 +1688,109 @@
       .hero-stat-row { gap: 2rem; }
       .features-strip { grid-template-columns: 1fr; }
       .dash-tabs { grid-template-columns: repeat(4,1fr); }
+    }
+    
+    /* Ge'ez & Amharic typography — enhanced legibility */
+    [lang="am"] *, [lang="gez"] * {
+      line-height: 1.7 !important;
+    }
+    [lang="am"] .ledger-table td, [lang="gez"] .ledger-table td,
+    [lang="am"] .ledger-table th, [lang="gez"] .ledger-table th {
+      padding-top: 0.875rem !important;
+      padding-bottom: 0.875rem !important;
+    }
+    [lang="am"] .dash-form-group label, [lang="gez"] .dash-form-group label {
+      line-height: 1.6;
+      margin-bottom: 0.55rem;
+    }
+    [lang="am"] .panel-desc, [lang="gez"] .panel-desc {
+      line-height: 1.75;
+      letter-spacing: 0.01em;
+    }
+    [lang="am"] .lock-overlay-title, [lang="gez"] .lock-overlay-title {
+      font-size: 1.15rem;
+      line-height: 1.65;
+    }
+    [lang="am"] .lock-overlay-desc, [lang="gez"] .lock-overlay-desc {
+      line-height: 1.8;
+    }
+
+    /* ── CRITICAL badge variant (red) ── */
+    .status-badge.critical-badge {
+      background: rgba(231,76,60,0.12);
+      color: var(--accent-red);
+      border: 1px solid rgba(231,76,60,0.3);
+    }
+
+    /* ── Outline gold action button for table rows ── */
+    .btn-outline-gold {
+      background: transparent;
+      border: 1px solid rgba(212,175,55,0.4);
+      color: var(--gold);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: var(--font-primary);
+      font-size: 0.78rem;
+      padding: 0.3rem 0.85rem;
+      transition: all var(--transition-fast) ease;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+    .btn-outline-gold:hover {
+      background: rgba(212,175,55,0.1);
+      border-color: var(--gold);
+      color: var(--gold-light);
+      transform: translateY(-1px);
+    }
+
+    /* ── M16 Panel banner (top header strip) ── */
+    .m16-panel-banner {
+      background: linear-gradient(135deg, rgba(74,14,23,0.6) 0%, rgba(10,8,9,0.4) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .m16-panel-banner-icon {
+      font-size: 2.5rem;
+      filter: drop-shadow(0 0 8px var(--gold-glow));
+    }
+    .m16-panel-banner-body { flex: 1; }
+    .m16-panel-banner-title {
+      font-family: var(--font-serif);
+      color: var(--gold);
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+    .m16-panel-banner-desc {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+    .m16-module-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      background: rgba(212,175,55,0.15);
+      color: var(--gold);
+      border: 1px solid rgba(212,175,55,0.3);
+      white-space: nowrap;
+    }
+
+    /* ── Responsive: 8-tab grid ── */
+    @media (max-width: 1100px) {
+      .dash-tabs { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .dash-tabs { grid-template-columns: repeat(2, 1fr); }
+      .dashboard-grid-m16 { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -2045,6 +2240,10 @@
           <span class="tab-icon">⛪</span>
           <span data-i18n="tab_clergy">Clergy Ledger</span>
         </button>
+        <button class="dash-tab-btn" id="tab-btn-artifacts-estates-panel" onclick="switchDashTab('artifacts-estates-panel')">
+          <span class="tab-icon">🏺</span>
+          <span data-i18n="tab_artifacts_estates">Monastic Estates & Artifacts Ledger</span>
+        </button>
         <button class="dash-tab-btn" id="tab-btn-db-panel" onclick="switchDashTab('db-panel')">
           <span class="tab-icon">⚙️</span>
           <span data-i18n="tab_db">DB Control</span>
@@ -2317,6 +2516,171 @@
         </div>
       </div>
 
+      <!-- ── Panel: Monastic Estates & Sacred Artifacts Ledger ── -->
+      <div class="dash-panel" id="artifacts-estates-panel">
+        <div class="dashboard-grid-m16">
+          
+          <!-- Card: Sacred Artifacts Registry -->
+          <div class="panel-card lock-overlay-container" id="artifact-registry-card">
+            <div class="lock-overlay" id="artifact-lock-overlay" style="display: none;">
+              <div class="lock-overlay-icon">🔒</div>
+              <div class="lock-overlay-title" data-i18n="lock_artifact_title">Clergy Permission Required</div>
+              <div class="lock-overlay-desc" data-i18n="lock_artifact_desc">Sacred artifact registries require minimum PRIEST level ecclesiastical authority.</div>
+            </div>
+            
+            <div class="panel-header">
+              <div class="panel-title" data-i18n="card_artifacts_title">🏺 Sacred Artifacts Registry</div>
+            </div>
+            <p class="panel-desc" data-i18n="card_artifacts_desc">Register and track historical manuscripts, holy crosses, vestments, and liturgical vessels.</p>
+            
+            <form id="artifact-form" onsubmit="registerArtifact(event)">
+              <div class="dash-form-row">
+                <div class="dash-form-group">
+                  <label for="artifact-name-en" data-i18n="label_artifact_name_en">Artifact Name (English)</label>
+                  <input type="text" id="artifact-name-en" data-i18n-placeholder="label_artifact_name_en" placeholder="e.g. Ancient Golden Cross" required>
+                </div>
+                <div class="dash-form-group">
+                  <label for="artifact-name-am" data-i18n="label_artifact_name_am">Artifact Name (Amharic)</label>
+                  <input type="text" id="artifact-name-am" data-i18n-placeholder="label_artifact_name_am" placeholder="ምሳሌ፡ የጥንት ወርቅ መስቀል" required>
+                </div>
+              </div>
+              <div class="dash-form-row">
+                <div class="dash-form-group">
+                  <label for="artifact-name-gez" data-i18n="label_artifact_name_gez">Artifact Name (Ge'ez - Optional)</label>
+                  <input type="text" id="artifact-name-gez" data-i18n-placeholder="label_artifact_name_gez" placeholder="ምሳሌ፡ ወርቀ መስቀል">
+                </div>
+                <div class="dash-form-group">
+                  <label for="artifact-category" data-i18n="label_artifact_category">Artifact Category</label>
+                  <select id="artifact-category" required>
+                    <option value="MANUSCRIPT" data-i18n-value="cat_manuscript">MANUSCRIPT</option>
+                    <option value="CROSS" data-i18n-value="cat_cross">CROSS</option>
+                    <option value="VESTMENT" data-i18n-value="cat_vestment">VESTMENT</option>
+                    <option value="LITURGICAL_VESSEL" data-i18n-value="cat_liturgical_vessel">LITURGICAL VESSEL</option>
+                  </select>
+                </div>
+              </div>
+              <div class="dash-form-row">
+                <div class="dash-form-group">
+                  <label for="artifact-condition" data-i18n="label_artifact_condition">Structural Condition</label>
+                  <select id="artifact-condition" required>
+                    <option value="EXCELLENT" data-i18n-value="status_excellent">EXCELLENT</option>
+                    <option value="GOOD" data-i18n-value="status_good">GOOD</option>
+                    <option value="NEEDS_RESTORATION" data-i18n-value="status_needs_restoration">NEEDS RESTORATION</option>
+                    <option value="CRITICAL" data-i18n-value="status_critical">CRITICAL</option>
+                  </select>
+                </div>
+                <div class="dash-form-group">
+                  <label for="artifact-age" data-i18n="label_artifact_age">Estimated Age (Years)</label>
+                  <input type="number" id="artifact-age" data-i18n-placeholder="label_artifact_age" placeholder="e.g. 350" min="0">
+                </div>
+              </div>
+              <div class="dash-form-group">
+                <label for="artifact-location" data-i18n="label_artifact_location">Storage Location</label>
+                <input type="text" id="artifact-location" data-i18n-placeholder="label_artifact_location" placeholder="e.g. Holy Vault A-12" required>
+              </div>
+              <button type="submit" class="btn" id="btn-register-artifact" data-i18n="btn_register_artifact">🏺 Register Artifact</button>
+            </form>
+            <div id="artifact-result" style="display:none;margin-top:1.25rem;"></div>
+          </div>
+          
+          <!-- Card: Monastic Lands & GPS Ledger -->
+          <div class="panel-card lock-overlay-container" id="estate-registry-card">
+            <div class="lock-overlay" id="estate-lock-overlay" style="display: none;">
+              <div class="lock-overlay-icon">🔒</div>
+              <div class="lock-overlay-title" data-i18n="lock_estate_title">Episcopal Permission Required</div>
+              <div class="lock-overlay-desc" data-i18n="lock_estate_desc">Monastic land registrations and deed updates require minimum BISHOP level ecclesiastical authority.</div>
+            </div>
+            
+            <div class="panel-header">
+              <div class="panel-title" data-i18n="card_estates_title">🗺️ Monastic Lands & GPS Ledger</div>
+            </div>
+            <p class="panel-desc" data-i18n="card_estates_desc">Register GPS-bounded land holdings and coordinate charters under diocesan or monastery deed controls.</p>
+            
+            <form id="estate-form" onsubmit="registerEstate(event)">
+              <div id="estate-fields-container">
+                <div class="dash-form-row">
+                  <div class="dash-form-group">
+                    <label for="estate-name" data-i18n="label_estate_name">Monastic Estate Name</label>
+                    <input type="text" id="estate-name" data-i18n-placeholder="label_estate_name" placeholder="e.g. Debre Damo Monastery Estate" required>
+                  </div>
+                  <div class="dash-form-group">
+                    <label for="estate-hectares" data-i18n="label_estate_hectares">Land Area (Hectares)</label>
+                    <input type="number" id="estate-hectares" data-i18n-placeholder="label_estate_hectares" placeholder="e.g. 24.5" step="any" min="0.0001" required>
+                  </div>
+                </div>
+                <div class="dash-form-row">
+                  <div class="dash-form-group">
+                    <label for="estate-latitude" data-i18n="label_estate_latitude">GPS Latitude (e.g. 11.59)</label>
+                    <input type="number" id="estate-latitude" data-i18n-placeholder="label_estate_latitude" placeholder="e.g. 14.3725" step="any" min="-90" max="90" required>
+                  </div>
+                  <div class="dash-form-group">
+                    <label for="estate-longitude" data-i18n="label_estate_longitude">GPS Longitude (e.g. 37.36)</label>
+                    <input type="number" id="estate-longitude" data-i18n-placeholder="label_estate_longitude" placeholder="e.g. 39.2814" step="any" min="-180" max="180" required>
+                  </div>
+                </div>
+                <div class="dash-form-group">
+                  <label for="estate-deed" data-i18n="label_estate_deed">Legal Deed Status</label>
+                  <input type="text" id="estate-deed" data-i18n-placeholder="label_estate_deed" placeholder="e.g. Registered Charter #209-A" required>
+                </div>
+                <div class="dash-form-group">
+                  <label for="estate-utilization" data-i18n="label_estate_utilization">Current Utilization</label>
+                  <textarea id="estate-utilization" data-i18n-placeholder="label_estate_utilization" placeholder="Describe land use (agriculture, housing, monastic orchard)..." required></textarea>
+                </div>
+              </div>
+              <button type="submit" class="btn" id="btn-register-estate" data-i18n="btn_register_estate">🗺️ Register Monastic Estate</button>
+            </form>
+            <div id="estate-result" style="display:none;margin-top:1.25rem;"></div>
+          </div>
+          
+        </div>
+
+        <!-- Lists Sections -->
+        <div class="panel-card" style="margin-top:2rem;">
+          <div class="panel-header">
+            <div class="panel-title" data-i18n="artifacts_list_title">📜 Registered Sacred Artifacts Registry Ledger</div>
+          </div>
+          <div class="ledger-table-container">
+            <table class="ledger-table">
+              <thead>
+                <tr>
+                  <th data-i18n="col_artifact_name">Name</th>
+                  <th data-i18n="col_artifact_category">Category</th>
+                  <th data-i18n="col_artifact_condition">Condition</th>
+                  <th data-i18n="col_artifact_location">Location</th>
+                  <th data-i18n="col_artifact_age">Age (Years)</th>
+                  <th data-i18n="col_action">Action</th>
+                </tr>
+              </thead>
+              <tbody id="artifacts-table-body">
+                <!-- Dynamically populated rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel-card" style="margin-top:2rem;">
+          <div class="panel-header">
+            <div class="panel-title" data-i18n="estates_list_title">📜 Registered Monastic Lands & GPS Registry Ledger</div>
+          </div>
+          <div class="ledger-table-container">
+            <table class="ledger-table">
+              <thead>
+                <tr>
+                  <th data-i18n="col_estate_name">Estate Name</th>
+                  <th data-i18n="col_estate_area">Area (Hectares)</th>
+                  <th data-i18n="col_estate_coords">GPS Coordinates</th>
+                  <th data-i18n="col_estate_deed">Deed Status</th>
+                  <th data-i18n="col_estate_utilization">Utilization</th>
+                </tr>
+              </thead>
+              <tbody id="estates-table-body">
+                <!-- Dynamically populated rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- ── Panel: DB Control ── -->
       <div class="dash-panel" id="db-panel">
         <div class="panel-card">
@@ -2470,6 +2834,64 @@
         txn_opt_fees: 'SACRAMENTAL FEES',
         placeholder_ref_id: 'e.g., TXN-99482939',
         marriage_fasting_warning: '⚠️ Marriage is not permitted during fasting periods.',
+        /* ── Module 16 ── */
+        tab_artifacts_estates: 'Monastic Estates & Artifacts Ledger',
+        lock_artifact_title: 'Clergy Permission Required',
+        lock_artifact_desc: 'Sacred artifact registries require minimum PRIEST level ecclesiastical authority.',
+        card_artifacts_title: '🏺 Sacred Artifacts Registry',
+        card_artifacts_desc: 'Register and track historical manuscripts, holy crosses, vestments, and liturgical vessels.',
+        label_artifact_name_en: 'Artifact Name (English)',
+        label_artifact_name_am: 'Artifact Name (Amharic)',
+        label_artifact_name_gez: 'Artifact Name (Ge\'ez - Optional)',
+        label_artifact_category: 'Artifact Category',
+        cat_manuscript: 'MANUSCRIPT',
+        cat_cross: 'CROSS',
+        cat_vestment: 'VESTMENT',
+        cat_liturgical_vessel: 'LITURGICAL VESSEL',
+        label_artifact_condition: 'Structural Condition',
+        status_excellent: 'EXCELLENT',
+        status_good: 'GOOD',
+        status_needs_restoration: 'NEEDS RESTORATION',
+        status_critical: 'CRITICAL',
+        label_artifact_age: 'Estimated Age (Years)',
+        label_artifact_location: 'Storage Location',
+        btn_register_artifact: '🏺 Register Artifact',
+        lock_estate_title: 'Episcopal Permission Required',
+        lock_estate_desc: 'Monastic land registrations and deed updates require minimum BISHOP level ecclesiastical authority.',
+        card_estates_title: '🗺️ Monastic Lands & GPS Ledger',
+        card_estates_desc: 'Register GPS-bounded land holdings and coordinate charters under diocesan or monastery deed controls.',
+        label_estate_name: 'Monastic Estate Name',
+        label_estate_hectares: 'Land Area (Hectares)',
+        label_estate_latitude: 'GPS Latitude',
+        label_estate_longitude: 'GPS Longitude',
+        label_estate_deed: 'Legal Deed Status',
+        label_estate_utilization: 'Current Utilization',
+        btn_register_estate: '🗺️ Register Monastic Estate',
+        artifacts_list_title: '📜 Registered Sacred Artifacts Registry Ledger',
+        col_artifact_name: 'Name',
+        col_artifact_category: 'Category',
+        col_artifact_condition: 'Condition',
+        col_artifact_location: 'Location',
+        col_artifact_age: 'Age (Years)',
+        col_action: 'Action',
+        estates_list_title: '📜 Registered Monastic Lands & GPS Registry Ledger',
+        col_estate_name: 'Estate Name',
+        col_estate_area: 'Area (Hectares)',
+        col_estate_coords: 'GPS Coordinates',
+        col_estate_deed: 'Deed Status',
+        col_estate_utilization: 'Utilization',
+        lock_combined_msg: 'ለካህናትና ለሊቀ ጳጳሳት ብቻ የተፈቀደ',
+        no_records: 'No records found.',
+        btn_inspect: 'Inspect',
+        /* ── Display labels for table (localized output) ── */
+        disp_cat_MANUSCRIPT: 'Manuscript',
+        disp_cat_CROSS: 'Cross',
+        disp_cat_VESTMENT: 'Vestment',
+        disp_cat_LITURGICAL_VESSEL: 'Liturgical Vessel',
+        disp_cond_EXCELLENT: 'Excellent',
+        disp_cond_GOOD: 'Good',
+        disp_cond_NEEDS_RESTORATION: 'Needs Restoration',
+        disp_cond_CRITICAL: 'Critical',
       },
       am: {
         /* ── App Shell ── */
@@ -2628,6 +3050,64 @@
         db_console_title: 'የዳታቤዝ ውጤት',
         btn_clear: 'አጽዳ',
         marriage_fasting_warning: '⚠️ በጾም ወቅት ተክሊል (ጋብቻ) መፈጸም አይፈቀድም።',
+        /* ── Module 16 ── */
+        tab_artifacts_estates: 'የገዳማትና አድባራት የንብረት ማህደር',
+        lock_artifact_title: 'የካህናት ፈቃድ ያስፈልጋል',
+        lock_artifact_desc: 'የጥንታውያን ንዋያተ ቅድሳትን መዝገብ ለመድረስ ቢያንስ የካህን ቀኖናዊ ሥልጣን ደረጃ ያስፈልጋል።',
+        card_artifacts_title: 'የጥንታውያን ንዋያተ ቅድሳት መዝገብ',
+        card_artifacts_desc: 'የብራና መጻሕፍት፣ ቅዱሳን መስቀሎች፣ አልባሳት እና የቅዳሴ ንዋያተ ቅድሳትን መዝግበው ይከታተሉ።',
+        label_artifact_name_en: 'የቅርሱ ስም (በእንግሊዝኛ)',
+        label_artifact_name_am: 'የቅርሱ ስም (በአማርኛ)',
+        label_artifact_name_gez: 'የቅርሱ ስም (በግዕዝ - አማራጭ)',
+        label_artifact_category: 'የቅርሱ ዓይነት',
+        cat_manuscript: 'የብራና መጽሐፍ',
+        cat_cross: 'መስቀል',
+        cat_vestment: 'አልባሳት',
+        cat_liturgical_vessel: 'የቀደሳ ንዋይ',
+        label_artifact_condition: 'የቅርሱ አሁናዊ ሁኔታ',
+        status_excellent: 'በጣም ጥሩ',
+        status_good: 'ጥሩ',
+        status_needs_restoration: 'ጥገና የሚያስፈልገው',
+        status_critical: 'አስጊ ሁኔታ ላይ ያለ',
+        label_artifact_age: 'የግምት ዕድሜ (በዓመታት)',
+        label_artifact_location: 'የተቀመጠበት ክፍል/ሳጥን',
+        btn_register_artifact: '🏺 ቅርስ መዝግብ',
+        lock_estate_title: 'ለሊቀ ጳጳሳት ብቻ የተፈቀደ',
+        lock_estate_desc: 'የርስት መሬቶች ምዝገባ እና የካርታ ለውጦች ቢያንስ የሊቀ ጳጳስ ቀኖናዊ ሥልጣን ደረጃ ያስፈልጋቸዋል።',
+        card_estates_title: 'የርስት መሬቶችና ጂፒኤስ ማውጫ',
+        card_estates_desc: 'በሀገረ ስብከት ወይም በገዳም ይዞታ ስር ያሉ በጂፒኤስ የተከለሉ የርስት መሬቶች መዝገብ።',
+        label_estate_name: 'የገዳሙ/ደብሩ ርስት ስም',
+        label_estate_hectares: 'የመሬቱ ስፋት (በሄክታር)',
+        label_estate_latitude: 'የጂፒኤስ ላቲቲዩድ (ምሳሌ፡ 14.3725)',
+        label_estate_longitude: 'የጂፒኤስ ሎንጊቲዩድ (ምሳሌ፡ 39.2814)',
+        label_estate_deed: 'የህጋዊ ካርታ/ደብዳቤ ሁኔታ',
+        label_estate_utilization: 'አሁናዊ አገልግሎት',
+        btn_register_estate: '🗺️ የርስት መሬት መዝግብ',
+        artifacts_list_title: 'የተመዘገቡ ጥንታውያን ንዋያተ ቅድሳት ማህደር',
+        col_artifact_name: 'ስም',
+        col_artifact_category: 'ዓይነት',
+        col_artifact_condition: 'ሁኔታ',
+        col_artifact_location: 'የተቀመጠበት ክፍል',
+        col_artifact_age: 'ዕድሜ (ዓመት)',
+        col_action: 'ተግባር',
+        estates_list_title: 'የተመዘገቡ የርስት መሬቶችና ጂፒኤስ ማውጫ ማህደር',
+        col_estate_name: 'የርስት ስም',
+        col_estate_area: 'ስፋት (ሄክታር)',
+        col_estate_coords: 'የጂፒኤስ መጋጠሚያ (ላቲቲዩድ / ሎንጊቲዩድ)',
+        col_estate_deed: 'የካርታ ሁኔታ',
+        col_estate_utilization: 'አሁናዊ አገልግሎት',
+        lock_combined_msg: 'ለካህናትና ለሊቀ ጳጳሳት ብቻ የተፈቀደ',
+        no_records: 'ምንም መዝገብ አልተገኘም።',
+        btn_inspect: 'ምርምር',
+        /* ── Display labels for table (localized output) ── */
+        disp_cat_MANUSCRIPT: 'የብራና መጽሐፍ',
+        disp_cat_CROSS: 'መስቀል',
+        disp_cat_VESTMENT: 'አልባሳት',
+        disp_cat_LITURGICAL_VESSEL: 'የቀደሳ ንዋይ',
+        disp_cond_EXCELLENT: 'በጣም ጥሩ',
+        disp_cond_GOOD: 'ጥሩ',
+        disp_cond_NEEDS_RESTORATION: 'ጥገና የሚያስፈልገው',
+        disp_cond_CRITICAL: 'አስጊ ሁኔታ ላይ ያለ',
       },
       gez: {
         /* ── App Shell ── */
@@ -2742,6 +3222,64 @@
         db_console_title: 'ኅቡዐ ዳታቤዝ',
         btn_clear: 'ሠዕ',
         marriage_fasting_warning: '⚠️ በጾም ጊዜ ተክሊል መፈጸም አይፈቀድም።',
+        /* ── Module 16 ── */
+        tab_artifacts_estates: 'መዝገበ ንዋያተ ቅድሳት ወርስተ ገዳማት',
+        lock_artifact_title: 'ሥልጣነ ቀሳውስት ዘተፈቅደ',
+        lock_artifact_desc: 'ዝንቱ መዝገብ ዘንዋያተ ቅድሳት ቢያንስ ቀሳውስት ይፈቅድ።',
+        card_artifacts_title: 'መዝገበ ንዋያተ ቅድሳት',
+        card_artifacts_desc: 'ዘብራና መጻሕፍት፣ ቅዱሳን መስቀላት፣ አልባሳት ወንዋያተ ቅዳሴ።',
+        label_artifact_name_en: 'ስመ ንዋይ (ዘእንግሊዝኛ)',
+        label_artifact_name_am: 'ስመ ንዋይ (ዘአማርኛ)',
+        label_artifact_name_gez: 'ስመ ንዋይ (ዘግዕዝ)',
+        label_artifact_category: 'ዓይነተ ንዋይ',
+        cat_manuscript: 'መጽሐፈ ብራና',
+        cat_cross: 'መስቀል',
+        cat_vestment: 'አልባሳት',
+        cat_liturgical_vessel: 'ንዋየ ቅዳሴ',
+        label_artifact_condition: 'አሁናዊ ኩነታ',
+        status_excellent: 'ፈድፋደ ሠናይ',
+        status_good: 'ሠናይ',
+        status_needs_restoration: 'ዕቅበት ዘይፈቅድ',
+        status_critical: 'ዕቅበት ዐቢይ',
+        label_artifact_age: 'ዓመታተ ዕድሜ',
+        label_artifact_location: 'ክፍለ ዕቅበት',
+        btn_register_artifact: '🏺 ንዋይ መዝግብ',
+        lock_estate_title: 'ዘጳጳሳት ሥልጣን',
+        lock_estate_desc: 'ዝንቱ ተግባር ለሊቀ ጳጳሳት ብቻ ዘተፈቅደ ውእቱ።',
+        card_estates_title: 'መዝገበ ርስት ወጂፒኤስ',
+        card_estates_desc: 'መዝገበ ርስተ ገዳማት ወአድባራት ዘበጂፒኤስ።',
+        label_estate_name: 'ስመ ርስተ ገዳም',
+        label_estate_hectares: 'ስፋተ መሬት (በሄክታር)',
+        label_estate_latitude: 'ጂፒኤስ ላቲቲዩድ',
+        label_estate_longitude: 'ጂፒኤስ ሎንጊቲዩድ',
+        label_estate_deed: 'ኩነተ ካርታ',
+        label_estate_utilization: 'አገልግሎት',
+        btn_register_estate: '🗺️ ርስት መዝግብ',
+        artifacts_list_title: 'መዝገበ ንዋያተ ቅድሳት',
+        col_artifact_name: 'ስም',
+        col_artifact_category: 'ዓይነት',
+        col_artifact_condition: 'ኩነታ',
+        col_artifact_location: 'ክፍል',
+        col_artifact_age: 'ዕድሜ',
+        col_action: 'ተግባር',
+        estates_list_title: 'መዝገበ ርስት ወጂፒኤስ',
+        col_estate_name: 'ስመ ርስት',
+        col_estate_area: 'ስፋት',
+        col_estate_coords: 'መጋጠሚያ ጂፒኤስ',
+        col_estate_deed: 'ካርታ',
+        col_estate_utilization: 'አገልግሎት',
+        lock_combined_msg: 'ለካህናትና ለሊቀ ጳጳሳት ብቻ ዘተፈቅደ',
+        no_records: 'ዘምሥ ውእቱ።',
+        btn_inspect: 'ምርምር',
+        /* ── Display labels for table (localized output) ── */
+        disp_cat_MANUSCRIPT: 'መጽሐፈ ብራና',
+        disp_cat_CROSS: 'መስቀል',
+        disp_cat_VESTMENT: 'አልባሳት',
+        disp_cat_LITURGICAL_VESSEL: 'ንዋየ ቅዳሴ',
+        disp_cond_EXCELLENT: 'ፈድፋደ ሠናይ',
+        disp_cond_GOOD: 'ሠናይ',
+        disp_cond_NEEDS_RESTORATION: 'ዕቅበት ዘይፈቅድ',
+        disp_cond_CRITICAL: 'ዕቅበት ዐቢይ',
       }
     };
 
@@ -3000,6 +3538,8 @@
 
       // Show first tab
       switchDashTab('calendar-panel');
+      // Initialise lock overlays based on role
+      updateLedgerLockOverlays();
     }
 
     function enterPublicView() {
@@ -3134,7 +3674,8 @@
     // ═══════════════════════════════════════════════════════════════
     const DASH_TAB_IDS = [
       'calendar-panel','sacraments-panel','fintech-panel',
-      'hierarchy-panel','vault-panel','clergy-panel','db-panel'
+      'hierarchy-panel','vault-panel','clergy-panel','db-panel',
+      'artifacts-estates-panel'
     ];
 
     function switchDashTab(tabId) {
@@ -3148,6 +3689,11 @@
       const activeBtn = document.getElementById('tab-btn-' + tabId);
       if (active) active.classList.add('active');
       if (activeBtn) activeBtn.classList.add('active');
+      if (tabId === 'artifacts-estates-panel') {
+        updateLedgerLockOverlays();
+        fetchArtifacts();
+        fetchEstates();
+      }
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -3724,6 +4270,271 @@
         alert(`Network error: ${err.message}`);
       } finally {
         btn.disabled = false; btn.innerText = t('clergy_btn_verify');
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  §16. MONASTIC ESTATES & SACRED ARTIFACTS LEDGER (Module 16)
+    // ═══════════════════════════════════════════════════════════════
+
+    // Role hierarchy helpers
+    const CLERGY_ROLES    = ['PATRIARCH','ARCHBISHOP','METROPOLITAN','BISHOP','PRIEST'];
+    const EPISCOPAL_ROLES = ['PATRIARCH','ARCHBISHOP','METROPOLITAN','BISHOP'];
+
+    function userIsClergy()   { return currentUserData && CLERGY_ROLES.includes(currentUserData.ecclesiastical_role); }
+    function userIsEpiscopal(){ return currentUserData && EPISCOPAL_ROLES.includes(currentUserData.ecclesiastical_role); }
+
+    /**
+     * Backend enum maps — translates locale-facing UI option values back to
+     * the canonical backend enum string accepted by the API.
+     */
+    const ARTIFACT_CATEGORY_MAP = {
+      // English (passthrough)
+      'MANUSCRIPT': 'MANUSCRIPT',
+      'CROSS': 'CROSS',
+      'VESTMENT': 'VESTMENT',
+      'LITURGICAL VESSEL': 'LITURGICAL_VESSEL',
+      // Amharic
+      'የብራና መጽሐፍ': 'MANUSCRIPT',
+      'መስቀል': 'CROSS',
+      'አልባሳት': 'VESTMENT',
+      'የቀደሳ ንዋይ': 'LITURGICAL_VESSEL',
+      // Ge'ez
+      'መጽሐፈ ብራና': 'MANUSCRIPT',
+      'ንዋየ ቅዳሴ': 'LITURGICAL_VESSEL',
+    };
+
+    const ARTIFACT_CONDITION_MAP = {
+      // English
+      'EXCELLENT': 'EXCELLENT',
+      'GOOD': 'GOOD',
+      'NEEDS RESTORATION': 'NEEDS_RESTORATION',
+      'CRITICAL': 'CRITICAL',
+      // Amharic
+      'በጣም ጥሩ': 'EXCELLENT',
+      'ጥሩ': 'GOOD',
+      'ጥገና የሚያስፈልገው': 'NEEDS_RESTORATION',
+      'አስጊ ሁኔታ ላይ ያለ': 'CRITICAL',
+      // Ge'ez
+      'ፈድፋደ ሠናይ': 'EXCELLENT',
+      'ሠናይ': 'GOOD',
+      'ዕቅበት ዘይፈቅድ': 'NEEDS_RESTORATION',
+      'ዕቅበት ዐቢይ': 'CRITICAL',
+    };
+
+    /**
+     * updateLedgerLockOverlays — gates sub-panels based on the authenticated user's
+     * ecclesiastical role. Clergy (PRIEST+) may access artifact registry; only
+     * Episcopal (BISHOP+) may access land registry.
+     */
+    function updateLedgerLockOverlays() {
+      const artifactLock = document.getElementById('artifact-lock-overlay');
+      const estateLock   = document.getElementById('estate-lock-overlay');
+      if (!artifactLock || !estateLock) return;
+
+      if (userIsClergy()) {
+        artifactLock.style.display = 'none';
+      } else {
+        artifactLock.style.display = 'flex';
+      }
+
+      if (userIsEpiscopal()) {
+        estateLock.style.display = 'none';
+      } else {
+        estateLock.style.display = 'flex';
+      }
+    }
+
+    // ─── Artifacts API ───────────────────────────────────────────────
+
+    async function fetchArtifacts() {
+      if (!currentToken) return;
+      const tbody = document.getElementById('artifacts-table-body');
+      if (!tbody) return;
+      try {
+        const res  = await fetch(`${BASE_URL}/api/v1/logistics/artifacts`, {
+          headers: { 'Authorization': `Bearer ${currentToken}` }
+        });
+        const data = await res.json();
+        if (!res.ok) { tbody.innerHTML = `<tr><td colspan="6" style="color:var(--accent-red);text-align:center;">${data.message || 'Error'}</td></tr>`; return; }
+        const rows = (data.data || data.artifacts || data || []);
+        if (!rows.length) {
+          tbody.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:1.5rem;">${t('no_records') || '—'}</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = rows.map(a => `
+          <tr>
+            <td><span style="font-weight:600;color:var(--text-white);">${a.nameAm || a.nameEn || '—'}</span><br><span style="font-size:0.75rem;color:var(--text-dim);">${a.nameEn || ''}</span></td>
+            <td><span class="status-badge active-mod">${a.category || '—'}</span></td>
+            <td><span class="status-badge ${conditionClass(a.structuralCondition)}">${a.structuralCondition || '—'}</span></td>
+            <td>${a.storageLocation || '—'}</td>
+            <td>${a.estimatedAge ?? '—'}</td>
+            <td><button class="btn-outline-gold" style="font-size:0.75rem;padding:0.3rem 0.75rem;" onclick="logArtifactInspection('${a.id}')">${t('col_action') || 'Inspect'}</button></td>
+          </tr>`).join('');
+      } catch(err) {
+        if (tbody) tbody.innerHTML = `<tr><td colspan="6" style="color:var(--accent-red);text-align:center;">${err.message}</td></tr>`;
+      }
+    }
+
+    function conditionClass(condition) {
+      const map = { 'EXCELLENT':'online', 'GOOD':'online', 'NEEDS_RESTORATION':'active-mod', 'CRITICAL':'critical-badge' };
+      return map[condition] || 'active-mod';
+    }
+
+    async function logArtifactInspection(artifactId) {
+      if (!currentToken) return;
+      const cond = prompt("Enter condition (EXCELLENT, GOOD, NEEDS_RESTORATION, CRITICAL):", "GOOD");
+      if (!cond) return;
+      const notes = prompt("Enter inspection notes:", "Routine physical check.");
+      if (notes === null) return;
+      
+      const payload = {
+        conditionAtInspection: cond.toUpperCase().trim(),
+        inspectionNotes: notes,
+        inspectedAt: new Date().toISOString()
+      };
+      try {
+        const res = await fetch(`${BASE_URL}/api/v1/logistics/artifacts/${artifactId}/inspect`, {
+          method: 'POST',
+          headers: { 
+            'Authorization': `Bearer ${currentToken}`, 
+            'Content-Type': 'application/json' 
+          },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          alert("Inspection logged successfully.");
+          fetchArtifacts();
+        } else {
+          const data = await res.json();
+          alert(`Error: ${data.message || 'Validation failed'}`);
+        }
+      } catch(err) {
+        alert(`Network error: ${err.message}`);
+      }
+    }
+
+    async function registerArtifact(event) {
+      event.preventDefault();
+      if (!currentToken || !userIsClergy()) return;
+      const btn = document.getElementById('btn-register-artifact');
+      btn.disabled = true;
+      const nameEn  = document.getElementById('artifact-name-en').value.trim();
+      const nameAm  = document.getElementById('artifact-name-am').value.trim();
+      const nameGez = document.getElementById('artifact-name-gez').value.trim();
+      const rawCat  = document.getElementById('artifact-category').value;
+      const rawCond = document.getElementById('artifact-condition').value;
+      const age     = parseInt(document.getElementById('artifact-age').value, 10) || undefined;
+      const loc     = document.getElementById('artifact-location').value.trim();
+
+      // Map locale values to backend enums
+      const category  = ARTIFACT_CATEGORY_MAP[rawCat]  || rawCat;
+      const condition = ARTIFACT_CONDITION_MAP[rawCond] || rawCond;
+
+      const payload = { 
+        nameEn, 
+        nameAm: nameAm || undefined, 
+        nameGez: nameGez || undefined,
+        category, 
+        structuralCondition: condition, 
+        estimatedAge: age, 
+        storageLocation: loc 
+      };
+      try {
+        const res  = await fetch(`${BASE_URL}/api/v1/logistics/artifacts`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${currentToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        const resultEl = document.getElementById('artifact-result');
+        if (res.ok) {
+          resultEl.innerHTML = `<div class="result-card success"><div class="result-card-header"><div class="result-card-icon">✅</div><div class="result-card-title" style="color:var(--accent-green);">${nameAm || nameEn}</div></div><div class="result-data-grid"><div class="result-data-item"><div class="result-data-key">${t('label_artifact_category')}</div><div class="result-data-val"><span class="status-badge active-mod">${category}</span></div></div><div class="result-data-item"><div class="result-data-key">${t('label_artifact_condition')}</div><div class="result-data-val"><span class="status-badge online">${condition}</span></div></div></div></div>`;
+          resultEl.style.display = 'block';
+          event.target.reset();
+          fetchArtifacts();
+        } else {
+          resultEl.innerHTML = `<div class="result-card failure"><div class="result-card-icon">🚫</div><p style="color:var(--accent-red);margin:0.5rem 0 0;">${data.message || 'Error'}</p></div>`;
+          resultEl.style.display = 'block';
+        }
+      } catch(err) {
+        alert(`Network error: ${err.message}`);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // ─── Monastic Estates API ────────────────────────────────────────
+
+    async function fetchEstates() {
+      if (!currentToken) return;
+      const tbody = document.getElementById('estates-table-body');
+      if (!tbody) return;
+      try {
+        const res  = await fetch(`${BASE_URL}/api/v1/logistics/estates`, {
+          headers: { 'Authorization': `Bearer ${currentToken}` }
+        });
+        const data = await res.json();
+        if (!res.ok) { tbody.innerHTML = `<tr><td colspan="5" style="color:var(--accent-red);text-align:center;">${data.message || 'Error'}</td></tr>`; return; }
+        const rows = (data.data || data.estates || data || []);
+        if (!rows.length) {
+          tbody.innerHTML = `<tr><td colspan="5" style="color:var(--text-muted);text-align:center;padding:1.5rem;">—</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = rows.map(e => `
+          <tr>
+            <td style="font-weight:600;color:var(--gold);">${e.estateName || '—'}</td>
+            <td>${e.landAreaHectares ?? '—'}</td>
+            <td style="font-family:'Courier New',monospace;font-size:0.8rem;">${e.gpsLatitude ? `${e.gpsLatitude}, ${e.gpsLongitude}` : '—'}</td>
+            <td><span class="status-badge active-mod">${e.legalDeedStatus || '—'}</span></td>
+            <td>${e.currentUtilization || '—'}</td>
+          </tr>`).join('');
+      } catch(err) {
+        if (tbody) tbody.innerHTML = `<tr><td colspan="5" style="color:var(--accent-red);text-align:center;">${err.message}</td></tr>`;
+      }
+    }
+
+    async function registerEstate(event) {
+      event.preventDefault();
+      if (!currentToken || !userIsEpiscopal()) return;
+      const btn = document.getElementById('btn-register-estate');
+      btn.disabled = true;
+      const name     = document.getElementById('estate-name').value.trim();
+      const hectares = parseFloat(document.getElementById('estate-hectares').value) || undefined;
+      const lat      = parseFloat(document.getElementById('estate-latitude').value) || undefined;
+      const lon      = parseFloat(document.getElementById('estate-longitude').value) || undefined;
+      const deed     = document.getElementById('estate-deed').value.trim();
+      const util     = document.getElementById('estate-utilization').value.trim();
+
+      const payload = { 
+        estateName: name, 
+        landAreaHectares: hectares, 
+        gpsLatitude: lat, 
+        gpsLongitude: lon,
+        legalDeedStatus: deed, 
+        currentUtilization: util 
+      };
+      try {
+        const res  = await fetch(`${BASE_URL}/api/v1/logistics/estates`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${currentToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        const resultEl = document.getElementById('estate-result');
+        if (res.ok) {
+          resultEl.innerHTML = `<div class="result-card success"><div class="result-card-header"><div class="result-card-icon">✅</div><div class="result-card-title" style="color:var(--accent-green);">${name}</div></div><div class="result-data-grid"><div class="result-data-item"><div class="result-data-key">${t('label_estate_hectares')}</div><div class="result-data-val">${hectares ?? '—'} ha</div></div><div class="result-data-item"><div class="result-data-key">GPS</div><div class="result-data-val" style="font-family:'Courier New',monospace;">${lat ?? '—'}, ${lon ?? '—'}</div></div></div></div>`;
+          resultEl.style.display = 'block';
+          event.target.reset();
+          fetchEstates();
+        } else {
+          resultEl.innerHTML = `<div class="result-card failure"><div class="result-card-icon">🚫</div><p style="color:var(--accent-red);margin:0.5rem 0 0;">${data.message || 'Error'}</p></div>`;
+          resultEl.style.display = 'block';
+        }
+      } catch(err) {
+        alert(`Network error: ${err.message}`);
+      } finally {
+        btn.disabled = false;
       }
     }
 

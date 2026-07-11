@@ -107,6 +107,7 @@ async function clearDatabase(): Promise<void> {
   await prisma.liturgicalDay.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.clergyAssignmentHistory.deleteMany();
+  await prisma.clergyAssignment.deleteMany();
   await prisma.clergyProfile.deleteMany();
   await prisma.sacramentalRecord.deleteMany();
   await prisma.user.deleteMany();
@@ -197,6 +198,16 @@ async function seedUsers(institutionIds: Map<string, string>): Promise<void> {
           canonicalStatus: CanonicalStatus.ACTIVE_GOOD_STANDING,
           ordinationDate: new Date('2018-09-11T00:00:00Z'),
           currentAssignmentId: institutionId,
+        },
+      });
+
+      await prisma.clergyAssignment.create({
+        data: {
+          userId: user.id,
+          institutionId: institutionId,
+          roleTitle: spec.role.toString(),
+          decreeNumber: `DEC-SEED-${user.id.slice(0, 8).toUpperCase()}`,
+          assignedAt: new Date('2018-09-11T00:00:00Z'),
         },
       });
     }

@@ -38,6 +38,18 @@ export class InstitutionRepository {
       data: { hierarchyPath },
     });
   }
+
+  /**
+   * Returns all non-deleted institutions ordered by hierarchy path.
+   * Used by the public tenant listing endpoint to populate the
+   * lay-donation parish/monastery dropdown.
+   */
+  async findAll(): Promise<Institution[]> {
+    return prisma.institution.findMany({
+      where: { deletedAt: null },
+      orderBy: { hierarchyPath: 'asc' },
+    });
+  }
 }
 
 export const institutionRepository = new InstitutionRepository();
