@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
-import { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 export class AppError extends Error {
   constructor(
@@ -90,8 +90,8 @@ function logError(metadata: ErrorLogMetadata): void {
   console.error(JSON.stringify(payload));
 }
 
-function isPrismaError(error: unknown): error is Prisma.PrismaClientKnownRequestError {
-  return error instanceof Prisma.PrismaClientKnownRequestError;
+function isPrismaError(error: unknown): error is PrismaClientKnownRequestError {
+  return error instanceof PrismaClientKnownRequestError;
 }
 
 export function errorHandler(
