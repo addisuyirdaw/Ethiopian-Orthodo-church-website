@@ -4,7 +4,7 @@
   "description": "Enterprise SaaS Church Management and FinTech platform for Orthodox Christian jurisdictions",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "prisma generate && tsc",
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
     "db:generate": "prisma generate",
