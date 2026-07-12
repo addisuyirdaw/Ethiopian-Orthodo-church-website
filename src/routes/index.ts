@@ -19,6 +19,8 @@ import clearinghouseRoutes from './clearinghouse.routes';
 import sacramentalRoutes from './sacramental-profile.routes';
 import liturgicalAlertRoutes from './liturgical-alert.routes';
 import publicPaymentRoutes from './public-payment.routes';
+import parishLedgerRoutes from './parish-ledger.routes';
+import priestCrmRoutes from './priest-crm.routes';
 
 
 const router = Router();
@@ -43,5 +45,10 @@ router.use('/liturgical', liturgicalAlertRoutes);
 router.use('/logistics', artifactsEstatesRoutes);
 router.use('/public', publicPaymentRoutes);
 router.use('/dev', devRoutes);
+// Module 17 — Parish CRM & Financial Ingestion
+router.use('/parish', parishLedgerRoutes);
+router.use('/transactions', parishLedgerRoutes);
+router.use('/treasury', parishLedgerRoutes);
+router.use('/priest', priestCrmRoutes);
 
 export default router;

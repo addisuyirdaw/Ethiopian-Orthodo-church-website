@@ -1,10 +1,11 @@
-import { EcclesiasticalRole } from '@prisma/client';
+import { AuthRole, EcclesiasticalRole } from '@prisma/client';
 
 export interface JwtPayload {
   sub: string;
   institution_id: string;
   hierarchy_path: string;
   ecclesiastical_role: EcclesiasticalRole;
+  auth_role?: AuthRole;
   isSuperAdmin?: boolean;
   iat?: number;
   exp?: number;
@@ -15,6 +16,7 @@ export interface AuthenticatedUser {
   institutionId: string;
   hierarchyPath: string;
   ecclesiasticalRole: EcclesiasticalRole;
+  authRole?: AuthRole;
   isSuperAdmin?: boolean;
 }
 

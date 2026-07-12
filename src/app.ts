@@ -32,6 +32,18 @@ export function createApp(): Application {
 
   // Capture the raw request body before JSON parsing so that the clearinghouse
   // webhook route can verify the HMAC-SHA256 signature over the original bytes.
+  // Normalize Content-Type charset to a lowercase form to avoid
+  // `UnsupportedMediaTypeError: unsupported charset "UTF-8"` thrown by
+  // body-parser when clients send uppercased charset tokens.
+  app.use((req: Request, _res, next) => {
+    const ct = req.headers['content-type'];
+    if (typeof ct === 'string' && /charset=/.test(ct)) {
+      // only change the charset token casing (UTF-8 -> utf-8)
+      req.headers['content-type'] = ct.replace(/charset=UTF-8/i, (m) => m.toLowerCase());
+    }
+    next();
+  });
+
   app.use(
     express.json({
       verify: (req: Request, _res, buf) => {

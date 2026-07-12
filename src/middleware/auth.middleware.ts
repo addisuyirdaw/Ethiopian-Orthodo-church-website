@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { EcclesiasticalRole } from '@prisma/client';
+import { AuthRole, EcclesiasticalRole } from '@prisma/client';
 import { AuthenticatedUser, JwtPayload } from '../types';
 
 const JWT_SECRET = process.env.JWT_SECRET ?? 'development-secret';
@@ -46,12 +46,21 @@ export function authenticateJwt(
       return;
     }
 
+    if (decoded.auth_role && !Object.values(AuthRole).includes(decoded.auth_role)) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Invalid auth role in token.',
+      });
+      return;
+    }
+
     req.user = {
       id: decoded.sub,
       institutionId: decoded.institution_id,
       hierarchyPath: decoded.hierarchy_path,
       ecclesiasticalRole: decoded.ecclesiastical_role,
-      isSuperAdmin: decoded.isSuperAdmin || decoded.ecclesiastical_role === 'PATRIARCH',
+      authRole: decoded.auth_role,
+      isSuperAdmin: decoded.isSuperAdmin || decoded.ecclesiastical_role === 'PATRIARCH' || decoded.auth_role === AuthRole.SYSTEM_ADMIN,
     } satisfies AuthenticatedUser;
 
     next();
@@ -98,4 +107,67 @@ export function requireEpiscopalRole(
   }
 
   next();
+}
+
+// ── Parish CRM Role Guards (appended — no existing code modified) ─────────────
+
+/**
+ * Generic role gate. Pass one or more EcclesiasticalRole values that are
+ * permitted to access the route. PATRIARCH is always allowed as super-admin.
+ *
+ * Usage:
+ *   router.get('/route', authenticateJwt, requireRole('PRIEST', 'BISHOP'), handler)
+ */
+export function requireRole(
+  ...allowedRoles: EcclesiasticalRole[]
+): (req: Request, res: Response, next: NextFunction) => void {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const user = req.user;
+
+    if (!user) {
+      res.status(401).json({
+        error: 'Unauthorized',
+        message: 'Authentication required.',
+      });
+      return;
+    }
+
+    const permitted =
+      user.ecclesiasticalRole === EcclesiasticalRole.PATRIARCH ||
+      (allowedRoles as EcclesiasticalRole[]).includes(user.ecclesiasticalRole);
+
+    if (!permitted) {
+      res.status(403).json({
+        error: 'Forbidden',
+        message: `Access restricted. Required role(s): ${allowedRoles.join(', ')}.`,
+      });
+      return;
+    }
+
+    next();
+  };
+}
+
+/**
+ * Convenience middleware — restricts access to TREASURER (Gimja Bet) role.
+ * PATRIARCH is always permitted as super-admin.
+ */
+export function requireTreasurerRole(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
+  requireRole(EcclesiasticalRole.TREASURER)(req, res, next);
+}
+
+/**
+ * Convenience middleware — restricts access to PRIEST role.
+ * PATRIARCH is always permitted as super-admin.
+ */
+export function requirePriestRole(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
+  requireRole(EcclesiasticalRole.PRIEST)(req, res, next);
 }

@@ -17,6 +17,15 @@ export class InstitutionService {
     return this.buildTree(root, descendants);
   }
 
+  async getPriestsForInstitution(institutionId: string) {
+    const institution = await institutionRepository.findById(institutionId);
+    if (!institution) {
+      throw new NotFoundError('Institution not found.');
+    }
+
+    return institutionRepository.findPriestsByInstitution(institutionId);
+  }
+
   private buildTree(root: Institution, allNodes: Institution[]): HierarchyNode {
     const nodeMap = new Map<string, HierarchyNode>();
 

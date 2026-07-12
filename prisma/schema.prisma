@@ -25,6 +25,14 @@ enum EcclesiasticalRole {
   PRIEST
   DEACON
   LAITY
+  TREASURER
+}
+
+enum AuthRole {
+  MIMEN
+  PRIEST
+  PARISH_ADMIN
+  SYSTEM_ADMIN
 }
 
 enum SacramentalType {
@@ -47,6 +55,26 @@ enum PaymentGateway {
   STRIPE
   MANUAL_CASH
   CHAPA
+}
+
+// ── Parish Financial Ledger Enums ──────────────────────────────────────────────
+
+enum Sex {
+  MALE
+  FEMALE
+}
+
+enum ParishLedgerCategory {
+  ASRAT            // ዐሥራት — Tithe (10%)
+  BEKURAT          // በኩራት — First-fruits offering
+  PRIEST_GIFT      // Voluntary gift directed to a specific priest
+  GENERAL_DONATION // General undesignated donation
+}
+
+enum ParishPaymentMethod {
+  TELEBIRR
+  CBE_BIRR
+  BANK_TRANSFER
 }
 
 enum TransactionStatus {
@@ -143,7 +171,13 @@ model User {
   nameAm             String?            @map("name_am")
   nameGez            String?            @map("name_gez")
   ecclesiasticalRole EcclesiasticalRole @map("ecclesiastical_role")
+  authRole           AuthRole          @default(MIMEN) @map("auth_role")
   institutionId      String             @map("institution_id")
+  // Parish CRM extensions
+  sex                Sex?               @map("sex")
+  age                Int?               @map("age")
+  location           String?            @map("location")
+  spiritualFatherId  String?            @map("spiritual_father_id")
   deletedAt          DateTime?          @map("deleted_at")
   createdAt          DateTime           @default(now()) @map("created_at")
   updatedAt          DateTime           @updatedAt @map("updated_at")
@@ -175,11 +209,17 @@ model User {
   // Module 16 — Monastic Estates & Sacred Artifacts Ledger
   artifactInspections     ArtifactAuditLog[]        @relation("ArtifactInspections")
   mimenChildren           Mimen[]                   @relation("PriestMimens")
-
+  // Parish CRM — self-referencing spiritual father (must be PRIEST)
+  spiritualFather         User?                     @relation("SpiritualFatherChildren", fields: [spiritualFatherId], references: [id])
+  spiritualChildren       User[]                    @relation("SpiritualFatherChildren")
+  // Parish Financial Ledger
+  parishLedgerEntries     ParishLedger[]            @relation("UserParishLedger")
+  targetedGiftEntries     ParishLedger[]            @relation("PriestGiftLedger")
 
   @@index([institutionId, deletedAt])
   @@index([id, nameAm])
   @@index([id, nameGez])
+  @@index([institutionId, spiritualFatherId])
   @@map("users")
 }
 
@@ -937,22 +977,27 @@ model MonasticEstate {
 }
 
 model Mimen {
-  id               String          @id @default(uuid())
-  phone            String          @unique
-  fullName         String          @map("full_name")
-  christianName    String?         @map("christian_name")
-  passwordHash     String          @map("password_hash")
-  tenantId         String          @map("tenant_id")
-  assignedPriestId String?         @map("assigned_priest_id")
-  createdAt        DateTime        @default(now()) @map("created_at")
-  updatedAt        DateTime        @updatedAt @map("updated_at")
+  id                 String          @id @default(uuid())
+  phone              String          @unique
+  fullName           String          @map("full_name")
+  christianName      String?         @map("christian_name")
+  passwordHash       String          @map("password_hash")
+  tenantId           String          @map("tenant_id")
+  assignedPriestId   String?         @map("assigned_priest_id")
+  // Parish CRM extension — spiritual father link (User.PRIEST)
+  spiritualFatherId  String?         @map("spiritual_father_id")
+  sex                Sex?            @map("sex")
+  location           String?         @map("location")
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
 
-  tenant           Institution     @relation("TenantMimens", fields: [tenantId], references: [id])
-  assignedPriest   User?           @relation("PriestMimens", fields: [assignedPriestId], references: [id])
-  payments         PaymentLedger[]
+  tenant             Institution     @relation("TenantMimens", fields: [tenantId], references: [id])
+  assignedPriest     User?           @relation("PriestMimens", fields: [assignedPriestId], references: [id])
+  payments           PaymentLedger[]
 
   @@index([tenantId])
   @@index([assignedPriestId])
+  @@index([spiritualFatherId])
   @@map("mimens")
 }
 
@@ -970,4 +1015,29 @@ model PaymentLedger {
 
   @@index([mimenId])
   @@map("payment_ledgers")
+}
+
+// ── Parish Financial Ledger (Module 17 — Parish CRM & Financial Ingestion) ──────
+
+model ParishLedger {
+  id              String               @id @default(uuid())
+  userId          String               @map("user_id")
+  category        ParishLedgerCategory @map("category")
+  amount          Decimal              @db.Decimal(19, 4)
+  currency        String               @default("ETB")
+  method          ParishPaymentMethod  @map("method")
+  referenceNumber String               @unique @map("reference_number")
+  /// Optional — set when category = PRIEST_GIFT; links to the recipient priest
+  targetPriestId  String?              @map("target_priest_id")
+  /// Raw gateway webhook payload stored for audit trail
+  rawPayload      Json?                @map("raw_payload")
+  createdAt       DateTime             @default(now()) @map("created_at")
+  updatedAt       DateTime             @updatedAt @map("updated_at")
+
+  user            User                 @relation("UserParishLedger", fields: [userId], references: [id])
+  targetPriest    User?                @relation("PriestGiftLedger", fields: [targetPriestId], references: [id])
+
+  @@index([userId, category, createdAt])
+  @@index([targetPriestId])
+  @@map("parish_ledgers")
 }

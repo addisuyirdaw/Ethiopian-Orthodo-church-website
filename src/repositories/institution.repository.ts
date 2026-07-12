@@ -50,6 +50,27 @@ export class InstitutionRepository {
       orderBy: { hierarchyPath: 'asc' },
     });
   }
+
+  async findPriestsByInstitution(institutionId: string) {
+    return prisma.user.findMany({
+      where: {
+        institutionId,
+        ecclesiasticalRole: 'PRIEST',
+        deletedAt: null,
+      },
+      orderBy: { fullName: 'asc' },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        titleEn: true,
+        titleAm: true,
+        titleGez: true,
+        sex: true,
+        location: true,
+      },
+    });
+  }
 }
 
 export const institutionRepository = new InstitutionRepository();

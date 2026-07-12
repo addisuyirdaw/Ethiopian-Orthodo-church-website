@@ -5,6 +5,16 @@ import { institutionController } from '../controllers/institution.controller';
 
 const router = Router();
 
+router.get(
+  '/',
+  asyncHandler(async (req, res) => institutionController.listPublicInstitutions(req, res)),
+);
+
+router.get(
+  '/:institutionId/priests',
+  asyncHandler(async (req, res) => institutionController.listInstitutionPriests(req, res)),
+);
+
 router.use(authenticateJwt);
 
 router.get(

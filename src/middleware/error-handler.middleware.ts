@@ -154,6 +154,26 @@ export function errorHandler(
       message: `[${err.code}] ${err.message}`,
       stack: err.stack,
     });
+
+    if (err.code === 'P2002') {
+      const target = Array.isArray(err.meta?.target) ? err.meta.target.join(', ') : String(err.meta?.target);
+      res.status(409).json({
+        error: 'Conflict',
+        message: target.includes('email')
+          ? 'A user with that email address already exists.'
+          : `A unique constraint violation occurred on ${target}.`,
+      });
+      return;
+    }
+
+    if (err.code === 'P2025') {
+      res.status(404).json({
+        error: 'NotFound',
+        message: 'A referenced record could not be found.',
+      });
+      return;
+    }
+
     res.status(500).json({
       error: 'InternalServerError',
       message: 'A database error occurred. Please try again later.',

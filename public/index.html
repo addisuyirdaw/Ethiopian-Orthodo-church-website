@@ -1956,6 +1956,7 @@
       </div>
 
       <button class="btn-modal-submit" id="login-submit-btn" onclick="doLogin()" data-i18n="btn_sign_in">Sign In to Dashboard</button>
+      <button class="btn" type="button" style="margin-top:0.75rem;" onclick="openSignupModal()">Create an account</button>
 
       <!-- Demo credentials accordion -->
       <button class="demo-creds-toggle" id="demo-creds-toggle" onclick="toggleDemoCreds()" aria-expanded="false">
@@ -1992,9 +1993,50 @@
     </div>
   </div>
 
-  <div class="page-wrapper">
+  <div class="modal-overlay" id="signup-modal" role="dialog" aria-modal="true" aria-labelledby="signup-modal-title">
+    <div class="modal-card">
+      <button class="modal-close-btn" onclick="closeSignupModal()" aria-label="Close signup modal">✕</button>
+      <div class="modal-header">
+        <span class="modal-cross" aria-hidden="true">☩</span>
+        <h2 class="modal-title" id="signup-modal-title">Join OrthodoxConnect</h2>
+        <p class="modal-subtitle">Create an account and select your church.</p>
+      </div>
 
-    <!-- ══════════════════════════════════════════════════════
+      <div class="modal-login-error" id="signup-modal-error"></div>
+
+      <div class="dash-form-group">
+        <label for="signup-fullname">Full Name</label>
+        <input type="text" id="signup-fullname" placeholder="Full Name" autocomplete="name">
+      </div>
+      <div class="dash-form-group">
+        <label for="signup-email">Email Address</label>
+        <input type="email" id="signup-email" placeholder="you@example.org" autocomplete="email">
+      </div>
+      <div class="dash-form-group">
+        <label for="signup-password">Password</label>
+        <input type="password" id="signup-password" placeholder="••••••••••" autocomplete="new-password">
+      </div>
+      <div class="dash-form-group">
+        <label for="signup-sex">Sex</label>
+        <select id="signup-sex">
+          <option value="">Select sex</option>
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
+        </select>
+      </div>
+      <div class="dash-form-group">
+        <label for="signup-age">Age</label>
+        <input type="number" id="signup-age" placeholder="Age" min="12" max="120">
+      </div>
+      <div class="dash-form-group">
+        <label for="signup-institution">Select Church</label>
+        <select id="signup-institution"><option value="">Loading institutions…</option></select>
+      </div>
+
+      <button class="btn-modal-submit" id="signup-submit-btn" onclick="doSignup()">Create account</button>
+    </div>
+  </div>
+
          PUBLIC LANDING VIEW
     ══════════════════════════════════════════════════════ -->
     <div id="public-view">
@@ -2224,29 +2266,38 @@
           <span class="tab-icon">📜</span>
           <span data-i18n="tab_sacraments">Sacraments</span>
         </button>
-        <button class="dash-tab-btn" id="tab-btn-fintech-panel" onclick="switchDashTab('fintech-panel')">
+        <button class="dash-tab-btn" id="tab-btn-fintech-split" onclick="switchDashTab('fintech-split')">
           <span class="tab-icon">💳</span>
           <span data-i18n="tab_fintech">FinTech Split</span>
         </button>
-        <button class="dash-tab-btn" id="tab-btn-hierarchy-panel" onclick="switchDashTab('hierarchy-panel')">
+        <button class="dash-tab-btn" id="tab-btn-jurisdictions" onclick="switchDashTab('jurisdictions')">
           <span class="tab-icon">🌿</span>
           <span data-i18n="tab_hierarchy">Jurisdictions</span>
         </button>
-        <button class="dash-tab-btn" id="tab-btn-vault-panel" onclick="switchDashTab('vault-panel')">
+        <button class="dash-tab-btn" id="tab-btn-seal-vault" onclick="switchDashTab('seal-vault')">
           <span class="tab-icon">🔏</span>
           <span data-i18n="tab_vault">Seal Vault</span>
         </button>
-        <button class="dash-tab-btn" id="tab-btn-clergy-panel" onclick="switchDashTab('clergy-panel')">
+        <button class="dash-tab-btn" id="tab-btn-clergy-ledger" onclick="switchDashTab('clergy-ledger')">
           <span class="tab-icon">⛪</span>
           <span data-i18n="tab_clergy">Clergy Ledger</span>
         </button>
-        <button class="dash-tab-btn" id="tab-btn-artifacts-estates-panel" onclick="switchDashTab('artifacts-estates-panel')">
+        <button class="dash-tab-btn" id="tab-btn-monastic-estates" onclick="switchDashTab('monastic-estates')">
           <span class="tab-icon">🏺</span>
           <span data-i18n="tab_artifacts_estates">Monastic Estates & Artifacts Ledger</span>
         </button>
         <button class="dash-tab-btn" id="tab-btn-db-panel" onclick="switchDashTab('db-panel')">
           <span class="tab-icon">⚙️</span>
           <span data-i18n="tab_db">DB Control</span>
+        </button>
+        <!-- Module 17: Parish CRM tabs (appended) -->
+        <button class="dash-tab-btn" id="tab-btn-payment-history-panel" onclick="switchDashTab('payment-history-panel')">
+          <span class="tab-icon">💳</span>
+          <span data-i18n="tab_payment_history">Payment History</span>
+        </button>
+        <button class="dash-tab-btn" id="tab-btn-priest-crm-panel" onclick="switchDashTab('priest-crm-panel')">
+          <span class="tab-icon">⛪</span>
+          <span data-i18n="tab_priest_crm">Follower CRM</span>
         </button>
       </div>
 
@@ -2377,7 +2428,7 @@
       </div>
 
       <!-- ── Panel: FinTech Split ── -->
-      <div class="dash-panel" id="fintech-panel">
+      <div class="dash-panel" id="fintech-split">
         <div class="panel-card">
           <div class="panel-header">
             <div class="panel-title" data-i18n="fintech_panel_title">💳 Real-time FinTech Ledger</div>
@@ -2437,7 +2488,7 @@
       </div>
 
       <!-- ── Panel: Jurisdiction Hierarchy ── -->
-      <div class="dash-panel" id="hierarchy-panel">
+      <div class="dash-panel" id="jurisdictions">
         <div class="panel-card">
           <div class="panel-header">
             <div class="panel-title" data-i18n="hierarchy_panel_title">🌿 Canonical Jurisdiction Hierarchy</div>
@@ -2451,7 +2502,7 @@
       </div>
 
       <!-- ── Panel: Cryptographic Seal Vault ── -->
-      <div class="dash-panel" id="vault-panel">
+      <div class="dash-panel" id="seal-vault">
         <div class="panel-card">
           <div class="panel-header">
             <div class="panel-title" data-i18n="vault_panel_title">🔏 Cryptographic Seal Vault</div>
@@ -2496,7 +2547,7 @@
       </div>
 
       <!-- ── Panel: Clergy Status Ledger ── -->
-      <div class="dash-panel" id="clergy-panel">
+      <div class="dash-panel" id="clergy-ledger">
         <div class="panel-card">
           <div class="panel-header">
             <div class="panel-title" data-i18n="clergy_panel_title">⛪ Clergy Canonical Status Ledger</div>
@@ -2517,7 +2568,7 @@
       </div>
 
       <!-- ── Panel: Monastic Estates & Sacred Artifacts Ledger ── -->
-      <div class="dash-panel" id="artifacts-estates-panel">
+      <div class="dash-panel" id="monastic-estates">
         <div class="dashboard-grid-m16">
           
           <!-- Card: Sacred Artifacts Registry -->
@@ -2892,6 +2943,30 @@
         disp_cond_GOOD: 'Good',
         disp_cond_NEEDS_RESTORATION: 'Needs Restoration',
         disp_cond_CRITICAL: 'Critical',
+        /* ── Parish CRM & Payment History (Module 17) ── */
+        tab_payment_history: 'Payment History',
+        tab_priest_crm: 'Follower CRM',
+        payment_history_title: '💳 የክፍያ ታሪክ — Payment History',
+        payment_history_desc: 'Your complete personal contribution history from the parish ledger.',
+        payment_history_empty: 'No payment records found.',
+        col_date: 'Date',
+        col_ref: 'Reference No.',
+        col_amount: 'Amount (ETB)',
+        col_category: 'Category',
+        col_method: 'Method',
+        col_target_priest: 'Target Priest',
+        btn_load_history: 'Load My History',
+        priest_crm_title: '⛪ ምእምናን ዝርዝር — Follower Registry',
+        priest_crm_desc: 'Followers assigned to your spiritual guidance. Delayed ASRAT payers are flagged automatically.',
+        priest_crm_empty: 'No followers found under your spiritual care.',
+        col_fullname: 'Full Name',
+        col_sex: 'Sex',
+        col_location: 'Location',
+        col_last_asrat: 'Last ASRAT',
+        col_status: 'Status',
+        badge_delayed: 'ክፍያ የዘገየ',
+        badge_ok: 'ሁኔታ ጥሩ',
+        btn_load_followers: 'Load Followers',
       },
       am: {
         /* ── App Shell ── */
@@ -3108,6 +3183,30 @@
         disp_cond_GOOD: 'ጥሩ',
         disp_cond_NEEDS_RESTORATION: 'ጥገና የሚያስፈልገው',
         disp_cond_CRITICAL: 'አስጊ ሁኔታ ላይ ያለ',
+        /* ── Parish CRM & Payment History (Module 17) ── */
+        tab_payment_history: 'የክፍያ ታሪክ',
+        tab_priest_crm: 'ምእምናን ማዕቀፍ',
+        payment_history_title: '💳 የክፍያ ታሪክ',
+        payment_history_desc: 'ሙሉ የክፍያ ታሪክዎን ከደብር ሂሳብ ይፈትሹ።',
+        payment_history_empty: 'ምንም የክፍያ መዝገብ አልተገኘም።',
+        col_date: 'ቀን',
+        col_ref: 'የደረሰኝ ቁጥር',
+        col_amount: 'መጠን (ብር)',
+        col_category: 'ምድብ',
+        col_method: 'ዘዴ',
+        col_target_priest: 'ተጠቃሚ ካህን',
+        btn_load_history: 'ታሪክ ጫን',
+        priest_crm_title: '⛪ ምእምናን ዝርዝር',
+        priest_crm_desc: 'ለእርስዎ መንፈሳዊ አባትነት የተሰጡ ምእምናን። የዘገዩ አሥራተኞች በቀይ ምልክት ይታያሉ።',
+        priest_crm_empty: 'ምንም ምእምን አልተሰጠዎትም።',
+        col_fullname: 'ሙሉ ስም',
+        col_sex: 'ጾታ',
+        col_location: 'አካባቢ',
+        col_last_asrat: 'ዳሕሬ አሥራት',
+        col_status: 'ሁኔታ',
+        badge_delayed: 'ክፍያ የዘገየ',
+        badge_ok: 'ሁኔታ ጥሩ',
+        btn_load_followers: 'ምእምናን ጫን',
       },
       gez: {
         /* ── App Shell ── */
@@ -3280,6 +3379,30 @@
         disp_cond_GOOD: 'ሠናይ',
         disp_cond_NEEDS_RESTORATION: 'ዕቅበት ዘይፈቅድ',
         disp_cond_CRITICAL: 'ዕቅበት ዐቢይ',
+        /* ── Parish CRM & Payment History (Module 17) ── */
+        tab_payment_history: 'ዜና ክፍያ',
+        tab_priest_crm: 'ዝርዝረ ምእምናን',
+        payment_history_title: '💳 ዜና ክፍያ — History of Payments',
+        payment_history_desc: 'ዘቤተ ክርስቲያን ሂሳብ ምሉዕ ዜና ክፍያክሙ ርኡዩ።',
+        payment_history_empty: 'ዘምሥ ዐቢደ ክፍያ ውእቱ።',
+        col_date: 'ዕለት',
+        col_ref: 'ቁጥር ዘደረሰኝ',
+        col_amount: 'ዋጋ (ብር)',
+        col_category: 'ምድብ',
+        col_method: 'ዘዴ',
+        col_target_priest: 'ካህን ዘተቀደሰ',
+        btn_load_history: 'ዜና ጫን',
+        priest_crm_title: '⛪ ዝርዝረ ምእምናን',
+        priest_crm_desc: 'ምእምናን ዘተሰጡ ለምንፈሳዊ አበዊከ።',
+        priest_crm_empty: 'ዘምሥ ምእምን ምሥጢር አልቦ።',
+        col_fullname: 'ስምከ ምሉዕ',
+        col_sex: 'ዘርዑ',
+        col_location: 'ቦታ',
+        col_last_asrat: 'ዳሕሬ አሥራት',
+        col_status: 'ሁኔታ',
+        badge_delayed: 'ክፍያ ዘዘገየ',
+        badge_ok: 'ሠናይ',
+        btn_load_followers: 'ምእምናን ጫን',
       }
     };
 
@@ -3536,10 +3659,57 @@
         document.getElementById('celebrant-priest-id').value = currentUserData.id;
       }
 
-      // Show first tab
-      switchDashTab('calendar-panel');
+      // Apply role-based panel visibility before showing any tab
+      applyRoleVisibility();
+
+      // Route MIMEN users straight to their payment history; everyone else starts on calendar
+      const authRole = (currentUserData.auth_role || currentUserData.authRole || 'MIMEN').toUpperCase();
+      switchDashTab(authRole === 'MIMEN' ? 'payment-history-panel' : 'calendar-panel');
+
       // Initialise lock overlays based on role
       updateLedgerLockOverlays();
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  §4b. ROLE-BASED VISIBILITY
+    //  Panels/tabs that require at least PRIEST level are hidden from
+    //  plain MIMEN (lay member) accounts immediately after login.
+    // ═══════════════════════════════════════════════════════════════
+    function applyRoleVisibility() {
+      if (!currentUserData) return;
+
+      const authRole = (currentUserData.auth_role || currentUserData.authRole || 'MIMEN').toUpperCase();
+      const isMimen  = authRole === 'MIMEN';
+
+      // IDs of dashboard panels and their matching tab buttons that are
+      // restricted to PRIEST / PARISH_ADMIN / SYSTEM_ADMIN accounts.
+      // Maps to: FinTech Split (#fintech-panel), Jurisdictions (#hierarchy-panel),
+      //          Seal Vault (#vault-panel), Clergy Ledger (#clergy-panel),
+      //          Monastic Estates (#artifacts-estates-panel).
+      const restrictedPanels = [
+        'fintech-panel',
+        'hierarchy-panel',
+        'vault-panel',
+        'clergy-panel',
+        'artifacts-estates-panel'
+      ];
+
+      restrictedPanels.forEach(function(panelId) {
+        var panel  = document.getElementById(panelId);
+        var tabBtn = document.getElementById('tab-btn-' + panelId);
+        var displayVal = isMimen ? 'none' : '';
+        if (panel)  panel.style.display  = displayVal;
+        if (tabBtn) tabBtn.style.display = displayVal;
+      });
+
+      // The Priest CRM tab is PRIEST+ only — hide it from MIMEN users.
+      var priestTab = document.getElementById('tab-btn-priest-crm-panel');
+      if (priestTab) priestTab.style.display = isMimen ? 'none' : '';
+
+      // MIMEN users see their own payment history and Tithe/Asrat panel only.
+      // Make sure the payment-history tab button is always visible to them.
+      var payHistTab = document.getElementById('tab-btn-payment-history-panel');
+      if (payHistTab) payHistTab.style.display = '';
     }
 
     function enterPublicView() {
@@ -3578,6 +3748,88 @@
     function closeLoginModal() {
       document.getElementById('login-modal').classList.remove('open');
       document.getElementById('modal-error').classList.remove('show');
+    }
+
+    function openSignupModal() {
+      closeLoginModal();
+      document.getElementById('signup-modal').classList.add('open');
+      document.getElementById('signup-fullname').focus();
+      loadSignupInstitutions();
+    }
+    function closeSignupModal() {
+      document.getElementById('signup-modal').classList.remove('open');
+      document.getElementById('signup-modal-error').classList.remove('show');
+    }
+
+    async function loadSignupInstitutions() {
+      const select = document.getElementById('signup-institution');
+      if (!select) return;
+      select.disabled = true;
+      select.innerHTML = '<option value="">Loading institutions…</option>';
+      try {
+        const res = await fetch(`${BASE_URL}/api/v1/institutions`);
+        const payload = await res.json();
+        const options = (payload.data || []).map(function(inst) {
+          const label = inst.name || inst.nameEn || inst.nameAm || inst.nameGez || inst.id;
+          return `<option value="${inst.id}">${label}</option>`;
+        });
+        select.innerHTML = '<option value="">Select your church</option>' + options.join('');
+      } catch (err) {
+        select.innerHTML = '<option value="">Unable to load churches</option>';
+      } finally {
+        select.disabled = false;
+      }
+    }
+
+    async function doSignup() {
+      const errorEl = document.getElementById('signup-modal-error');
+      const submitBtn = document.getElementById('signup-submit-btn');
+      const fullName = document.getElementById('signup-fullname').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const sex = document.getElementById('signup-sex').value;
+      const age = parseInt(document.getElementById('signup-age').value, 10);
+      const institutionId = document.getElementById('signup-institution').value;
+
+      if (!errorEl || !submitBtn) return;
+      errorEl.classList.remove('show');
+
+      if (!fullName || !email || !password || !sex || !age || !institutionId) {
+        errorEl.innerText = 'All fields are required to create an account.';
+        errorEl.classList.add('show');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Creating…';
+
+      try {
+        const res = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          // authRole is sent explicitly so the intent is clear; the backend enforces MIMEN on public signup
+          body: JSON.stringify({ email, password, fullName, sex, age, institutionId, authRole: 'MIMEN' })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errorEl.innerText = data.error?.message || data.message || 'Unable to create account.';
+          errorEl.classList.add('show');
+          return;
+        }
+
+        currentToken = data.data.token;
+        currentUserData = data.data.user;
+        localStorage.setItem('token', currentToken);
+        localStorage.setItem('userData', JSON.stringify(currentUserData));
+        closeSignupModal();
+        enterDashboard();
+      } catch (err) {
+        errorEl.innerText = 'Network error. Please check your connection.';
+        errorEl.classList.add('show');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Create account';
+      }
     }
 
     function toggleDemoCreds() {
@@ -3673,9 +3925,11 @@
     //  §7. DASHBOARD TAB NAVIGATION
     // ═══════════════════════════════════════════════════════════════
     const DASH_TAB_IDS = [
-      'calendar-panel','sacraments-panel','fintech-panel',
-      'hierarchy-panel','vault-panel','clergy-panel','db-panel',
-      'artifacts-estates-panel'
+      'calendar-panel','sacraments-panel','fintech-split',
+      'jurisdictions','seal-vault','clergy-ledger','db-panel',
+      'monastic-estates',
+      // Module 17 — Parish CRM panels (appended)
+      'payment-history-panel','priest-crm-panel'
     ];
 
     function switchDashTab(tabId) {
@@ -3993,7 +4247,8 @@
       const splitsSection = document.getElementById('splits-section');
       splitsSection.style.display = 'none';
       if (!currentToken) {
-        alert('Authentication required. Please log in first.');
+        // PAYMENT AUTH GUARD — replaced alert() with modal
+        openLoginModal();
         return;
       }
       const btn = document.getElementById('fintech-btn');
@@ -4366,6 +4621,10 @@
           <tr>
             <td><span style="font-weight:600;color:var(--text-white);">${a.nameAm || a.nameEn || '—'}</span><br><span style="font-size:0.75rem;color:var(--text-dim);">${a.nameEn || ''}</span></td>
             <td><span class="status-badge active-mod">${a.category || '—'}</span></td>
+            <td style="padding:0.55rem 0.8rem;white-space:nowrap;">
+              <button class="btn-outline-gold" style="font-size:0.72rem;padding:0.3rem 0.6rem;margin-right:0.35rem;" title="Edit follower profile (PUT /api/v1/priest/followers/${a.id})" onclick="promptEditFollower('${a.id}')">✏️ Edit Profile</button>
+              <button class="btn-outline-danger" style="font-size:0.72rem;padding:0.3rem 0.6rem;" title="Remove follower (DELETE /api/v1/priest/followers/${a.id})" onclick="promptDeleteFollower('${a.id}')">🗑️ Remove</button>
+            </td>
             <td><span class="status-badge ${conditionClass(a.structuralCondition)}">${a.structuralCondition || '—'}</span></td>
             <td>${a.storageLocation || '—'}</td>
             <td>${a.estimatedAge ?? '—'}</td>
@@ -4538,6 +4797,268 @@
       }
     }
 
+  </script>
+
+  <!-- ══════════════════════════════════════════════════════
+       MODULE 17: PARISH PAYMENT HISTORY PANEL (appended)
+  ══════════════════════════════════════════════════════ -->
+  <script>
+  // Inject the two new panel HTML into the dashboard-view on load
+  document.addEventListener('DOMContentLoaded', function() {
+    var dashView = document.getElementById('dashboard-view');
+    if (!dashView) return;
+
+    // ── Payment History Panel ──────────────────────────────────
+    var phPanel = document.createElement('div');
+    phPanel.className = 'dash-panel';
+    phPanel.id = 'payment-history-panel';
+    phPanel.innerHTML = [
+      '<div class="panel-card">',
+        '<div class="panel-header">',
+          '<div class="panel-title" data-i18n="payment_history_title">💳 የክፍያ ታሪክ — Payment History</div>',
+        '</div>',
+        '<p class="panel-desc" data-i18n="payment_history_desc">Your complete personal contribution history from the parish ledger.</p>',
+        '<button class="btn" id="ph-load-btn" onclick="loadPaymentHistory()" data-i18n="btn_load_history">Load My History</button>',
+        '<div id="ph-status" style="margin:1rem 0;color:var(--text-muted);font-size:0.9rem;"></div>',
+        '<div style="overflow-x:auto;margin-top:1rem;">',
+          '<table id="ph-table" style="width:100%;border-collapse:collapse;display:none;">',
+            '<thead>',
+              '<tr style="border-bottom:1px solid var(--border-color);">',
+                '<th style="text-align:left;padding:0.6rem 0.8rem;color:var(--gold);font-family:var(--font-serif);font-size:0.85rem;" data-i18n="col_date">Date</th>',
+                '<th style="text-align:left;padding:0.6rem 0.8rem;color:var(--gold);font-family:var(--font-serif);font-size:0.85rem;" data-i18n="col_ref">Reference No.</th>',
+                '<th style="text-align:left;padding:0.6rem 0.8rem;color:var(--gold);font-family:var(--font-serif);font-size:0.85rem;" data-i18n="col_amount">Amount (ETB)</th>',
+                '<th style="text-align:left;padding:0.6rem 0.8rem;color:var(--gold);font-family:var(--font-serif);font-size:0.85rem;" data-i18n="col_category">Category</th>',
+                '<th style="text-align:left;padding:0.6rem 0.8rem;color:var(--gold);font-family:var(--font-serif);font-size:0.85rem;" data-i18n="col_method">Method</th>',
+                '<th style="text-align:left;padding:0.6rem 0.8rem;color:var(--gold);font-family:var(--font-serif);font-size:0.85rem;" data-i18n="col_target_priest">Target Priest</th>',
+              '</tr>',
+            '</thead>',
+            '<tbody id="ph-tbody"></tbody>',
+          '</table>',
+        '</div>',
+      '</div>'
+    ].join('');
+    dashView.appendChild(phPanel);
+
+    // ── Priest CRM Panel ───────────────────────────────────────
+    var crmPanel = document.createElement('div');
+    crmPanel.className = 'dash-panel';
+    crmPanel.id = 'priest-crm-panel';
+    crmPanel.innerHTML = [
+      '<div class="panel-card">',
+        '<div class="panel-header">',
+          '<div class="panel-title" data-i18n="priest_crm_title">⛪ ምእምናን ዝርዝር — Follower Registry</div>',
+        '</div>',
+        '<p class="panel-desc" data-i18n="priest_crm_desc">Followers assigned to your spiritual guidance. Delayed ASRAT payers are flagged automatically.</p>',
+        '<button class="btn" id="crm-load-btn" onclick="loadPriestFollowers()" data-i18n="btn_load_followers">Load Followers</button>',
+        '<button class="btn" type="button" style="margin-left:0.75rem;" onclick="promptCreateFollower()">Create Follower</button>',
+        '<div id="crm-status" style="margin:1rem 0;color:var(--text-muted);font-size:0.9rem;"></div>',
+        '<div style="overflow-x:auto;margin-top:1rem;">',
+          '<table id="crm-table" style="width:100%;border-collapse:collapse;display:none;">',
+            '<thead>',
+              '<tr style="border-bottom:1px solid var(--border-color);">',
+                '<th style="text-align:left;padding:0.6rem 0.8rem;color:var(--gold);font-family:var(--font-serif);font-size:0.85rem;" data-i18n="col_fullname">Full Name</th>',
+                '<th style="text-align:left;padding:0.6rem 0.8rem;color:var(--gold);font-family:var(--font-serif);font-size:0.85rem;" data-i18n="col_sex">Sex</th>',
+                '<th style="text-align:left;padding:0.6rem 0.8rem;color:var(--gold);font-family:var(--font-serif);font-size:0.85rem;" data-i18n="col_location">Location</th>',
+                '<th style="text-align:left;padding:0.6rem 0.8rem;color:var(--gold);font-family:var(--font-serif);font-size:0.85rem;" data-i18n="col_last_asrat">Last ASRAT</th>',
+                '<th style="text-align:left;padding:0.6rem 0.8rem;color:var(--gold);font-family:var(--font-serif);font-size:0.85rem;" data-i18n="col_status">Status</th>',
+                '<th style="text-align:left;padding:0.6rem 0.8rem;color:var(--gold);font-family:var(--font-serif);font-size:0.85rem;">Actions</th>',
+              '</tr>',
+            '</thead>',
+            '<tbody id="crm-tbody"></tbody>',
+          '</table>',
+        '</div>',
+      '</div>'
+    ].join('');
+    dashView.appendChild(crmPanel);
+
+    // Re-apply translations to newly injected elements
+    if (typeof applyTranslations === 'function') applyTranslations();
+  });
+
+  // ── Payment History Loader ──────────────────────────────────
+  async function loadPaymentHistory() {
+    if (!currentToken) { openLoginModal(); return; }
+    var statusEl = document.getElementById('ph-status');
+    var table    = document.getElementById('ph-table');
+    var tbody    = document.getElementById('ph-tbody');
+    var btn      = document.getElementById('ph-load-btn');
+    if (!statusEl || !table || !tbody) return;
+    btn.disabled = true;
+    statusEl.innerText = 'Loading…';
+    try {
+      var res  = await fetch(BASE_URL + '/api/v1/transactions/history', {
+        headers: { 'Authorization': 'Bearer ' + currentToken }
+      });
+      var data = await res.json();
+      if (!res.ok) {
+        statusEl.innerText = data.message || 'Failed to load history.';
+        return;
+      }
+      var rows = data.data || [];
+      statusEl.innerText = rows.length + ' ' + (t('col_ref') === 'ቀን' ? 'ክፍያዎች' : 'payment(s) found.');
+      tbody.innerHTML = '';
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:1.5rem;">' + t('payment_history_empty') + '</td></tr>';
+      } else {
+        rows.forEach(function(r) {
+          var tr = document.createElement('tr');
+          tr.style.borderBottom = '1px solid var(--border-color)';
+          tr.innerHTML = [
+            '<td style="padding:0.55rem 0.8rem;font-size:0.87rem;">' + new Date(r.createdAt).toLocaleDateString() + '</td>',
+            '<td style="padding:0.55rem 0.8rem;font-family:\'Courier New\',monospace;font-size:0.8rem;color:var(--gold);">' + (r.referenceNumber || '—') + '</td>',
+            '<td style="padding:0.55rem 0.8rem;font-weight:600;">' + parseFloat(r.amount).toFixed(2) + ' ' + (r.currency || 'ETB') + '</td>',
+            '<td style="padding:0.55rem 0.8rem;"><span class="status-badge active-mod">' + (r.category || '—') + '</span></td>',
+            '<td style="padding:0.55rem 0.8rem;">' + (r.method || '—') + '</td>',
+            '<td style="padding:0.55rem 0.8rem;">' + (r.targetPriest ? r.targetPriest.fullName : '—') + '</td>'
+          ].join('');
+          tbody.appendChild(tr);
+        });
+      }
+      table.style.display = 'table';
+    } catch(err) {
+      statusEl.innerText = 'Network error: ' + err.message;
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  // ── Priest CRM Followers Loader ─────────────────────────────
+  async function loadPriestFollowers() {
+    if (!currentToken) { openLoginModal(); return; }
+    var statusEl = document.getElementById('crm-status');
+    var table    = document.getElementById('crm-table');
+    var tbody    = document.getElementById('crm-tbody');
+    var btn      = document.getElementById('crm-load-btn');
+    if (!statusEl || !table || !tbody) return;
+    btn.disabled = true;
+    statusEl.innerText = 'Loading…';
+    try {
+      var res  = await fetch(BASE_URL + '/api/v1/priest/my-followers', {
+        headers: { 'Authorization': 'Bearer ' + currentToken }
+      });
+      var data = await res.json();
+      if (!res.ok) {
+        statusEl.style.color = 'var(--accent-red)';
+        statusEl.innerText = data.message || 'Access denied. This panel requires PRIEST role.';
+        return;
+      }
+      statusEl.style.color = '';
+      var followers = data.data || [];
+      statusEl.innerText = followers.length + ' follower(s). Delayed: ' + (data.delayedCount || 0);
+      tbody.innerHTML = '';
+      if (!followers.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:1.5rem;">' + t('priest_crm_empty') + '</td></tr>';
+      } else {
+        followers.forEach(function(f) {
+          var isDelayed = f.paymentStatus === 'DELAYED';
+          var statusBadge = isDelayed
+            ? '<span style="display:inline-flex;align-items:center;gap:0.35rem;background:rgba(231,76,60,0.18);color:#e74c3c;border:1px solid rgba(231,76,60,0.45);border-radius:4px;padding:0.2rem 0.6rem;font-size:0.78rem;font-weight:700;font-family:var(--font-serif);">🔴 ' + t('badge_delayed') + '</span>'
+            : '<span style="display:inline-flex;align-items:center;gap:0.35rem;background:rgba(39,174,96,0.15);color:#27ae60;border:1px solid rgba(39,174,96,0.35);border-radius:4px;padding:0.2rem 0.6rem;font-size:0.78rem;font-weight:600;">✅ ' + t('badge_ok') + '</span>';
+          var lastAsrat = f.lastAsratDate ? new Date(f.lastAsratDate).toLocaleDateString() : '—';
+          var tr = document.createElement('tr');
+          tr.style.borderBottom = '1px solid var(--border-color)';
+          if (isDelayed) tr.style.background = 'rgba(231,76,60,0.06)';
+          tr.innerHTML = [
+            '<td style="padding:0.55rem 0.8rem;font-weight:600;font-family:var(--font-serif);">' + (f.nameAm || f.fullName || '—') + '</td>',
+            '<td style="padding:0.55rem 0.8rem;font-size:0.87rem;">' + (f.sex || '—') + '</td>',
+            '<td style="padding:0.55rem 0.8rem;font-size:0.87rem;">' + (f.location || '—') + '</td>',
+            '<td style="padding:0.55rem 0.8rem;font-family:\'Courier New\',monospace;font-size:0.82rem;">' + lastAsrat + '</td>',
+            '<td style="padding:0.55rem 0.8rem;">' + statusBadge + '</td>',
+            '<td style="padding:0.55rem 0.8rem;white-space:nowrap;">' +
+              '<button class="btn-outline-gold" style="font-size:0.72rem;padding:0.3rem 0.6rem;margin-right:0.35rem;" title="Edit Profile (PUT /api/v1/priest/followers/' + f.id + ')" onclick="promptEditFollower(\'' + f.id + '\')">Edit Profile</button>' +
+              '<button class="btn-outline-danger" style="font-size:0.72rem;padding:0.3rem 0.6rem;" title="Remove (DELETE /api/v1/priest/followers/' + f.id + ')" onclick="promptDeleteFollower(\'' + f.id + '\')">Remove</button>' +
+            '</td>'
+          ].join('');
+          tbody.appendChild(tr);
+        });
+      }
+      table.style.display = 'table';
+    } catch(err) {
+      statusEl.style.color = 'var(--accent-red)';
+      statusEl.innerText = 'Network error: ' + err.message;
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  async function promptCreateFollower() {
+    if (!currentToken) { openLoginModal(); return; }
+    const fullName = prompt('Follower full name:');
+    if (!fullName) return;
+    const email = prompt('Follower email address:');
+    if (!email) return;
+    const password = prompt('Temporary password (min 6 chars):', 'orthodox123');
+    if (!password) return;
+    const sex = prompt('Sex (MALE/FEMALE):', 'MALE');
+    const location = prompt('Location (optional):', '');
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/v1/priest/followers`, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + currentToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, fullName, sex: sex || null, location: location || null })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error?.message || data.message || 'Failed to create follower.');
+        return;
+      }
+      loadPriestFollowers();
+    } catch (err) {
+      alert('Network error: ' + err.message);
+    }
+  }
+
+  async function promptEditFollower(id) {
+    if (!currentToken) { openLoginModal(); return; }
+    const email = prompt('Email (leave blank to keep current):');
+    const fullName = prompt('Full name (leave blank to keep current):');
+    const password = prompt('New password (leave blank to keep current):');
+    const sex = prompt('Sex (MALE/FEMALE, leave blank to keep current):');
+    const location = prompt('Location (leave blank to keep current):');
+    const payload = {};
+    if (email) payload.email = email;
+    if (fullName) payload.fullName = fullName;
+    if (password) payload.password = password;
+    if (sex) payload.sex = sex;
+    if (location) payload.location = location;
+    if (!Object.keys(payload).length) return;
+
+    try {
+      const res = await fetch(`${BASE_URL}/api/v1/priest/followers/${id}`, {
+        method: 'PUT',
+        headers: { 'Authorization': 'Bearer ' + currentToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error?.message || data.message || 'Failed to update follower.');
+        return;
+      }
+      loadPriestFollowers();
+    } catch (err) {
+      alert('Network error: ' + err.message);
+    }
+  }
+
+  async function promptDeleteFollower(id) {
+    if (!currentToken) { openLoginModal(); return; }
+    if (!confirm('Remove this follower from your spiritual care?')) return;
+    try {
+      const res = await fetch(`${BASE_URL}/api/v1/priest/followers/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + currentToken }
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error?.message || data.message || 'Failed to remove follower.');
+        return;
+      }
+      loadPriestFollowers();
+    } catch (err) {
+      alert('Network error: ' + err.message);
+    }
+  }
   </script>
 
 </body>
