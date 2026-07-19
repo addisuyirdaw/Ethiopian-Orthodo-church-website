@@ -22,5 +22,10 @@ export default defineConfig({
     // the static site without needing an outputDirectory in vercel.json.
     outDir: '../public',
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        format: 'es',
+      },
+    },
   },
 })
