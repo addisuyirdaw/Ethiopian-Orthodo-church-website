@@ -53,6 +53,9 @@ export function createApp(): Application {
   );
   app.use(localeMiddleware);
 
+  // Serve Vite-built frontend static files from /public
+  // process.cwd() is /var/task on Vercel, which is where includeFiles places public/**
+  app.use(express.static(path.join(process.cwd(), 'public'), { index: 'index.html' }));
 
 
   // Root welcome route redirects or shows API welcome page
@@ -91,6 +94,13 @@ export function createApp(): Application {
   });
 
   app.use('/api/v1', apiRoutes);
+
+  // SPA catch-all — serve index.html for any route not matched above
+  // This allows React Router to handle client-side navigation
+  app.get('*', (_req: Request, res: Response) => {
+    const indexPath = path.join(process.cwd(), 'public', 'index.html');
+    res.sendFile(indexPath);
+  });
 
   app.use(errorHandler);
 
