@@ -6,15 +6,19 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
+    // Dev-only proxy: forwards /api/* → local backend at https://localhost:3443/api/v1/*
+    // In production on Vercel, vercel.json routes handle /api/v1/* directly.
     proxy: {
-      // Forward /api/* → https://localhost:3443/api/v1/*
       '/api': {
         target: 'https://localhost:3443',
         changeOrigin: true,
-        secure: false, // accept self-signed mkcert cert in dev
+        secure: false,
         rewrite: (path) => path.replace(/^\/api/, '/api/v1'),
       },
     },
   },
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+  },
 })
-
