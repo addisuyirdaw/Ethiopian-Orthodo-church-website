@@ -1,18 +1,26 @@
 {
   "version": 2,
   "buildCommand": "npm run vercel-build",
-  "rewrites": [
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "prisma/schema.prisma"
+    }
+  },
+  "routes": [
     {
-      "source": "/health",
-      "destination": "/api"
+      "src": "^/health$",
+      "dest": "/api/index.ts"
     },
     {
-      "source": "/api/v1/:path*",
-      "destination": "/api"
+      "src": "^/api/v1(/.*)?$",
+      "dest": "/api/index.ts"
     },
     {
-      "source": "/((?!assets/).*)",
-      "destination": "/index.html"
+      "handle": "filesystem"
+    },
+    {
+      "src": "^(?!/api|/health).*$",
+      "dest": "/index.html"
     }
   ]
 }
