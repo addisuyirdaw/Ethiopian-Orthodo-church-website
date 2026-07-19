@@ -75,8 +75,11 @@ export function createApp(): Application {
   });
 
   app.get('/health', async (_req: Request, res: Response) => {
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('DB health check timed out after 5 s')), 5000)
+    );
     try {
-      const count = await prisma.institution.count();
+      const count = await Promise.race([prisma.institution.count(), timeout]);
       if (count === 0) {
         res.status(200).json({ status: 'pending', service: 'OrthodoxConnect API', message: 'Seeding pending.' });
         return;
