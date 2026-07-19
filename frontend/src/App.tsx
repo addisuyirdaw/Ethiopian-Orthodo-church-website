@@ -1,44 +1,8 @@
-import React, { useState } from 'react';
+import React, { Suspense, lazy, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import DirectoryDashboard from './components/DirectoryDashboard';
-import IdCardPrinter from './components/IdCardPrinter';
-import { SacramentClergyVerification } from './components/SacramentClergyVerification';
-import { UnifiedLoginPage } from './components/UnifiedLoginPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { ThemeProvider } from './components/common/ThemeProvider';
-import { HomePage } from './pages/public/HomePage';
-import { AboutPage } from './pages/public/AboutPage';
-import { ServicesPage } from './pages/public/ServicesPage';
-import { AnnouncementsPage } from './pages/public/AnnouncementsPage';
-import { PrayerRequestPage } from './pages/public/PrayerRequestPage';
-import { ContactPage } from './pages/public/ContactPage';
-import { RegistrationPage } from './pages/public/RegistrationPage';
-import { MemberProfilePage } from './pages/member/MemberProfilePage';
-import { PriestsListPage } from './pages/member/PriestsListPage';
-import { RequestStatusPage } from './pages/member/RequestStatusPage';
-import { PriestAssignmentPanel } from './pages/priest/PriestAssignmentPanel';
-// Phase 3 — Appointment Management
-import { BookAppointmentPage } from './pages/member/BookAppointmentPage';
-import { MyAppointmentsPage } from './pages/member/MyAppointmentsPage';
-import { PriestAppointmentsPage } from './pages/priest/PriestAppointmentsPage';
-// Phase 2.2 — Church Hierarchy Admin
-import { ChurchManagementPage } from './pages/admin/ChurchManagementPage';
-
-import { LiturgicalCalendarPanel } from './components/LiturgicalCalendarPanel';
-import { AlmsPaymentPanel } from './components/AlmsPaymentPanel';
-import { PaymentHistoryPanel } from './components/PaymentHistoryPanel';
-import { ClergyVerificationPanel } from './components/ClergyVerificationPanel';
-import { QaleGubaeMinutesPanel } from './components/QaleGubaeMinutesPanel';
-import { SebekaGubaeSeatsPanel } from './components/SebekaGubaeSeatsPanel';
-import { RelicsEstatesLedgerPanel } from './components/RelicsEstatesLedgerPanel';
-import { SealVaultPanel } from './components/SealVaultPanel';
-import { FollowerCrmPanel } from './components/FollowerCrmPanel';
-import { DatabaseControlPanel } from './components/DatabaseControlPanel';
-import { OnboardingWizard } from './components/OnboardingWizard';
-import { AppointmentBookingPanel } from './components/AppointmentBookingPanel';
-import { PriestAppointmentsPanel } from './components/PriestAppointmentsPanel';
-import { DualAuthApprovalPanel } from './components/DualAuthApprovalPanel';
 import {
   LogOut,
   CreditCard,
@@ -55,47 +19,74 @@ import {
   MapPin,
 } from 'lucide-react';
 
+// ─── Lazy-loaded Pages (code split — only loads the chunk you navigate to) ─────
+const DirectoryDashboard          = lazy(() => import('./components/DirectoryDashboard'));
+const IdCardPrinter               = lazy(() => import('./components/IdCardPrinter'));
+const SacramentClergyVerification = lazy(() => import('./components/SacramentClergyVerification').then(m => ({ default: m.SacramentClergyVerification })));
+const UnifiedLoginPage            = lazy(() => import('./components/UnifiedLoginPage').then(m => ({ default: m.UnifiedLoginPage })));
+const HomePage                    = lazy(() => import('./pages/public/HomePage').then(m => ({ default: m.HomePage })));
+const AboutPage                   = lazy(() => import('./pages/public/AboutPage').then(m => ({ default: m.AboutPage })));
+const ServicesPage                = lazy(() => import('./pages/public/ServicesPage').then(m => ({ default: m.ServicesPage })));
+const AnnouncementsPage           = lazy(() => import('./pages/public/AnnouncementsPage').then(m => ({ default: m.AnnouncementsPage })));
+const PrayerRequestPage           = lazy(() => import('./pages/public/PrayerRequestPage').then(m => ({ default: m.PrayerRequestPage })));
+const ContactPage                 = lazy(() => import('./pages/public/ContactPage').then(m => ({ default: m.ContactPage })));
+const RegistrationPage            = lazy(() => import('./pages/public/RegistrationPage').then(m => ({ default: m.RegistrationPage })));
+const MemberProfilePage           = lazy(() => import('./pages/member/MemberProfilePage').then(m => ({ default: m.MemberProfilePage })));
+const PriestsListPage             = lazy(() => import('./pages/member/PriestsListPage').then(m => ({ default: m.PriestsListPage })));
+const RequestStatusPage           = lazy(() => import('./pages/member/RequestStatusPage').then(m => ({ default: m.RequestStatusPage })));
+const PriestAssignmentPanel       = lazy(() => import('./pages/priest/PriestAssignmentPanel').then(m => ({ default: m.PriestAssignmentPanel })));
+const BookAppointmentPage         = lazy(() => import('./pages/member/BookAppointmentPage').then(m => ({ default: m.BookAppointmentPage })));
+const MyAppointmentsPage          = lazy(() => import('./pages/member/MyAppointmentsPage').then(m => ({ default: m.MyAppointmentsPage })));
+const PriestAppointmentsPage      = lazy(() => import('./pages/priest/PriestAppointmentsPage').then(m => ({ default: m.PriestAppointmentsPage })));
+const ChurchManagementPage        = lazy(() => import('./pages/admin/ChurchManagementPage').then(m => ({ default: m.ChurchManagementPage })));
+
+// ─── Lazy-loaded Dashboard Panels ────────────────────────────────────────────
+const LiturgicalCalendarPanel  = lazy(() => import('./components/LiturgicalCalendarPanel').then(m => ({ default: m.LiturgicalCalendarPanel })));
+const AlmsPaymentPanel         = lazy(() => import('./components/AlmsPaymentPanel').then(m => ({ default: m.AlmsPaymentPanel })));
+const PaymentHistoryPanel      = lazy(() => import('./components/PaymentHistoryPanel').then(m => ({ default: m.PaymentHistoryPanel })));
+const ClergyVerificationPanel  = lazy(() => import('./components/ClergyVerificationPanel').then(m => ({ default: m.ClergyVerificationPanel })));
+const QaleGubaeMinutesPanel    = lazy(() => import('./components/QaleGubaeMinutesPanel').then(m => ({ default: m.QaleGubaeMinutesPanel })));
+const SebekaGubaeSeatsPanel    = lazy(() => import('./components/SebekaGubaeSeatsPanel').then(m => ({ default: m.SebekaGubaeSeatsPanel })));
+const RelicsEstatesLedgerPanel = lazy(() => import('./components/RelicsEstatesLedgerPanel').then(m => ({ default: m.RelicsEstatesLedgerPanel })));
+const SealVaultPanel           = lazy(() => import('./components/SealVaultPanel').then(m => ({ default: m.SealVaultPanel })));
+const FollowerCrmPanel         = lazy(() => import('./components/FollowerCrmPanel').then(m => ({ default: m.FollowerCrmPanel })));
+const DatabaseControlPanel     = lazy(() => import('./components/DatabaseControlPanel').then(m => ({ default: m.DatabaseControlPanel })));
+const OnboardingWizard         = lazy(() => import('./components/OnboardingWizard').then(m => ({ default: m.OnboardingWizard })));
+const AppointmentBookingPanel  = lazy(() => import('./components/AppointmentBookingPanel').then(m => ({ default: m.AppointmentBookingPanel })));
+const PriestAppointmentsPanel  = lazy(() => import('./components/PriestAppointmentsPanel').then(m => ({ default: m.PriestAppointmentsPanel })));
+const DualAuthApprovalPanel    = lazy(() => import('./components/DualAuthApprovalPanel').then(m => ({ default: m.DualAuthApprovalPanel })));
+
 // ─── Shared Layout Shell ──────────────────────────────────────────────────────
 
-// Maps backend ecclesiasticalRole to display strings
 const ROLE_DISPLAY: Record<string, { en: string; am: string }> = {
-  PATRIARCH:     { en: 'Patriarch',      am: 'ፓትርያርክ' },
-  ARCHBISHOP:    { en: 'Archbishop',     am: 'ሊቀ ጳጳሳት' },
-  BISHOP:        { en: 'Bishop',         am: 'ጳጳስ' },
-  ARCHPRIEST:    { en: 'Archpriest',     am: 'ሊቀ ካህናት' },
-  PRIEST:        { en: 'Priest',         am: 'ካህን' },
-  DEACON:        { en: 'Deacon',         am: 'ዲያቆን' },
-  TREASURER:     { en: 'Treasurer',      am: 'ግምጃ ቤት' },
-  SECRETARY:     { en: 'Secretary',      am: 'ጸሐፊ' },
+  PATRIARCH:     { en: 'Patriarch',           am: 'ፓትርያርክ' },
+  ARCHBISHOP:    { en: 'Archbishop',          am: 'ሊቀ ጳጳሳት' },
+  BISHOP:        { en: 'Bishop',              am: 'ጳጳስ' },
+  ARCHPRIEST:    { en: 'Archpriest',          am: 'ሊቀ ካህናት' },
+  PRIEST:        { en: 'Priest',              am: 'ካህን' },
+  DEACON:        { en: 'Deacon',              am: 'ዲያቆን' },
+  TREASURER:     { en: 'Treasurer',           am: 'ግምጃ ቤት' },
+  SECRETARY:     { en: 'Secretary',           am: 'ጸሐፊ' },
   LAITY:         { en: 'Congregation Member', am: 'ምእመን' },
-  CHOIR_MASTER:  { en: 'Choir Master',   am: 'ዘማሪ' },
-  SYSTEM_ADMIN:  { en: 'System Admin',   am: 'አስተዳዳሪ' },
+  CHOIR_MASTER:  { en: 'Choir Master',        am: 'ዘማሪ' },
+  SYSTEM_ADMIN:  { en: 'System Admin',        am: 'አስተዳዳሪ' },
 };
 
-// Roles that get the Clergy Administration Portal
 const CLERGY_ROLES = new Set([
   'PATRIARCH', 'ARCHBISHOP', 'BISHOP', 'ARCHPRIEST', 'PRIEST',
   'DEACON', 'SECRETARY', 'CHOIR_MASTER', 'TREASURER', 'SYSTEM_ADMIN'
 ]);
 
-interface PortalShellProps {
-  children: React.ReactNode;
-}
+interface PortalShellProps { children: React.ReactNode; }
 
 function PortalShell({ children }: PortalShellProps) {
   const { clearAuth, fullName, ecclesiasticalRole } = useAuth();
   const navigate = useNavigate();
-
   const roleDisplay = ROLE_DISPLAY[ecclesiasticalRole] ?? { en: ecclesiasticalRole, am: '' };
-
-  const handleLogout = () => {
-    clearAuth();
-    navigate('/');
-  };
+  const handleLogout = () => { clearAuth(); navigate('/'); };
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#0a0809', color: '#F2EEEE' }}>
-      {/* Top Navigation Bar */}
       <header
         style={{
           background: 'linear-gradient(135deg, #800020 0%, #651A67 60%, #4A154B 100%)',
@@ -104,7 +95,6 @@ function PortalShell({ children }: PortalShellProps) {
         className="sticky top-0 z-40 shadow-lg"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-          {/* Brand */}
           <div className="flex items-center gap-3">
             <div
               className="w-10 h-10 rounded-full flex items-center justify-center border-2 text-lg shadow-inner"
@@ -121,8 +111,6 @@ function PortalShell({ children }: PortalShellProps) {
               </p>
             </div>
           </div>
-
-          {/* User context + logout */}
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex flex-col items-end">
               <span className="text-white text-xs font-bold">{fullName}</span>
@@ -148,12 +136,10 @@ function PortalShell({ children }: PortalShellProps) {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}
       </main>
 
-      {/* Footer */}
       <footer
         className="border-t py-4 text-center text-xs"
         style={{ borderColor: 'var(--eotc-border)', backgroundColor: 'rgba(0,0,0,0.4)', color: '#6B7280' }}
@@ -187,6 +173,23 @@ function DashTabs({ tabs, active, onSelect }: { tabs: TabDef[]; active: string; 
   );
 }
 
+// ─── Panel Suspense wrapper ───────────────────────────────────────────────────
+
+function PanelLoader() {
+  return (
+    <div className="flex items-center justify-center py-24">
+      <div
+        className="w-10 h-10 rounded-full border-4 animate-spin"
+        style={{ borderColor: '#D4AF37', borderTopColor: 'transparent' }}
+      />
+    </div>
+  );
+}
+
+function Panel({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<PanelLoader />}>{children}</Suspense>;
+}
+
 // ─── FOLLOWER DASHBOARD ───────────────────────────────────────────────────────
 
 function FollowerDashboard() {
@@ -196,12 +199,12 @@ function FollowerDashboard() {
   const parishName = institution?.nameAm || institution?.nameEn || 'ደብረ ብርሃን መድኃኔዓለም ቤተ ክርስቲያን';
 
   const tabs: TabDef[] = [
-    { id: 'calendar',   label: 'Liturgical Calendar', icon: <Calendar className="w-3.5 h-3.5" /> },
-    { id: 'appointments', label: 'Book Appointment',   icon: <Calendar className="w-3.5 h-3.5" /> },
-    { id: 'payment',    label: 'Pay Tithes & Alms',   icon: <CreditCard className="w-3.5 h-3.5" /> },
-    { id: 'history',    label: 'Payment History',      icon: <ScrollText className="w-3.5 h-3.5" /> },
-    { id: 'sacraments', label: 'Sacramental Records',  icon: <BookOpen className="w-3.5 h-3.5" /> },
-    { id: 'directory',  label: 'Parish Directory',     icon: <Users className="w-3.5 h-3.5" /> },
+    { id: 'calendar',     label: 'Liturgical Calendar', icon: <Calendar className="w-3.5 h-3.5" /> },
+    { id: 'appointments', label: 'Book Appointment',    icon: <Calendar className="w-3.5 h-3.5" /> },
+    { id: 'payment',      label: 'Pay Tithes & Alms',   icon: <CreditCard className="w-3.5 h-3.5" /> },
+    { id: 'history',      label: 'Payment History',     icon: <ScrollText className="w-3.5 h-3.5" /> },
+    { id: 'sacraments',   label: 'Sacramental Records', icon: <BookOpen className="w-3.5 h-3.5" /> },
+    { id: 'directory',    label: 'Parish Directory',    icon: <Users className="w-3.5 h-3.5" /> },
   ];
 
   return (
@@ -220,12 +223,14 @@ function FollowerDashboard() {
 
       <DashTabs tabs={tabs} active={tab} onSelect={setTab} />
 
-      {tab === 'calendar'     && <LiturgicalCalendarPanel />}
-      {tab === 'appointments' && <AppointmentBookingPanel />}
-      {tab === 'payment'      && <AlmsPaymentPanel />}
-      {tab === 'history'      && <PaymentHistoryPanel />}
-      {tab === 'sacraments'   && <SacramentClergyVerification />}
-      {tab === 'directory'    && <DirectoryDashboard />}
+      <Panel>
+        {tab === 'calendar'     && <LiturgicalCalendarPanel />}
+        {tab === 'appointments' && <AppointmentBookingPanel />}
+        {tab === 'payment'      && <AlmsPaymentPanel />}
+        {tab === 'history'      && <PaymentHistoryPanel />}
+        {tab === 'sacraments'   && <SacramentClergyVerification />}
+        {tab === 'directory'    && <DirectoryDashboard />}
+      </Panel>
     </PortalShell>
   );
 }
@@ -237,29 +242,28 @@ function ClergyDashboard() {
   const parishName = institution?.nameAm || institution?.nameEn || 'ደብረ ብርሃን መድኃኔዓለም ቤተ ክርስቲያን';
   const roleDisplay = ROLE_DISPLAY[ecclesiasticalRole] ?? { en: ecclesiasticalRole, am: '' };
 
-  // Treasurer gets a financial-focused view
   const isTreasurer = ecclesiasticalRole === 'TREASURER';
   const defaultTab = isTreasurer ? 'payment' : 'verify';
   const [activeTab, setActiveTab] = useState(defaultTab);
 
   const tabs: TabDef[] = isTreasurer ? [
-    { id: 'directory',  label: 'Parish Directory',     icon: <Users className="w-3.5 h-3.5" /> },
-    { id: 'payment',    label: 'Tithe Ledger',          icon: <CreditCard className="w-3.5 h-3.5" /> },
-    { id: 'history',    label: 'Payment History',       icon: <ScrollText className="w-3.5 h-3.5" /> },
-    { id: 'calendar',   label: 'Liturgical Calendar',   icon: <Calendar className="w-3.5 h-3.5" /> },
+    { id: 'directory',  label: 'Parish Directory',   icon: <Users className="w-3.5 h-3.5" /> },
+    { id: 'payment',    label: 'Tithe Ledger',        icon: <CreditCard className="w-3.5 h-3.5" /> },
+    { id: 'history',    label: 'Payment History',     icon: <ScrollText className="w-3.5 h-3.5" /> },
+    { id: 'calendar',   label: 'Liturgical Calendar', icon: <Calendar className="w-3.5 h-3.5" /> },
   ] : [
-    { id: 'verify',     label: 'Clergy Verification',  icon: <Shield className="w-3.5 h-3.5" /> },
-    { id: 'approvals',  label: 'Dual-Auth Approvals',  icon: <ShieldCheck className="w-3.5 h-3.5" /> },
-    { id: 'minutes',    label: 'Council Minutes',       icon: <FileText className="w-3.5 h-3.5" /> },
-    { id: 'seats',      label: 'Sebeka Seats',          icon: <Users className="w-3.5 h-3.5" /> },
-    { id: 'relics',     label: 'Relics & Estates',      icon: <MapPin className="w-3.5 h-3.5" /> },
-    { id: 'vault',      label: 'Seal Vault',            icon: <Lock className="w-3.5 h-3.5" /> },
-    { id: 'crm',        label: 'Spiritual Children',    icon: <Activity className="w-3.5 h-3.5" /> },
-    { id: 'appointments', label: 'Confession Queue',    icon: <Calendar className="w-3.5 h-3.5" /> },
-    { id: 'sacraments', label: 'Sacramental Registry',  icon: <BookOpen className="w-3.5 h-3.5" /> },
-    { id: 'directory',  label: 'Parish Directory',      icon: <Users className="w-3.5 h-3.5" /> },
-    { id: 'calendar',   label: 'Liturgical Calendar',   icon: <Calendar className="w-3.5 h-3.5" /> },
-    { id: 'db',         label: 'DB Control',            icon: <Database className="w-3.5 h-3.5" /> },
+    { id: 'verify',       label: 'Clergy Verification',  icon: <Shield className="w-3.5 h-3.5" /> },
+    { id: 'approvals',    label: 'Dual-Auth Approvals',  icon: <ShieldCheck className="w-3.5 h-3.5" /> },
+    { id: 'minutes',      label: 'Council Minutes',      icon: <FileText className="w-3.5 h-3.5" /> },
+    { id: 'seats',        label: 'Sebeka Seats',         icon: <Users className="w-3.5 h-3.5" /> },
+    { id: 'relics',       label: 'Relics & Estates',     icon: <MapPin className="w-3.5 h-3.5" /> },
+    { id: 'vault',        label: 'Seal Vault',           icon: <Lock className="w-3.5 h-3.5" /> },
+    { id: 'crm',          label: 'Spiritual Children',   icon: <Activity className="w-3.5 h-3.5" /> },
+    { id: 'appointments', label: 'Confession Queue',     icon: <Calendar className="w-3.5 h-3.5" /> },
+    { id: 'sacraments',   label: 'Sacramental Registry', icon: <BookOpen className="w-3.5 h-3.5" /> },
+    { id: 'directory',    label: 'Parish Directory',     icon: <Users className="w-3.5 h-3.5" /> },
+    { id: 'calendar',     label: 'Liturgical Calendar',  icon: <Calendar className="w-3.5 h-3.5" /> },
+    { id: 'db',           label: 'DB Control',           icon: <Database className="w-3.5 h-3.5" /> },
   ];
 
   return (
@@ -278,20 +282,22 @@ function ClergyDashboard() {
 
       <DashTabs tabs={tabs} active={activeTab} onSelect={setActiveTab} />
 
-      {activeTab === 'verify'       && <ClergyVerificationPanel />}
-      {activeTab === 'approvals'    && <DualAuthApprovalPanel />}
-      {activeTab === 'minutes'      && <QaleGubaeMinutesPanel />}
-      {activeTab === 'seats'        && <SebekaGubaeSeatsPanel />}
-      {activeTab === 'relics'       && <RelicsEstatesLedgerPanel />}
-      {activeTab === 'vault'        && <SealVaultPanel />}
-      {activeTab === 'crm'          && <FollowerCrmPanel />}
-      {activeTab === 'appointments' && <PriestAppointmentsPanel />}
-      {activeTab === 'sacraments'   && <SacramentClergyVerification />}
-      {activeTab === 'directory'    && <DirectoryDashboard />}
-      {activeTab === 'calendar'     && <LiturgicalCalendarPanel />}
-      {activeTab === 'db'           && <DatabaseControlPanel />}
-      {activeTab === 'payment'      && <AlmsPaymentPanel />}
-      {activeTab === 'history'      && <PaymentHistoryPanel />}
+      <Panel>
+        {activeTab === 'verify'       && <ClergyVerificationPanel />}
+        {activeTab === 'approvals'    && <DualAuthApprovalPanel />}
+        {activeTab === 'minutes'      && <QaleGubaeMinutesPanel />}
+        {activeTab === 'seats'        && <SebekaGubaeSeatsPanel />}
+        {activeTab === 'relics'       && <RelicsEstatesLedgerPanel />}
+        {activeTab === 'vault'        && <SealVaultPanel />}
+        {activeTab === 'crm'          && <FollowerCrmPanel />}
+        {activeTab === 'appointments' && <PriestAppointmentsPanel />}
+        {activeTab === 'sacraments'   && <SacramentClergyVerification />}
+        {activeTab === 'directory'    && <DirectoryDashboard />}
+        {activeTab === 'calendar'     && <LiturgicalCalendarPanel />}
+        {activeTab === 'db'           && <DatabaseControlPanel />}
+        {activeTab === 'payment'      && <AlmsPaymentPanel />}
+        {activeTab === 'history'      && <PaymentHistoryPanel />}
+      </Panel>
     </PortalShell>
   );
 }
@@ -320,7 +326,6 @@ function CanonicalLoader() {
 
 // ─── Main App Router ──────────────────────────────────────────────────────────
 
-// Role-aware app shell: selects the correct dashboard based on ecclesiastical role
 function RoleAwareAppShell() {
   const { ecclesiasticalRole } = useAuth();
   return CLERGY_ROLES.has(ecclesiasticalRole) ? <ClergyDashboard /> : <FollowerDashboard />;
@@ -328,67 +333,66 @@ function RoleAwareAppShell() {
 
 function MainApp() {
   const { loading, token } = useAuth();
-
-  // Show canonical loader while restoring session from localStorage
   if (loading) return <CanonicalLoader />;
 
   return (
     <Router>
-      <Routes>
-        {/* Public Website Pages (Amharic) */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/services" element={<ServicesPage />} />
-        <Route path="/announcements" element={<AnnouncementsPage />} />
-        <Route path="/prayer-request" element={<PrayerRequestPage />} />
-        <Route path="/contact" element={<ContactPage />} />
+      <Suspense fallback={<CanonicalLoader />}>
+        <Routes>
+          {/* Public Website Pages */}
+          <Route path="/"               element={<HomePage />} />
+          <Route path="/about"          element={<AboutPage />} />
+          <Route path="/services"       element={<ServicesPage />} />
+          <Route path="/announcements"  element={<AnnouncementsPage />} />
+          <Route path="/prayer-request" element={<PrayerRequestPage />} />
+          <Route path="/contact"        element={<ContactPage />} />
+          <Route path="/register"       element={<RegistrationPage />} />
 
-        {/* Phase 2 — Registration and Spiritual Father Workflow */}
-        <Route path="/register" element={<RegistrationPage />} />
-        <Route path="/member/profile" element={<MemberProfilePage />} />
-        <Route path="/member/priests" element={<PriestsListPage />} />
-        <Route path="/member/request-status" element={<RequestStatusPage />} />
-        <Route path="/priest/assignments" element={<PriestAssignmentPanel />} />
+          {/* Member Pages */}
+          <Route path="/member/profile"         element={<MemberProfilePage />} />
+          <Route path="/member/priests"         element={<PriestsListPage />} />
+          <Route path="/member/request-status"  element={<RequestStatusPage />} />
+          <Route path="/member/book-appointment" element={<BookAppointmentPage />} />
+          <Route path="/member/my-appointments" element={<MyAppointmentsPage />} />
 
-        {/* Phase 3 — Appointment Management */}
-        <Route path="/member/book-appointment" element={<BookAppointmentPage />} />
-        <Route path="/member/my-appointments" element={<MyAppointmentsPage />} />
-        <Route path="/priest/appointments" element={<PriestAppointmentsPage />} />
+          {/* Priest Pages */}
+          <Route path="/priest/assignments"  element={<PriestAssignmentPanel />} />
+          <Route path="/priest/appointments" element={<PriestAppointmentsPage />} />
 
-        {/* Phase 2.2 — Church Hierarchy Administration */}
-        <Route path="/admin/churches" element={<ProtectedRoute><ChurchManagementPage /></ProtectedRoute>} />
+          {/* Admin Pages */}
+          <Route path="/admin/churches" element={<ProtectedRoute><ChurchManagementPage /></ProtectedRoute>} />
 
-        {/* Login — redirect to app if already authenticated */}
+          {/* Login */}
+          <Route
+            path="/login"
+            element={token ? <Navigate to="/app/dashboard" replace /> : <UnifiedLoginPage />}
+          />
 
-        <Route
-          path="/login"
-          element={token ? <Navigate to="/app/dashboard" replace /> : <UnifiedLoginPage />}
-        />
+          {/* Legacy redirect */}
+          <Route path="/dashboard/*" element={token ? <Navigate to="/app/dashboard" replace /> : <Navigate to="/login" replace />} />
 
-        {/* Legacy redirect: old dashboard paths → new unified path */}
-        <Route path="/dashboard/*" element={token ? <Navigate to="/app/dashboard" replace /> : <Navigate to="/login" replace />} />
+          {/* Directory */}
+          <Route path="/directory" element={<DirectoryDashboard />} />
 
-        {/* Directory — public for now, auth check enforced by backend */}
-        <Route path="/directory" element={<DirectoryDashboard />} />
+          {/* Unified authenticated shell */}
+          <Route
+            path="/app/*"
+            element={
+              <ProtectedRoute>
+                <RoleAwareAppShell />
+              </ProtectedRoute>
+            }
+          />
 
-        {/* Unified authenticated app shell with RBAC-aware routing */}
-        <Route
-          path="/app/*"
-          element={
-            <ProtectedRoute>
-              <RoleAwareAppShell />
-            </ProtectedRoute>
-          }
-        />
+          {/* Protected Operational Wizards */}
+          <Route path="/onboarding" element={<ProtectedRoute><OnboardingWizard /></ProtectedRoute>} />
+          <Route path="/idcard/:id" element={<ProtectedRoute><IdCardPrinter /></ProtectedRoute>} />
+          <Route path="/sacraments" element={<ProtectedRoute><SacramentClergyVerification /></ProtectedRoute>} />
 
-        {/* Protected Operational Wizards */}
-        <Route path="/onboarding" element={<ProtectedRoute><OnboardingWizard /></ProtectedRoute>} />
-        <Route path="/idcard/:id" element={<ProtectedRoute><IdCardPrinter /></ProtectedRoute>} />
-        <Route path="/sacraments" element={<ProtectedRoute><SacramentClergyVerification /></ProtectedRoute>} />
-
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 }
