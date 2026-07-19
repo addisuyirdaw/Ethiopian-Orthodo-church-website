@@ -11,9 +11,20 @@ router.get(
 );
 
 router.get(
+  '/dioceses',
+  asyncHandler(async (req, res) => institutionController.listDioceses(req, res)),
+);
+
+router.get(
+  '/dioceses/:dioceseId/parishes',
+  asyncHandler(async (req, res) => institutionController.listParishesByDiocese(req, res)),
+);
+
+router.get(
   '/:institutionId/priests',
   asyncHandler(async (req, res) => institutionController.listInstitutionPriests(req, res)),
 );
+
 
 router.use(authenticateJwt);
 

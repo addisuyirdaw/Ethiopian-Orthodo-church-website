@@ -123,7 +123,7 @@ export class LedgerService {
           changes: {
             after: {
               id: transaction.id,
-              amount: transaction.amount.toString(),
+              amount: ((transaction as any).amountInCents / 100).toString(),
               currency: transaction.currency,
               type: transaction.type,
               gateway: transaction.gateway,
@@ -147,7 +147,7 @@ export class LedgerService {
       transaction: {
         id: result.transaction.id,
         institutionId: result.transaction.institutionId,
-        amount: result.transaction.amount.toString(),
+        amount: ((result.transaction as any).amountInCents / 100).toString(),
         currency: result.transaction.currency,
         type: result.transaction.type,
         gateway: result.transaction.gateway,

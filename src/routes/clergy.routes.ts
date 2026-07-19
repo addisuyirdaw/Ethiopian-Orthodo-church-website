@@ -9,6 +9,16 @@ const router = Router();
 router.use(authenticateJwt);
 
 /**
+ * GET /api/v1/clergy
+ *
+ * Returns a list of all active clergy members.
+ */
+router.get(
+  '/',
+  asyncHandler(async (req, res) => clergyController.list(req, res)),
+);
+
+/**
  * GET /api/v1/clergy/verify/:clergyId
  *
  * Returns the canonical authority status of the given clergy member.
@@ -22,3 +32,4 @@ router.get(
 );
 
 export default router;
+

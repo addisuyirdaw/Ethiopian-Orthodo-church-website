@@ -161,13 +161,21 @@ export function requireTreasurerRole(
 }
 
 /**
- * Convenience middleware — restricts access to PRIEST role.
- * PATRIARCH is always permitted as super-admin.
+ * Convenience middleware — allows any ordained priest or higher:
+ * PRIEST, ARCHPRIEST, DEACON, BISHOP, METROPOLITAN, ARCHBISHOP, PATRIARCH.
+ * This is used for routes that manage spiritual children and appointments.
  */
 export function requirePriestRole(
   req: Request,
   res: Response,
   next: NextFunction,
 ): void {
-  requireRole(EcclesiasticalRole.PRIEST)(req, res, next);
+  requireRole(
+    EcclesiasticalRole.PRIEST,
+    EcclesiasticalRole.ARCHPRIEST,
+    EcclesiasticalRole.DEACON,
+    EcclesiasticalRole.BISHOP,
+    EcclesiasticalRole.METROPOLITAN,
+    EcclesiasticalRole.ARCHBISHOP,
+  )(req, res, next);
 }

@@ -61,13 +61,13 @@ export class FinancialTransactionRepository {
     return client.financialTransaction.create({
       data: {
         institutionId: data.institutionId,
-        amount: data.amount,
+        amountInCents: Math.round(Number(data.amount) * 100),
         currency: data.currency,
         type: data.type,
         gateway: data.gateway,
         referenceId: data.referenceId,
         status: data.status,
-      },
+      } as any,
     });
   }
 

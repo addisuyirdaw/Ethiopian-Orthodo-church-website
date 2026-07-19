@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { clergyLedgerService } from '../services/clergy/clergy-ledger.service';
 import { CanonicalStatusException } from '../middleware/error-handler.middleware';
+import prisma from '../lib/prisma';
 
 export class ClergyController {
   /**
@@ -23,6 +24,23 @@ export class ClergyController {
       },
     });
   }
+
+  /**
+   * GET /api/v1/clergy
+   *
+   * Returns a list of all active clergy members in the parish registry.
+   */
+  async list(req: Request, res: Response): Promise<void> {
+    const clergyList = await (prisma as any).clergy.findMany({
+      where: { isActive: true },
+      orderBy: { ordainedNameEn: 'asc' },
+    });
+
+    res.status(200).json({
+      data: clergyList,
+    });
+  }
 }
 
 export const clergyController = new ClergyController();
+

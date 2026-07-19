@@ -19,6 +19,14 @@ export interface UserWithInstitution {
   spiritualFatherId?: string | null;
   sex?: string | null;
   location?: string | null;
+  christianName?: string | null;
+  birthDate?: Date | null;
+  phoneNumber?: string | null;
+  region?: string | null;
+  city?: string | null;
+  address?: string | null;
+  baptismStatus?: string | null;
+  photoUrl?: string | null;
   deletedAt?: Date | null;
   institution: {
     id: string;
@@ -56,6 +64,14 @@ export class UserRepository {
         spiritualFatherId: true,
         sex: true,
         location: true,
+        christianName: true,
+        birthDate: true,
+        phoneNumber: true,
+        region: true,
+        city: true,
+        address: true,
+        baptismStatus: true,
+        photoUrl: true,
         deletedAt: true,
         institution: {
           select: {
@@ -93,6 +109,14 @@ export class UserRepository {
         spiritualFatherId: true,
         sex: true,
         location: true,
+        christianName: true,
+        birthDate: true,
+        phoneNumber: true,
+        region: true,
+        city: true,
+        address: true,
+        baptismStatus: true,
+        photoUrl: true,
         deletedAt: true,
         institution: {
           select: {

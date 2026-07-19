@@ -21,9 +21,22 @@ import liturgicalAlertRoutes from './liturgical-alert.routes';
 import publicPaymentRoutes from './public-payment.routes';
 import parishLedgerRoutes from './parish-ledger.routes';
 import priestCrmRoutes from './priest-crm.routes';
-
+import unifiedPaymentsRoutes from './unified-payments.routes';
+import kaleAwadiRoutes from './kale-awadi.routes';
+import parishionersRoutes from './parishioners.routes';
+import appointmentRoutes from './appointment.routes';
+import publicWebsiteRoutes from './public-website.routes';
+import memberRoutes from './member.routes';
+import priestAssignmentRoutes from './priest-assignment.routes';
+import notificationRoutes from './notification.routes';
+import adminRoutes from './admin.routes';
 
 const router = Router();
+
+// Supply-chain logistics + Module 16b artifacts/estates share the /logistics prefix
+const logisticsRouter = Router();
+logisticsRouter.use(logisticsRoutes);
+logisticsRouter.use(artifactsEstatesRoutes);
 
 router.use('/auth', authRoutes);
 router.use('/financials', financialRoutes);
@@ -35,20 +48,28 @@ router.use('/clergy', clergyRoutes);
 router.use('/synod', synodRoutes);
 router.use('/synodal', synodalRoutes);
 router.use('/finance', financeRoutes);
-router.use('/logistics', logisticsRoutes);
+router.use('/logistics', logisticsRouter);
 router.use('/pastoral', pastoralRoutes);
 router.use('/hymnology', hymnologyRoutes);
 router.use('/canonical-court', courtRoutes);
 router.use('/fintech/clearing', clearinghouseRoutes);
+router.use('/fintech/unified', unifiedPaymentsRoutes);
+router.use('/governance', kaleAwadiRoutes);
 router.use('/sacramental', sacramentalRoutes);
 router.use('/liturgical', liturgicalAlertRoutes);
-router.use('/logistics', artifactsEstatesRoutes);
 router.use('/public', publicPaymentRoutes);
+router.use('/website', publicWebsiteRoutes);
 router.use('/dev', devRoutes);
 // Module 17 — Parish CRM & Financial Ingestion
 router.use('/parish', parishLedgerRoutes);
 router.use('/transactions', parishLedgerRoutes);
 router.use('/treasury', parishLedgerRoutes);
 router.use('/priest', priestCrmRoutes);
+router.use('/parishioners', parishionersRoutes);
+router.use('/appointments', appointmentRoutes);
+router.use('/members', memberRoutes);
+router.use('/priest-assignments', priestAssignmentRoutes);
+router.use('/notifications', notificationRoutes);
+router.use('/admin', adminRoutes);
 
 export default router;

@@ -6,6 +6,7 @@ import { JWT_SECRET } from '../middleware/auth.middleware';
 import { userRepository } from '../repositories/user.repository';
 import { institutionRepository } from '../repositories/institution.repository';
 import { JwtPayload } from '../types';
+import prisma from '../lib/prisma';
 
 const JWT_EXPIRY = '24h';
 
@@ -56,15 +57,70 @@ export class AuthService {
     return this.issueToken(user);
   }
 
-  async signup(email: string, password: string, fullName: string, sex: 'MALE' | 'FEMALE', age: number, institutionId: string): Promise<LoginResult> {
+  async signup(
+    email: string,
+    password: string,
+    fullName: string,
+    sex: 'MALE' | 'FEMALE',
+    institutionId?: string | null,
+    extra?: {
+      christianName?: string;
+      birthDate?: string;
+      phoneNumber?: string;
+      region?: string;
+      city?: string;
+      address?: string;
+      baptismStatus?: string;
+      photoUrl?: string;
+    }
+  ): Promise<LoginResult> {
     const existingUser = await userRepository.findByEmail(email);
     if (existingUser) {
       throw new ConflictError('A user with that email already exists.');
     }
 
-    const institution = await institutionRepository.findById(institutionId);
+    let resolvedInstitutionId = institutionId;
+    if (!resolvedInstitutionId) {
+      const dbMedhaneAlem = await prisma.institution.findFirst({
+        where: {
+          type: 'PARISH',
+          nameAm: 'ደብረ ብርሃን መድኃኔዓለም ቤተ ክርስቲያን',
+          deletedAt: null,
+        },
+      });
+      if (dbMedhaneAlem) {
+        resolvedInstitutionId = dbMedhaneAlem.id;
+      } else {
+        const fallbackParish = await prisma.institution.findFirst({
+          where: {
+            type: 'PARISH',
+            deletedAt: null,
+          },
+        });
+        if (fallbackParish) {
+          resolvedInstitutionId = fallbackParish.id;
+        } else {
+          throw new NotFoundError('No active parish institution found in system.');
+        }
+      }
+    }
+
+    const institution = await institutionRepository.findById(resolvedInstitutionId!);
     if (!institution || institution.deletedAt !== null) {
       throw new NotFoundError('Selected institution is unavailable.');
+    }
+
+    let age: number | null = null;
+    let parsedBirthDate: Date | null = null;
+    if (extra?.birthDate) {
+      parsedBirthDate = new Date(extra.birthDate);
+      const today = new Date();
+      let calculatedAge = today.getFullYear() - parsedBirthDate.getFullYear();
+      const m = today.getMonth() - parsedBirthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < parsedBirthDate.getDate())) {
+        calculatedAge--;
+      }
+      age = calculatedAge;
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -79,9 +135,17 @@ export class AuthService {
       nameAm: null,
       nameGez: null,
       sex,
-      location: null,
+      location: extra?.city || null,
+      christianName: extra?.christianName || null,
+      birthDate: parsedBirthDate,
+      phoneNumber: extra?.phoneNumber || null,
+      region: extra?.region || null,
+      city: extra?.city || null,
+      address: extra?.address || null,
+      baptismStatus: extra?.baptismStatus || null,
+      photoUrl: extra?.photoUrl || null,
       institution: {
-        connect: { id: institutionId },
+        connect: { id: resolvedInstitutionId! },
       },
     });
 

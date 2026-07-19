@@ -1,12 +1,16 @@
 import { Request, Response } from 'express';
 import { pastoralCrmService } from '../services/pastoral/pastoral-crm.service';
+import { priestCrmService } from '../services/priest-crm.service';
 import {
   addSpiritualChildSchema,
   logCounselingSessionSchema,
   advanceCatechumenSchema,
   listCatechumensSchema,
+  assignPriestSchema,
+  logConfessionSchema,
+  listSpiritualChildrenSchema,
 } from '../validators/pastoral.validator';
-import { ForbiddenError } from '../middleware/error-handler.middleware';
+import { ForbiddenError, UnauthorizedError } from '../middleware/error-handler.middleware';
 import { EcclesiasticalRole } from '@prisma/client';
 
 // ─── Roles that may act as spiritual fathers ──────────────────────────────────
@@ -163,6 +167,120 @@ export class PastoralController {
     );
 
     res.status(200).json({ data: catechumens });
+  }
+
+  /**
+   * POST /api/v1/pastoral/assign-priest
+   * 
+   * A parishioner (MIMEN/LAITY) assigns themselves to a priest as their spiritual father.
+   * Creates/updates a SpiritualChildRelation record.
+   * 
+   * Validates:
+   * - Authenticated user is the parishioner
+   * - Priest exists and belongs to same institution
+   * - Priest has PRIEST ecclesiastical role
+   */
+  async assignPriest(req: Request, res: Response): Promise<void> {
+    const user = req.user!;
+
+    if (!user) {
+      throw new UnauthorizedError('Authentication required to assign a spiritual father.');
+    }
+
+    const input = assignPriestSchema.parse(req.body);
+    const institutionId = user.institutionId;
+
+    // Call priestCrmService to assign the user to the priest
+    const result = await priestCrmService.assignPriest(
+      user.id, // parishionerId
+      input.priestUserId,
+      institutionId
+    );
+
+    res.status(201).json({
+      success: true,
+      data: result,
+      message: 'Spiritual father assigned successfully.',
+    });
+  }
+
+  /**
+   * GET /api/v1/pastoral/my-spiritual-children
+   * 
+   * Retrieves all followers (parishioners) assigned to the authenticated priest.
+   * Returns paginated list with latest confession date and penance info.
+   * 
+   * Query parameters:
+   *   ?limit=50   (pagination limit)
+   *   ?offset=0   (pagination offset)
+   */
+  async getMySpirtualChildren(req: Request, res: Response): Promise<void> {
+    const user = req.user!;
+
+    if (!user) {
+      throw new UnauthorizedError('Authentication required.');
+    }
+
+    // Verify user is a priest
+    if (user.ecclesiasticalRole !== EcclesiasticalRole.PRIEST) {
+      throw new ForbiddenError('Only priests can retrieve their spiritual children.');
+    }
+
+    const query = listSpiritualChildrenSchema.parse(req.query);
+    const limit = parseInt(String(query.limit ?? '50'), 10);
+    const offset = parseInt(String(query.offset ?? '0'), 10);
+
+    const result = await priestCrmService.getMySpirtualChildren(
+      user.id,
+      user.institutionId,
+      limit,
+      offset
+    );
+
+    res.status(200).json({
+      success: true,
+      data: result,
+      message: 'Spiritual children retrieved successfully.',
+    });
+  }
+
+  /**
+   * POST /api/v1/pastoral/log-confession
+   * 
+   * Records a confession (ቦታ/ፍርድ) session between authenticated priest and parishioner.
+   * Creates immutable ConfessionRecord with encrypted notes, penance, and next scheduled date.
+   * 
+   * Only the assigned priest can record confession for their assigned parishioner.
+   * Confession details are never exposed in responses.
+   */
+  async logConfession(req: Request, res: Response): Promise<void> {
+    const user = req.user!;
+
+    if (!user) {
+      throw new UnauthorizedError('Authentication required to log confession.');
+    }
+
+    // Verify user is a priest
+    if (user.ecclesiasticalRole !== EcclesiasticalRole.PRIEST) {
+      throw new ForbiddenError('Only priests can log confession.');
+    }
+
+    const input = logConfessionSchema.parse(req.body);
+
+    const result = await priestCrmService.logConfession(
+      user.id, // priestUserId
+      input.parishionerId,
+      user.institutionId,
+      input.notes,
+      input.penanceText,
+      input.nextScheduledDate
+    );
+
+    res.status(201).json({
+      success: true,
+      data: result,
+      message: 'Confession logged successfully.',
+    });
   }
 }
 

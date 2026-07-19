@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@300;400;500;600;700;800;900&family=Noto+Serif+Ethiopic:wght@400;600;700;900&family=Playfair+Display:wght@400;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+
+/* ══════════════════════════════════════════════════════
+   EOTC Design Tokens — Shared across all site sections
+   ══════════════════════════════════════════════════════ */
+:root {
+  /* Brand Colors */
+  --eotc-gold:          #D4AF37;
+  --eotc-gold-light:    #F0D060;
+  --eotc-gold-dark:     #A88A1E;
+  --eotc-burgundy:      #800020;
+  --eotc-burgundy-2:    #651A1A;
+  --eotc-purple:        #4A154B;
+  --eotc-purple-light:  #6B2D6C;
+
+  /* Dark Mode (Internal Portal) */
+  --eotc-canvas:        #0a0809;
+  --eotc-surface:       #141014;
+  --eotc-border:        rgba(212,175,55,0.15);
+  --eotc-text:          #F2EEEE;
+  --eotc-text-muted:    #9CA3AF;
+
+  /* Public Site (Light/Cream) */
+  --pub-bg:             #FDFAF5;
+  --pub-bg-alt:         #F5F0E8;
+  --pub-surface:        #FFFFFF;
+  --pub-border:         #E8E0D0;
+  --pub-text:           #1A1209;
+  --pub-text-muted:     #6B5E45;
+  --pub-text-light:     #9B8E7A;
+
+  /* Semantic */
+  --color-primary:      #4A154B;
+  --color-accent:       #D4AF37;
+  --color-neutral-bg:   #FDFBF7;
+  --color-slate:        #1F2937;
+}
+
+/* ══════════════════════════════════════════════════════
+   Base Reset
+   ══════════════════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--eotc-canvas);
+  color: var(--eotc-text);
+  font-family: 'Inter', 'Noto Sans Ethiopic', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ══════════════════════════════════════════════════════
+   Amharic Typography Utilities
+   ══════════════════════════════════════════════════════ */
+.font-ethiopic {
+  font-family: 'Noto Sans Ethiopic', 'Noto Serif Ethiopic', sans-serif;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+
+.font-ethiopic-serif {
+  font-family: 'Noto Serif Ethiopic', serif;
+  line-height: 1.7;
+}
+
+.font-display {
+  font-family: 'Playfair Display', 'Noto Serif Ethiopic', serif;
+}
+
+/* ══════════════════════════════════════════════════════
+   Public Site Utilities
+   ══════════════════════════════════════════════════════ */
+.pub-bg {
+  background-color: var(--pub-bg);
+  color: var(--pub-text);
+}
+
+.pub-surface {
+  background-color: var(--pub-surface);
+}
+
+/* Gold gradient text */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #D4AF37 0%, #F0D060 50%, #A88A1E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Orthodox cross decoration */
+.cross-divider::before {
+  content: '☩';
+  color: var(--eotc-gold);
+  margin: 0 0.75rem;
+}
+
+/* ══════════════════════════════════════════════════════
+   Smooth scrolling
+   ══════════════════════════════════════════════════════ */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ══════════════════════════════════════════════════════
+   Card hover lift
+   ══════════════════════════════════════════════════════ */
+.card-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(212,175,55,0.12);
+}
+
+/* ══════════════════════════════════════════════════════
+   Focus ring (accessibility)
+   ══════════════════════════════════════════════════════ */
+:focus-visible {
+  outline: 2px solid var(--eotc-gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ══════════════════════════════════════════════════════
+   Scrollbar styling
+   ══════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(212,175,55,0.6); }

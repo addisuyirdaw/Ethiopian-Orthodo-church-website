@@ -1,0 +1,90 @@
+{
+  "nav": {
+    "home": "ዋና ገጽ",
+    "about": "ስለ ቤተ ክርስቲያን",
+    "services": "አገልግሎቶች",
+    "announcements": "ማስታወቂያዎች",
+    "contact": "አድራሻ",
+    "portal": "ፖርታል",
+    "menu": "ምናሌ"
+  },
+  "home": {
+    "hero_eyebrow": "ቅዱስ ሚካኤል ቤተ ክርስቲያን",
+    "hero_headline": "እንኳን ደህና መጣችሁ",
+    "hero_subline": "በሰላም ቁጥር ቤታችሁ ናት",
+    "hero_cta_primary": "አገልግሎቶቻችን",
+    "hero_cta_secondary": "ስለ እኛ ይወቁ",
+    "section_schedule": "የዚህ ሳምንት ሥርዓት",
+    "section_feasts": "መጪ የበዓል ቀናት",
+    "section_announcements": "ዘመናዊ ማስታወቂያዎች",
+    "section_quick_services": "ፈጣን አገልግሎቶች",
+    "more_announcements": "ሁሉም ማስታወቂያዎች →",
+    "all_services": "ሁሉም አገልግሎቶች →",
+    "contact_section": "አድራሻና ጊዜ",
+    "office_hours": "የጽ/ቤት ሰዓታት",
+    "today_services": "የዛሬ አገልግሎቶች"
+  },
+  "about": {
+    "page_title": "ስለ ቤተ ክርስቲያናችን",
+    "section_history": "ታሪካችን",
+    "section_vision": "ራዕያችን",
+    "section_mission": "ተልዕኮዋ",
+    "section_leadership": "የቤተ ክርስቲያን አመራር",
+    "section_departments": "መምሪያዎች",
+    "section_gallery": "ፎቶ ማዕከል"
+  },
+  "services": {
+    "page_title": "አገልግሎቶቻችን",
+    "page_subtitle": "ለእያንዳንዱ አገልግሎት ምን ያስፈልጋል?",
+    "who_can_request": "ማን ሊጠይቅ ይችላል",
+    "documents_required": "የሚያስፈልጉ ሰነዶች",
+    "responsible_office": "ኃላፊ ጽ/ቤት",
+    "office_hours": "የጽ/ቤት ሰዓታት",
+    "processing_time": "የሂደት ጊዜ",
+    "required": "ግዴታ",
+    "optional": "ፍቃደኛ"
+  },
+  "announcements": {
+    "page_title": "ማስታወቂያዎች",
+    "page_subtitle": "የቤተ ክርስቲያን ዜና እና ዝግጅቶች",
+    "filter_all": "ሁሉም",
+    "pinned": "ቋሚ"
+  },
+  "prayer": {
+    "page_title": "የጸሎት ጥያቄ",
+    "page_subtitle": "ጸሎትዎን ከካህናቱ ጋር ያካፍሉ",
+    "form_name": "ሙሉ ስምዎ",
+    "form_phone": "ስልክ ቁጥር (አማራጭ)",
+    "form_request": "የጸሎት ጥያቄዎ",
+    "form_submit": "ጸሎቴን ላክ",
+    "form_placeholder_name": "ለምሳሌ: ሰለሞን ታደሰ",
+    "form_placeholder_phone": "ለምሳሌ: 0911234567",
+    "form_placeholder_request": "ጸሎትዎን እዚህ ይጻፉ...",
+    "success_title": "ጸሎቱ ደርሷል!",
+    "success_body": "ካህናቱ ጸሎትዎን ተቀብለዋል። ምናለ ጌታ ይመልስ ለናንተ።",
+    "privacy_note": "ጸሎቱ ሚስጥራዊ ነው። ለካህናቱ ብቻ ይደርሳል።",
+    "status_pending": "ተቀብሏል",
+    "status_approved": "ጸሎት ተጀምሯል",
+    "status_completed": "ጸሎት ተፈጽሟል"
+  },
+  "contact": {
+    "page_title": "አድራሻ",
+    "page_subtitle": "ካህናቱና ጽ/ቤቱ ይደውሉልዎ",
+    "phone": "ስልክ",
+    "email": "ኢሜይል",
+    "address": "አድራሻ",
+    "office_hours": "የጽ/ቤት ሰዓታት",
+    "find_us": "የት ነን",
+    "social_media": "ሶሻል ሚዲያ"
+  },
+  "common": {
+    "loading": "በመጫን ላይ...",
+    "error": "ስህተት ተፈጥሯል",
+    "back": "ተመለስ",
+    "close": "ዝጋ",
+    "see_more": "ተጨማሪ ይመልከቱ",
+    "church_name": "ቅዱስ ሚካኤል ቤተ ክርስቲያን",
+    "church_subtitle": "የኢትዮጵያ ኦርቶዶክስ ተዋሕዶ ቤተ ክርስቲያን",
+    "copyright": "© 2016 ዓ.ም. ቅዱስ ሚካኤል ቤተ ክርስቲያን · ሁሉም መብቶች የተጠበቁ ናቸው"
+  }
+}

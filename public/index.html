@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OrthodoxConnect — Jurisdictional Governance & FinTech Registry</title>
-  <meta name="description" content="OrthodoxConnect is the premier enterprise platform for Ethiopian Orthodox Tewahedo Church jurisdictional governance, sacramental registry, and FinTech clearinghouse operations.">
+  <title>OrthodoxConnect — Canonical Governance & Parish Administration</title>
+  <meta name="description" content="OrthodoxConnect is the official digital governance platform for the Ethiopian Orthodox Tewahedo Church — enabling canonical administration, sacramental records, parish alms management, and liturgical coordination under the Qale Awadi charter.">
   <!-- Premium Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1792,6 +1792,77 @@
       .dash-tabs { grid-template-columns: repeat(2, 1fr); }
       .dashboard-grid-m16 { grid-template-columns: 1fr; }
     }
+
+    /* ── EOTC Compliance & FinTech Hub Styles ── */
+    .provider-btn {
+      padding: 0.65rem 1.25rem;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-white);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast) ease;
+      font-family: var(--font-primary);
+      font-size: 0.88rem;
+    }
+    .provider-btn:hover {
+      border-color: var(--border-hover);
+      background: rgba(255,255,255,0.05);
+    }
+    .provider-btn.selected {
+      border-color: var(--gold);
+      background: rgba(212,175,55,0.12);
+      color: var(--gold-light);
+      box-shadow: 0 0 10px var(--gold-glow);
+    }
+    .seat-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-mid) ease;
+      margin-bottom: 0.85rem;
+    }
+    .seat-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(212,175,55,0.08);
+    }
+    .seat-card-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .seat-card-role {
+      font-weight: 700;
+      color: var(--gold);
+      font-size: 1rem;
+      font-family: var(--font-serif);
+    }
+    .seat-card-user {
+      font-size: 0.95rem;
+      color: var(--text-white);
+    }
+    .seat-card-term {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    html.light .provider-btn, .light-theme .provider-btn {
+      background: rgba(0,0,0,0.03);
+      color: var(--text-white);
+    }
+    html.light .provider-btn:hover, .light-theme .provider-btn:hover {
+      background: rgba(0,0,0,0.06);
+    }
+    html.light .provider-btn.selected, .light-theme .provider-btn.selected {
+      border-color: var(--gold);
+      background: rgba(212,175,55,0.1);
+      color: var(--gold-dark);
+    }
   </style>
 </head>
 <body>
@@ -2048,9 +2119,8 @@
           <div class="hero-eyebrow" data-i18n="hero_eyebrow">Ethiopian Orthodox Tewahedo Church Platform</div>
           <h1 class="hero-headline" data-i18n="hero_headline">Canonical Governance<br>for the Digital Age</h1>
           <p class="hero-tagline" data-i18n="hero_tagline">
-            The <strong>enterprise-grade platform</strong> unifying jurisdictional administration,
-            sacramental record-keeping, and FinTech clearinghouse operations across the
-            global Ethiopian Orthodox Tewahedo Church.
+            The <strong>unified canonical governance platform</strong> for the Ethiopian Orthodox Tewahedo Church —
+            administering parishes, sacramental records, and alms management under the Qale Awadi constitution.
           </p>
           <div class="hero-cta-row">
             <button class="btn-hero-primary" id="hero-cta-btn" onclick="openLoginModal()" data-i18n="btn_explore">Explore Platform</button>
@@ -2070,8 +2140,8 @@
               <div class="hero-stat-label" data-i18n="stat_langs">Sacred Languages</div>
             </div>
             <div class="hero-stat">
-              <div class="hero-stat-num">RSA-PSS</div>
-              <div class="hero-stat-label" data-i18n="stat_fintech">FinTech Clearing</div>
+              <div class="hero-stat-num">ቃለ ዓዋዲ</div>
+              <div class="hero-stat-label" data-i18n="stat_fintech">Alms Register</div>
             </div>
           </div>
         </div>
@@ -2093,10 +2163,10 @@
               The platform implements a <strong>multi-tenant jurisdictional model</strong> where each institution exists within a strict canonical scope. Every API call, every sacramental registration, and every financial transaction is governed by the ecclesiastical authority level of the authenticated user.
             </p>
             <p data-i18n="about_p2">
-              <strong>Sacramental records</strong> — baptisms, chrismations, marriages, and funerals — are cryptographically sealed with RSA-PSS-SHA256, linked to a dual Gregorian/Ethiopic calendar, and enforce canonical verification of clergy standing at the time of the ceremony.
+              <strong>Sacramental records</strong> — baptisms, chrismations, marriages, and funerals — are canonically sealed and cryptographically signed, linked to a dual Gregorian/Ethiopic calendar, and enforce canonical verification of clergy standing at the time of the ceremony.
             </p>
             <p data-i18n="about_p3">
-              The integrated <strong>FinTech Clearinghouse</strong> performs real-time, atomic ledger splits across the hierarchy (Parish 90%, Diocese 7%, Patriarchate 3%), supporting TELEBIRR, CBE BIRR, Stripe, and manual cash gateway entries.
+              The integrated <strong>Parish Alms Ledger</strong> performs transparent, audited tithe splits across the canonical hierarchy (Parish 90%, Diocese 7%, Patriarchate 3%), supporting Telebirr, CBE Birr, and manual cash receipt entries.
             </p>
           </div>
           <div class="hierarchy-cards">
@@ -2142,9 +2212,9 @@
             <div class="feature-desc" data-i18n="feat_sacraments_desc">Immutable, cryptographically sealed records of all canonical rites linked to dual Gregorian &amp; Ethiopic calendars.</div>
           </div>
           <div class="feature-card">
-            <div class="feature-icon">💳</div>
-            <div class="feature-title" data-i18n="feat_fintech_title">FinTech Clearinghouse</div>
-            <div class="feature-desc" data-i18n="feat_fintech_desc">Real-time atomic ledger splits for tithes and offerings across the canonical hierarchy via local and international gateways.</div>
+            <div class="feature-icon">📒</div>
+            <div class="feature-title" data-i18n="feat_fintech_title">Parish Alms Ledger</div>
+            <div class="feature-desc" data-i18n="feat_fintech_desc">Transparent, audited tithe and offering splits across the canonical hierarchy. Supports Telebirr, CBE Birr, and cash receipts.</div>
           </div>
           <div class="feature-card">
             <div class="feature-icon">📅</div>
@@ -2229,7 +2299,7 @@
       <!-- FOOTER -->
       <footer class="site-footer">
         <div class="footer-inner">
-          <p>☩ <strong>OrthodoxConnect</strong> — Jurisdictional Governance &amp; FinTech Registry</p>
+          <p>☩ <strong>OrthodoxConnect</strong> — Canonical Governance &amp; Parish Administration Portal</p>
           <span data-i18n="footer_rights">© 2024 Ethiopian Orthodox Tewahedo Church Platform. All rights reserved.</span>
         </div>
       </footer>
@@ -2269,6 +2339,18 @@
         <button class="dash-tab-btn" id="tab-btn-fintech-split" onclick="switchDashTab('fintech-split')">
           <span class="tab-icon">💳</span>
           <span data-i18n="tab_fintech">FinTech Split</span>
+        </button>
+        <button class="dash-tab-btn" id="tab-btn-sebeka-gubae-panel" onclick="switchDashTab('sebeka-gubae-panel')">
+          <span class="tab-icon">👥</span>
+          <span data-i18n="tab_sebeka_gubae">Sebeka Gubae Board</span>
+        </button>
+        <button class="dash-tab-btn" id="tab-btn-qale-gubae-panel" onclick="switchDashTab('qale-gubae-panel')">
+          <span class="tab-icon">📜</span>
+          <span data-i18n="tab_qale_gubae">Minutes Registry</span>
+        </button>
+        <button class="dash-tab-btn" id="tab-btn-parish-support-panel" onclick="switchDashTab('parish-support-panel')">
+          <span class="tab-icon">💖</span>
+          <span data-i18n="tab_parish_support">Support Our Parish</span>
         </button>
         <button class="dash-tab-btn" id="tab-btn-jurisdictions" onclick="switchDashTab('jurisdictions')">
           <span class="tab-icon">🌿</span>
@@ -2482,6 +2564,242 @@
             <div class="splits-card">
               <h4 data-i18n="splits_title">Atomic Ledger Splits Generated</h4>
               <div class="splits-grid" id="splits-container"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Panel: Sebeka Gubae Board ── -->
+      <div class="dash-panel" id="sebeka-gubae-panel">
+        <div class="dashboard-grid-m16" style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 2rem;">
+          <!-- Left Column: Seat Assignment Card -->
+          <div class="panel-card lock-overlay-container" id="sebeka-assign-card" style="position: relative;">
+            <div class="lock-overlay" id="sebeka-lock-overlay" style="display: none;">
+              <div class="lock-overlay-icon">🔒</div>
+              <div class="lock-overlay-title">Chairperson Required</div>
+              <div class="lock-overlay-desc">Parish council seat assignments require a verified Liqe Menber account.</div>
+            </div>
+            
+            <div class="panel-header">
+              <div class="panel-title" data-i18n="sebeka_assign_title">Assign Council Seat</div>
+            </div>
+            <p class="panel-desc">Assign a parish user to an active council officer seat.</p>
+            
+            <form id="sebeka-form" onsubmit="assignCouncilSeat(event)">
+              <div class="dash-form-group">
+                <label for="sebeka-user-id">User ID (UUID)</label>
+                <input type="text" id="sebeka-user-id" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required>
+              </div>
+              <div class="dash-form-group">
+                <label for="sebeka-role">Council Role</label>
+                <select id="sebeka-role" required>
+                  <option value="LIQE_MENBER">Chairperson (ሊቀ መንበር)</option>
+                  <option value="MEK_LIQE_MENBER">Vice Chairperson (ምክትል ሊቀ መንበር)</option>
+                  <option value="WANA_TSEHAFI">Secretary (ዋና ጸሐፊ)</option>
+                  <option value="GENZEB_YAZHI">Treasurer (ገንዘብ ያዥ)</option>
+                  <option value="HISAB_SHUM">Accountant (ሒሳብ ሹም)</option>
+                </select>
+              </div>
+              <div class="dash-form-row">
+                <div class="dash-form-group">
+                  <label for="sebeka-term-start">Term Start</label>
+                  <input type="date" id="sebeka-term-start" required>
+                </div>
+                <div class="dash-form-group">
+                  <label for="sebeka-term-end">Term End</label>
+                  <input type="date" id="sebeka-term-end" required>
+                </div>
+              </div>
+              <button type="submit" class="btn" id="btn-assign-seat">👥 Assign Council Seat</button>
+            </form>
+            <div id="sebeka-assign-result" style="display:none; margin-top:1rem;"></div>
+          </div>
+          
+          <!-- Right Column: Active Council Seats List -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title" data-i18n="parish_council">Parish Council</div>
+            </div>
+            <p class="panel-desc">Active Sebeka Gubae council members and officer seats.</p>
+            
+            <div id="sebeka-seats-list" class="seats-list-container" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+              <!-- Dynamically populated seat cards -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Panel: Qale Gubae Minutes Ledger ── -->
+      <div class="dash-panel" id="qale-gubae-panel">
+        <div class="dashboard-grid-m16" style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 2rem;">
+          <!-- Left Column: Minutes Registry Form -->
+          <div class="panel-card lock-overlay-container" id="qale-minutes-card" style="position: relative;">
+            <div class="lock-overlay" id="qale-lock-overlay" style="display: none;">
+              <div class="lock-overlay-icon">🔒</div>
+              <div class="lock-overlay-title">Secretary Required</div>
+              <div class="lock-overlay-desc">Access Restricted: Minutes ledger entries require a verified Wana Tsehafi account.</div>
+            </div>
+            
+            <div class="panel-header">
+              <div class="panel-title" data-i18n="tab_qale_gubae">Minutes Registry</div>
+            </div>
+            <p class="panel-desc">Record a Qale Gubae council meeting minutes entry into the immutable ledger.</p>
+            
+            <form id="qale-form" onsubmit="recordMinutes(event)">
+              <div class="dash-form-group">
+                <label for="qale-minute-number">Minute Number</label>
+                <input type="text" id="qale-minute-number" placeholder="e.g., OC/Bole/2026/001" required>
+                <div class="field-error" id="qale-minute-err">Format must match OC/[PARISH_CODE]/[YEAR]/[SEQ]</div>
+              </div>
+              <div class="dash-form-group">
+                <label for="qale-meeting-date">Meeting Date</label>
+                <input type="date" id="qale-meeting-date" required>
+              </div>
+              <div class="dash-form-group">
+                <label for="qale-topic">Discussion Topic</label>
+                <input type="text" id="qale-topic" placeholder="e.g., Parish Expansion Budget" required>
+              </div>
+              <div class="dash-form-group">
+                <label for="qale-resolutions">Resolutions Passed</label>
+                <textarea id="qale-resolutions" placeholder="Provide complete resolution texts..." required></textarea>
+              </div>
+              
+              <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button type="button" class="btn-outline-gold" onclick="generateMinutesSignaturePreview()">Generate Signature</button>
+                <button type="submit" class="btn" id="btn-record-minutes">📜 Record Minutes</button>
+              </div>
+            </form>
+            
+            <div id="minutes-signature-card" class="seal-result-card" style="display:none; margin-top: 1.5rem;">
+              <div class="seal-result-title">QALE GUBAE MINUTES LEDGER PREVIEW</div>
+              <div class="seal-field-label">SHA-256 Ledger Signature Hash Preview</div>
+              <div class="seal-hash-value" id="minutes-signature-preview" style="word-break: break-all; font-family: 'Courier New', monospace; font-size: 0.8rem;"></div>
+            </div>
+            
+            <div id="qale-record-result" style="display:none; margin-top:1rem;"></div>
+          </div>
+          
+          <!-- Right Column: Historical Minutes Ledger -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title" data-i18n="minutes_ledger">Minutes Ledger</div>
+            </div>
+            <p class="panel-desc">Historical logged council resolutions for this parish.</p>
+            
+            <div class="ledger-table-container" style="margin-top: 1rem;">
+              <table class="ledger-table" style="width: 100%;">
+                <thead>
+                  <tr>
+                    <th>Minute #</th>
+                    <th>Date</th>
+                    <th>Topic</th>
+                    <th>Signature Seal</th>
+                  </tr>
+                </thead>
+                <tbody id="qale-minutes-tbody">
+                  <!-- Dynamically populated minutes -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Panel: Support Our Parish ── -->
+      <div class="dash-panel" id="parish-support-panel">
+        <div class="dashboard-grid-m16" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+          <!-- Left Column: Support Form -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title" data-i18n="tab_parish_support">Support Our Parish</div>
+            </div>
+            <p class="panel-desc">Submit outgoing tithes or support donations to support EOTC local and central ministries.</p>
+            
+            <form id="support-form" onsubmit="initiateSupportPayment(event)">
+              <div class="dash-form-row">
+                <div class="dash-form-group">
+                  <label for="support-amount">Amount</label>
+                  <input type="number" id="support-amount" placeholder="e.g. 500" min="1" step="any" required oninput="calculateFintechSplits(this.value)">
+                </div>
+                <div class="dash-form-group">
+                  <label for="support-currency">Currency</label>
+                  <select id="support-currency" onchange="updateProviderOptions(this.value)">
+                    <option value="ETB">ETB (Ethiopian Birr)</option>
+                    <option value="USD">USD (US Dollar)</option>
+                    <option value="EUR">EUR (Euro)</option>
+                  </select>
+                </div>
+              </div>
+              
+              <!-- Payment Providers selector -->
+              <div class="dash-form-group">
+                <label>Payment Method</label>
+                <div id="provider-selector-container" style="display: flex; gap: 0.75rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                  <!-- Dynamically populated provider buttons -->
+                </div>
+              </div>
+              
+              <!-- Conditional phone input -->
+              <div class="dash-form-group" id="phone-input-group" style="display: none;">
+                <label for="support-phone">Mobile Phone Number</label>
+                <input type="tel" id="support-phone" placeholder="e.g. +251911223344">
+              </div>
+              
+              <!-- Conditional credit card fields -->
+              <div id="credit-card-group" style="display: none;">
+                <div class="dash-form-group">
+                  <label for="card-number">Card Number</label>
+                  <input type="text" id="card-number" placeholder="4111 2222 3333 4444">
+                </div>
+                <div class="dash-form-row">
+                  <div class="dash-form-group">
+                    <label for="card-expiry">Expiration</label>
+                    <input type="text" id="card-expiry" placeholder="MM/YY">
+                  </div>
+                  <div class="dash-form-group">
+                    <label for="card-cvc">CVC</label>
+                    <input type="text" id="card-cvc" placeholder="123">
+                  </div>
+                </div>
+              </div>
+              
+              <button type="submit" class="btn" id="btn-support-submit" style="margin-top: 1rem;">💳 Initiate Contribution</button>
+            </form>
+            <div id="support-payment-result" style="display:none; margin-top:1rem;"></div>
+          </div>
+          
+          <!-- Right Column: Interactive Split Calculator -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title" data-i18n="splits_title">Atomic Ledger Splits Generated</div>
+            </div>
+            <p class="panel-desc">Visual breakdown of the canonical 80/15/5 fund splits per the Kale Awadi (ቃለ ዓዋዲ) 4th Edition.</p>
+            
+            <div style="margin-top: 1.5rem;">
+              <div class="split-breakdown-row" style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-weight: 500;" data-i18n="local_parish_share">Local Parish Share (80%)</span>
+                <span id="split-parish-amt" style="font-weight: 700; color: var(--gold);">0.00 ETB</span>
+              </div>
+              <div class="split-breakdown-row" style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="font-weight: 500;" data-i18n="diocese_share">Diocese Share (15%)</span>
+                <span id="split-diocese-amt" style="font-weight: 700; color: var(--gold);">0.00 ETB</span>
+              </div>
+              <div class="split-breakdown-row" style="display: flex; justify-content: space-between; margin-bottom: 1.5rem;">
+                <span style="font-weight: 500;" data-i18n="patriarchate_share">Patriarchate Share (5%)</span>
+                <span id="split-patriarchate-amt" style="font-weight: 700; color: var(--gold);">0.00 ETB</span>
+              </div>
+              
+              <!-- Responsive CSS bar chart -->
+              <div class="split-chart-bar" style="display: flex; width: 100%; height: 35px; border-radius: var(--radius-sm); overflow: hidden; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color);">
+                <div id="chart-parish-bar" style="width: 80%; background: var(--burgundy-glow); transition: width 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700;">80%</div>
+                <div id="chart-diocese-bar" style="width: 15%; background: var(--gold-dark); transition: width 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; color: var(--text-white);">15%</div>
+                <div id="chart-patriarchate-bar" style="width: 5%; background: var(--gold-light); transition: width 0.3s ease; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; color: var(--bg-dark);">5%</div>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.5rem;">
+                <span>የአጥቢያ ድርሻ</span>
+                <span>የሀገረ ስብከት ድርሻ</span>
+                <span>የጠቅላይ ቤተ ክህነት ድርሻ</span>
+              </div>
             </div>
           </div>
         </div>
@@ -2773,7 +3091,7 @@
     const I18N = {
       en: {
         app_title: 'OrthodoxConnect',
-        app_subtitle: 'Jurisdictional Governance & FinTech Registry',
+        app_subtitle: 'Canonical Governance & Parish Administration Portal',
         select_language: 'Language',
         select_theme: 'Theme',
         db_loading_title: 'Initializing Canonical Database...',
@@ -2781,7 +3099,7 @@
         btn_logout: 'Logout',
         btn_login_nav: 'Login',
         nav_home: 'Home', nav_about: 'About', nav_contact: 'Contact',
-        nav_sacraments: 'Sacramental Records', nav_fintech: 'FinTech Clearing',
+        nav_sacraments: 'Sacramental Records', nav_fintech: 'Alms & Tithes Ledger',
         modal_title: 'Welcome Back',
         modal_subtitle: 'Sign in to access the OrthodoxConnect platform',
         label_email: 'Email Address', label_password: 'Password',
@@ -2789,23 +3107,23 @@
         demo_creds_label: 'Demo Canonical Credentials',
         hero_eyebrow: 'Ethiopian Orthodox Tewahedo Church Platform',
         hero_headline: 'Canonical Governance\nfor the Digital Age',
-        hero_tagline: 'The enterprise-grade platform unifying jurisdictional administration, sacramental record-keeping, and FinTech clearinghouse operations across the global Ethiopian Orthodox Tewahedo Church.',
-        btn_explore: 'Explore Platform', btn_learn_more: 'Learn More',
-        stat_tiers: 'Canonical Tiers', stat_seal: 'Cryptographic Seal',
-        stat_langs: 'Sacred Languages', stat_fintech: 'FinTech Clearing',
+        hero_tagline: 'The unified canonical governance platform for the Ethiopian Orthodox Tewahedo Church — administering parishes, sacramental records, and alms management under the Qale Awadi constitution.',
+        btn_explore: 'Explore Portal', btn_learn_more: 'Learn More',
+        stat_tiers: 'Canonical Tiers', stat_seal: 'Canonical Seal',
+        stat_langs: 'Sacred Languages', stat_fintech: 'Alms Register',
         about_eyebrow: 'The Governance Model',
         about_title: 'Jurisdictional Hierarchy & Canonical Alignment',
         about_lead: 'OrthodoxConnect encodes the full five-tier canonical authority structure of the Ethiopian Orthodox Tewahedo Church into a secure, auditable digital backbone.',
         about_p1: 'The platform implements a multi-tenant jurisdictional model where each institution exists within a strict canonical scope.',
-        about_p2: 'Sacramental records are cryptographically sealed with RSA-PSS-SHA256, linked to a dual Gregorian/Ethiopic calendar.',
-        about_p3: 'The integrated FinTech Clearinghouse performs real-time, atomic ledger splits across the hierarchy.',
+        about_p2: 'Sacramental records are canonically sealed and cryptographically signed, linked to a dual Gregorian/Ethiopic calendar under the ecclesiastical registry.',
+        about_p3: 'The integrated Parish Alms Ledger performs transparent, audited tithe splits across the canonical hierarchy (Parish 90%, Diocese 7%, Patriarchate 3%).',
         hier_label: 'Tier',
         hier_patriarchate: 'Holy Synod — Patriarchate', hier_patriarchate_desc: 'Supreme canonical jurisdiction over the global EOTC',
         hier_archdiocese: 'Archdiocese', hier_archdiocese_desc: 'Metropolitan authority over diocesan clusters',
         hier_diocese: 'Diocese', hier_diocese_desc: 'Episcopal oversight of regional parishes',
         hier_parish: 'Parish & Clergy', hier_parish_desc: 'Sacramental celebrants with active canonical standing',
         feat_sacraments_title: 'Sacramental Registry', feat_sacraments_desc: 'Immutable, cryptographically sealed records of all canonical rites.',
-        feat_fintech_title: 'FinTech Clearinghouse', feat_fintech_desc: 'Real-time atomic ledger splits for tithes and offerings.',
+        feat_fintech_title: 'Parish Alms Ledger', feat_fintech_desc: 'Transparent, audited tithe and offering splits across the canonical hierarchy.',
         feat_calendar_title: 'Liturgical Calendar', feat_calendar_desc: 'Gregorian-to-Ethiopic conversion and fasting tier classification.',
         contact_eyebrow: 'Get in Touch', contact_title: 'Contact the Registry Office',
         contact_lead: 'For institutional onboarding, canonical questions, or technical support.',
@@ -2819,13 +3137,13 @@
         contact_subject_placeholder: '— Select a topic —',
         contact_subject_onboarding: 'Institutional Onboarding',
         contact_subject_sacraments: 'Sacramental Registry Query',
-        contact_subject_fintech: 'FinTech Clearinghouse Support',
+        contact_subject_fintech: 'Parish Alms & Tithes Registry Support',
         contact_subject_canonical: 'Canonical Governance Question',
         contact_subject_technical: 'Technical Support',
         err_required: 'This field is required.', err_email: 'Enter a valid email address.',
         footer_rights: '© 2024 Ethiopian Orthodox Tewahedo Church Platform. All rights reserved.',
         dash_welcome: 'Welcome,',
-        tab_calendar: 'Calendar', tab_sacraments: 'Sacraments', tab_fintech: 'FinTech Split',
+        tab_calendar: 'Calendar', tab_sacraments: 'Sacraments', tab_fintech: 'Alms Ledger',
         tab_hierarchy: 'Jurisdictions', tab_vault: 'Seal Vault',
         tab_clergy: 'Clergy Ledger', tab_db: 'DB Control',
         db_panel_title: '⚙️ Database Setup & Seeding', db_panel_badge: 'Development Mode',
@@ -2842,8 +3160,8 @@
         btn_register_record: 'Register Sacramental Record',
         verify_seal_title: 'Cryptographically Sealed Record',
         verify_seal_desc: 'Successfully verified against the Holy Synod registry. SHA-256 seal:',
-        fintech_panel_title: '💳 Real-time FinTech Ledger',
-        fintech_panel_desc: 'Submit tithes or donations. Splits: Parish 90%, Diocese 7%, Patriarchate 3%.',
+        fintech_panel_title: '📒 Parish Alms & Tithes Ledger',
+        fintech_panel_desc: 'Submit tithes (አሥራት) or canonical offerings. Ledger splits: Parish 90%, Diocese 7%, Patriarchate 3%.',
         label_amount: 'Amount', label_currency: 'Currency', label_txn_type: 'Transaction Type',
         label_gateway: 'Payment Gateway', label_ref_id: 'Reference ID (Must be unique)',
         btn_submit_contribution: 'Submit Contribution & Split Funds',
@@ -2857,8 +3175,8 @@
         fasting_tier_MODERATE: 'Moderate Fast', fasting_tier_WINE_OIL: 'Wine & Oil Permitted',
         fasting_tier_FISH_ALLOWED: 'Fish Allowed',
         liturgical_color_label: 'Liturgical Color',
-        vault_panel_title: '🔏 Cryptographic Seal Vault', vault_panel_badge: 'RSA-PSS-SHA256',
-        vault_panel_desc: 'Generate and verify RSA-PSS-SHA256 cryptographic seals on sacramental records.',
+        vault_panel_title: '🔏 Canonical Seal Vault', vault_panel_badge: 'Canonical Signing',
+        vault_panel_desc: 'Generate and verify cryptographic canonical seals on sacramental records for Qale Awadi compliance.',
         vault_seal_desc: 'Enter a Record ID to generate a cryptographic seal. Authentication required.',
         vault_label_record_id: 'Sacramental Record ID (UUID)', vault_label_signature: 'RSA-PSS-SHA256 Signature', vault_label_algo: 'Algorithm',
         vault_seal_result_title: 'CRYPTOGRAPHIC SEAL GENERATED',
@@ -2967,6 +3285,15 @@
         badge_delayed: 'ክፍያ የዘገየ',
         badge_ok: 'ሁኔታ ጥሩ',
         btn_load_followers: 'Load Followers',
+        /* ── EOTC Compliance & FinTech Hub ── */
+        tab_sebeka_gubae: 'Sebeka Gubae Board',
+        tab_qale_gubae: 'Minutes Registry',
+        tab_parish_support: 'Support Our Parish',
+        parish_council: 'Parish Council',
+        minutes_ledger: 'Minutes Ledger',
+        local_parish_share: 'Local Parish Share',
+        diocese_share: 'Diocese Share',
+        patriarchate_share: 'Patriarchate Share',
       },
       am: {
         /* ── App Shell ── */
@@ -3207,6 +3534,15 @@
         badge_delayed: 'ክፍያ የዘገየ',
         badge_ok: 'ሁኔታ ጥሩ',
         btn_load_followers: 'ምእምናን ጫን',
+        /* ── EOTC Compliance & FinTech Hub ── */
+        tab_sebeka_gubae: 'የሰበካ ጉባኤ ቦርድ',
+        tab_qale_gubae: 'የቃለ ጉባኤ መዝገብ',
+        tab_parish_support: 'አጥቢያችንን እንደግፍ',
+        parish_council: 'የሰበካ ጉባኤ',
+        minutes_ledger: 'ቃለ ጉባኤ',
+        local_parish_share: 'የአጥቢያ ሰበካ ድርሻ',
+        diocese_share: 'የሀገረ ስብከት ድርሻ',
+        patriarchate_share: 'የጠቅላይ ቤተ ክህነት ድርሻ',
       },
       gez: {
         /* ── App Shell ── */
@@ -3403,6 +3739,15 @@
         badge_delayed: 'ክፍያ ዘዘገየ',
         badge_ok: 'ሠናይ',
         btn_load_followers: 'ምእምናን ጫን',
+        /* ── EOTC Compliance & FinTech Hub ── */
+        tab_sebeka_gubae: 'የሰበካ ጉባኤ ቦርድ',
+        tab_qale_gubae: 'የቃለ ጉባኤ መዝገብ',
+        tab_parish_support: 'አጥቢያችንን እንደግፍ',
+        parish_council: 'የሰበካ ጉባኤ',
+        minutes_ledger: 'ቃለ ጉባኤ',
+        local_parish_share: 'የአጥቢያ ሰበካ ድርሻ',
+        diocese_share: 'የሀገረ ስብከት ድርሻ',
+        patriarchate_share: 'የጠቅላይ ቤተ ክህነት ድርሻ',
       }
     };
 
@@ -3456,30 +3801,37 @@
     // ═══════════════════════════════════════════════════════════════
     // Theme Switcher API
     function changeTheme(theme) {
+      localStorage.setItem('theme', theme);
       localStorage.setItem('theme-preference', theme);
       applyTheme(theme);
     }
 
     function applyTheme(theme) {
       if (theme === 'light') {
+        document.documentElement.classList.add('light');
         document.body.classList.add('light-theme');
       } else if (theme === 'dark') {
+        document.documentElement.classList.remove('light');
         document.body.classList.remove('light-theme');
       } else if (theme === 'system') {
         const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (isDark) {
+          document.documentElement.classList.remove('light');
           document.body.classList.remove('light-theme');
         } else {
+          document.documentElement.classList.add('light');
           document.body.classList.add('light-theme');
         }
       }
       // Sync mobile drawer select
       const mobileSelect = document.getElementById('theme-select-mobile');
       if (mobileSelect) mobileSelect.value = theme;
+      const desktopSelect = document.getElementById('theme-select');
+      if (desktopSelect) desktopSelect.value = theme;
     }
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      const savedTheme = localStorage.getItem('theme-preference') || 'system';
+      const savedTheme = localStorage.getItem('theme') || localStorage.getItem('theme-preference') || 'system';
       if (savedTheme === 'system') {
         applyTheme('system');
       }
@@ -3530,11 +3882,7 @@
       document.getElementById('sacrament-type').addEventListener('change', checkSacramentFasting);
 
       // Restore theme option dropdowns (desktop + mobile)
-      const savedTheme = localStorage.getItem('theme-preference') || 'system';
-      const themeSelect = document.getElementById('theme-select');
-      if (themeSelect) themeSelect.value = savedTheme;
-      const themeMobile = document.getElementById('theme-select-mobile');
-      if (themeMobile) themeMobile.value = savedTheme;
+      const savedTheme = localStorage.getItem('theme') || localStorage.getItem('theme-preference') || 'system';
       applyTheme(savedTheme);
 
       // 1. Silent backend database readiness check
@@ -3668,6 +4016,7 @@
 
       // Initialise lock overlays based on role
       updateLedgerLockOverlays();
+      updateGovernanceLockOverlays();
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -3928,6 +4277,7 @@
       'calendar-panel','sacraments-panel','fintech-split',
       'jurisdictions','seal-vault','clergy-ledger','db-panel',
       'monastic-estates',
+      'sebeka-gubae-panel','qale-gubae-panel','parish-support-panel',
       // Module 17 — Parish CRM panels (appended)
       'payment-history-panel','priest-crm-panel'
     ];
@@ -3947,6 +4297,15 @@
         updateLedgerLockOverlays();
         fetchArtifacts();
         fetchEstates();
+      }
+      if (tabId === 'sebeka-gubae-panel') {
+        fetchSebekaGubaeSeats();
+      }
+      if (tabId === 'qale-gubae-panel') {
+        fetchQaleGubaeMinutes();
+      }
+      if (tabId === 'parish-support-panel') {
+        updateProviderOptions('ETB');
       }
     }
 
@@ -4797,11 +5156,382 @@
       }
     }
 
+    // ─── EOTC Compliance & FinTech Hub Frontend Logic ────────────────
+
+    function updateGovernanceLockOverlays() {
+      const sebekaLock = document.getElementById('sebeka-lock-overlay');
+      const qaleLock = document.getElementById('qale-lock-overlay');
+      if (!currentUserData) return;
+      if (sebekaLock) {
+        sebekaLock.style.display = (currentUserData.ecclesiastical_role === 'LIQE_MENBER') ? 'none' : 'flex';
+      }
+      if (qaleLock) {
+        qaleLock.style.display = (currentUserData.ecclesiastical_role === 'WANA_TSEHAFI') ? 'none' : 'flex';
+      }
+    }
+
+    async function fetchSebekaGubaeSeats() {
+      if (!currentToken || !currentUserData) return;
+      const container = document.getElementById('sebeka-seats-list');
+      if (!container) return;
+      container.textContent = 'Loading...';
+      try {
+        const res = await fetch(`${BASE_URL}/api/v1/governance/sebeka-gubae/seats/${currentUserData.institutionId}`, {
+          headers: { 'Authorization': `Bearer ${currentToken}` }
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          container.textContent = json.message || 'Failed to fetch seats.';
+          return;
+        }
+        const seats = json.data || [];
+        container.innerHTML = '';
+        if (!seats.length) {
+          container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:1rem;">—</div>`;
+          return;
+        }
+        seats.forEach(seat => {
+          const card = document.createElement('div');
+          card.className = 'seat-card';
+          const details = document.createElement('div');
+          details.className = 'seat-card-details';
+          const roleSpan = document.createElement('span');
+          roleSpan.className = 'seat-card-role';
+          const roleMap = {
+            'LIQE_MENBER': 'Chairperson (ሊቀ መንበር)',
+            'MEK_LIQE_MENBER': 'Vice Chairperson (ምክትል ሊቀ መንበር)',
+            'WANA_TSEHAFI': 'Secretary (ዋና ጸሐፊ)',
+            'GENZEB_YAZHI': 'Treasurer (ገንዘብ ያዥ)',
+            'HISAB_SHUM': 'Accountant (ሒሳብ ሹም)'
+          };
+          roleSpan.textContent = roleMap[seat.role] || seat.role;
+          const userSpan = document.createElement('span');
+          userSpan.className = 'seat-card-user';
+          userSpan.textContent = seat.user?.fullName || seat.userId;
+          const termSpan = document.createElement('span');
+          termSpan.className = 'seat-card-term';
+          termSpan.textContent = `Term: ${new Date(seat.termStart).toLocaleDateString()} - ${new Date(seat.termEnd).toLocaleDateString()}`;
+          details.appendChild(roleSpan);
+          details.appendChild(userSpan);
+          details.appendChild(termSpan);
+          card.appendChild(details);
+          if (currentUserData.ecclesiastical_role === 'LIQE_MENBER') {
+            const decBtn = document.createElement('button');
+            decBtn.className = 'btn-outline-danger';
+            decBtn.style.padding = '0.35rem 0.75rem';
+            decBtn.style.fontSize = '0.78rem';
+            decBtn.textContent = 'Deactivate';
+            decBtn.onclick = () => deactivateCouncilSeat(seat.id);
+            card.appendChild(decBtn);
+          }
+          container.appendChild(card);
+        });
+      } catch (err) {
+        container.textContent = `Network error: ${err.message}`;
+      }
+    }
+
+    async function deactivateCouncilSeat(seatId) {
+      if (!currentToken) return;
+      if (!confirm('Are you sure you want to deactivate this council seat assignment?')) return;
+      try {
+        const res = await fetch(`${BASE_URL}/api/v1/governance/sebeka-gubae/seats/${seatId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${currentToken}` }
+        });
+        const json = await res.json();
+        if (res.ok) {
+          alert('Council seat deactivated successfully.');
+          fetchSebekaGubaeSeats();
+        } else {
+          alert(`Error: ${json.message || 'Deactivation failed.'}`);
+        }
+      } catch (err) {
+        alert(`Network error: ${err.message}`);
+      }
+    }
+
+    async function assignCouncilSeat(event) {
+      event.preventDefault();
+      if (!currentToken || !currentUserData) return;
+      const btn = document.getElementById('btn-assign-seat');
+      const resultEl = document.getElementById('sebeka-assign-result');
+      btn.disabled = true;
+      resultEl.style.display = 'none';
+      const userId = document.getElementById('sebeka-user-id').value.trim();
+      const role = document.getElementById('sebeka-role').value;
+      const termStart = document.getElementById('sebeka-term-start').value;
+      const termEnd = document.getElementById('sebeka-term-end').value;
+      const payload = {
+        institutionId: currentUserData.institutionId,
+        userId,
+        role,
+        termStart: new Date(termStart).toISOString(),
+        termEnd: new Date(termEnd).toISOString()
+      };
+      try {
+        const res = await fetch(`${BASE_URL}/api/v1/governance/sebeka-gubae/seats`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${currentToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (res.ok) {
+          resultEl.innerHTML = `<div class="result-card success"><p style="color:var(--accent-green)">✓ Seat assigned successfully.</p></div>`;
+          resultEl.style.display = 'block';
+          document.getElementById('sebeka-form').reset();
+          fetchSebekaGubaeSeats();
+        } else {
+          resultEl.innerHTML = `<div class="result-card failure"><p style="color:var(--accent-red)">🚫 Error: ${json.message || 'Assignment failed.'}</p></div>`;
+          resultEl.style.display = 'block';
+        }
+      } catch (err) {
+        resultEl.innerHTML = `<div class="result-card failure"><p style="color:var(--accent-red)">🚫 Network error: ${err.message}</p></div>`;
+        resultEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function fetchQaleGubaeMinutes() {
+      if (!currentToken || !currentUserData) return;
+      const tbody = document.getElementById('qale-minutes-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading...</td></tr>';
+      try {
+        const res = await fetch(`${BASE_URL}/api/v1/governance/qale-gubae/minutes/${currentUserData.institutionId}`, {
+          headers: { 'Authorization': `Bearer ${currentToken}` }
+        });
+        const json = await res.json();
+        if (!res.ok) {
+          tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--accent-red);">${json.message || 'Error'}</td></tr>`;
+          return;
+        }
+        const minutes = json.data || [];
+        tbody.innerHTML = '';
+        if (!minutes.length) {
+          tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:1.5rem;">—</td></tr>`;
+          return;
+        }
+        minutes.forEach(m => {
+          const tr = document.createElement('tr');
+          tr.style.borderBottom = '1px solid var(--border-color)';
+          const tdNum = document.createElement('td');
+          tdNum.style.fontWeight = '600';
+          tdNum.textContent = m.minuteNumber;
+          const tdDate = document.createElement('td');
+          tdDate.textContent = new Date(m.meetingDate).toLocaleDateString();
+          const tdTopic = document.createElement('td');
+          tdTopic.textContent = m.discussionTopic;
+          const tdSeal = document.createElement('td');
+          tdSeal.style.fontFamily = 'Courier New, monospace';
+          tdSeal.style.fontSize = '0.75rem';
+          tdSeal.style.maxWidth = '180px';
+          tdSeal.style.overflow = 'hidden';
+          tdSeal.style.textOverflow = 'ellipsis';
+          tdSeal.style.whiteSpace = 'nowrap';
+          tdSeal.textContent = m.signatureHash;
+          tdSeal.title = m.signatureHash;
+          tr.appendChild(tdNum);
+          tr.appendChild(tdDate);
+          tr.appendChild(tdTopic);
+          tr.appendChild(tdSeal);
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--accent-red);">${err.message}</td></tr>`;
+      }
+    }
+
+    async function generateMinutesSignaturePreview() {
+      const minuteNumber = document.getElementById('qale-minute-number').value.trim();
+      const meetingDate = document.getElementById('qale-meeting-date').value;
+      const topic = document.getElementById('qale-topic').value.trim();
+      const resolutions = document.getElementById('qale-resolutions').value.trim();
+      if (!minuteNumber || !meetingDate || !topic || !resolutions) {
+        alert('Please fill out all fields first to generate a signature.');
+        return;
+      }
+      const message = `${minuteNumber}|${new Date(meetingDate).toISOString()}|${topic}|${resolutions}|${currentUserData.id}`;
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      const previewEl = document.getElementById('minutes-signature-preview');
+      if (previewEl) previewEl.textContent = hashHex;
+      document.getElementById('minutes-signature-card').style.display = 'block';
+    }
+
+    async function recordMinutes(event) {
+      event.preventDefault();
+      if (!currentToken || !currentUserData) return;
+      const btn = document.getElementById('btn-record-minutes');
+      const resultEl = document.getElementById('qale-record-result');
+      const errEl = document.getElementById('qale-minute-err');
+      btn.disabled = true;
+      resultEl.style.display = 'none';
+      if (errEl) errEl.classList.remove('show');
+      const minuteNumber = document.getElementById('qale-minute-number').value.trim();
+      const meetingDate = document.getElementById('qale-meeting-date').value;
+      const topic = document.getElementById('qale-topic').value.trim();
+      const resolutions = document.getElementById('qale-resolutions').value.trim();
+      const formatRegex = /^OC\/[A-Za-z0-9_-]+\/\d{4}\/[A-Za-z0-9_-]+$/;
+      if (!formatRegex.test(minuteNumber)) {
+        if (errEl) errEl.classList.add('show');
+        btn.disabled = false;
+        return;
+      }
+      const payload = {
+        institutionId: currentUserData.institutionId,
+        minuteNumber,
+        meetingDate: new Date(meetingDate).toISOString(),
+        discussionTopic: topic,
+        resolutionsPassed: resolutions
+      };
+      try {
+        const res = await fetch(`${BASE_URL}/api/v1/governance/qale-gubae/minutes`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${currentToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (res.ok) {
+          resultEl.innerHTML = `<div class="result-card success"><p style="color:var(--accent-green)">✓ Minutes recorded successfully.</p></div>`;
+          resultEl.style.display = 'block';
+          document.getElementById('qale-form').reset();
+          document.getElementById('minutes-signature-card').style.display = 'none';
+          fetchQaleGubaeMinutes();
+        } else {
+          resultEl.innerHTML = `<div class="result-card failure"><p style="color:var(--accent-red)">🚫 Error: ${json.message || 'Saving failed.'}</p></div>`;
+          resultEl.style.display = 'block';
+        }
+      } catch (err) {
+        resultEl.innerHTML = `<div class="result-card failure"><p style="color:var(--accent-red)">🚫 Network error: ${err.message}</p></div>`;
+        resultEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    let selectedProvider = '';
+
+    function updateProviderOptions(currency) {
+      const container = document.getElementById('provider-selector-container');
+      const phoneGroup = document.getElementById('phone-input-group');
+      const cardGroup = document.getElementById('credit-card-group');
+      if (!container || !phoneGroup || !cardGroup) return;
+      container.innerHTML = '';
+      selectedProvider = '';
+      if (currency === 'ETB') {
+        phoneGroup.style.display = 'block';
+        cardGroup.style.display = 'none';
+        const teleBtn = document.createElement('button');
+        teleBtn.type = 'button';
+        teleBtn.className = 'provider-btn';
+        teleBtn.textContent = 'TeleBirr';
+        teleBtn.onclick = () => selectProvider(teleBtn, 'TELEBIRR');
+        const cbeBtn = document.createElement('button');
+        cbeBtn.type = 'button';
+        cbeBtn.className = 'provider-btn';
+        cbeBtn.textContent = 'CBE Birr';
+        cbeBtn.onclick = () => selectProvider(cbeBtn, 'CBE_BIRR');
+        container.appendChild(teleBtn);
+        container.appendChild(cbeBtn);
+        selectProvider(teleBtn, 'TELEBIRR');
+      } else {
+        phoneGroup.style.display = 'none';
+        cardGroup.style.display = 'block';
+        const stripeBtn = document.createElement('button');
+        stripeBtn.type = 'button';
+        stripeBtn.className = 'provider-btn';
+        stripeBtn.textContent = 'Stripe (Credit Card)';
+        stripeBtn.onclick = () => selectProvider(stripeBtn, 'STRIPE');
+        container.appendChild(stripeBtn);
+        selectProvider(stripeBtn, 'STRIPE');
+      }
+      const amt = parseFloat(document.getElementById('support-amount').value) || 0;
+      calculateFintechSplits(amt);
+    }
+
+    function selectProvider(element, provider) {
+      document.querySelectorAll('.provider-btn').forEach(btn => btn.classList.remove('selected'));
+      element.classList.add('selected');
+      selectedProvider = provider;
+    }
+
+    function calculateFintechSplits(value) {
+      const amount = parseFloat(value) || 0;
+      const currency = document.getElementById('support-currency').value;
+      const parishShare = amount * 0.8;
+      const dioceseShare = amount * 0.15;
+      const patriarchateShare = amount * 0.05;
+      document.getElementById('split-parish-amt').textContent = `${parishShare.toFixed(2)} ${currency}`;
+      document.getElementById('split-diocese-amt').textContent = `${dioceseShare.toFixed(2)} ${currency}`;
+      document.getElementById('split-patriarchate-amt').textContent = `${patriarchateShare.toFixed(2)} ${currency}`;
+    }
+
+    async function initiateSupportPayment(event) {
+      event.preventDefault();
+      if (!currentToken || !currentUserData) {
+        alert('Authentication required. Please log in first.');
+        return;
+      }
+      const btn = document.getElementById('btn-support-submit');
+      const resultEl = document.getElementById('support-payment-result');
+      btn.disabled = true;
+      resultEl.style.display = 'none';
+      const amount = parseFloat(document.getElementById('support-amount').value);
+      const currency = document.getElementById('support-currency').value;
+      if (!amount || amount <= 0 || !selectedProvider) {
+        alert('Please fill out all payment details.');
+        btn.disabled = false;
+        return;
+      }
+      const payload = {
+        institutionId: currentUserData.institutionId,
+        amount,
+        currency,
+        provider: selectedProvider
+      };
+      try {
+        const res = await fetch(`${BASE_URL}/api/v1/fintech/unified/transactions/initiate`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${currentToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (res.ok) {
+          resultEl.innerHTML = `
+            <div class="result-card success">
+              <div class="result-card-header">
+                <div class="result-card-icon">✅</div>
+                <div class="result-card-title" style="color:var(--accent-green)">Payment Initiated Successfully</div>
+              </div>
+              <div class="verify-data-grid" style="margin-top:0.75rem;">
+                <div class="verify-data-item"><div class="verify-data-key">Reference</div><div class="verify-data-val" style="color:var(--gold);font-family:monospace;">${json.data.providerRef}</div></div>
+                <div class="verify-data-item"><div class="verify-data-key">Gateway URL</div><div class="verify-data-val"><a href="${json.data.gatewayUrl}" target="_blank" class="btn-outline-gold" style="display:inline-block;font-size:0.75rem;padding:0.2rem 0.5rem;text-decoration:none;">Go to Payment Gateway</a></div></div>
+              </div>
+            </div>`;
+          resultEl.style.display = 'block';
+          document.getElementById('support-form').reset();
+          updateProviderOptions(currency);
+        } else {
+          resultEl.innerHTML = `<div class="result-card failure"><p style="color:var(--accent-red)">🚫 Error: ${json.message || 'Initiation failed.'}</p></div>`;
+          resultEl.style.display = 'block';
+        }
+      } catch (err) {
+        resultEl.innerHTML = `<div class="result-card failure"><p style="color:var(--accent-red)">🚫 Network error: ${err.message}</p></div>`;
+        resultEl.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // ─── End EOTC Compliance & FinTech Hub Frontend Logic ────────────
   </script>
 
   <!-- ══════════════════════════════════════════════════════
        MODULE 17: PARISH PAYMENT HISTORY PANEL (appended)
-  ══════════════════════════════════════════════════════ -->
   <script>
   // Inject the two new panel HTML into the dashboard-view on load
   document.addEventListener('DOMContentLoaded', function() {

@@ -1,0 +1,54 @@
+/* ══════════════════════════════════════════════════════════════════════
+   Card.module.css — EOTC Canonical Design System
+   Sandalwood Cream surface, Burgundy title, Warm Gold border accent
+═══════════════════════════════════════════════════════════════════════ */
+
+.card {
+  background: var(--eotc-surface, #FFFFFF);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--eotc-border, #E5E7EB);
+  box-shadow: 0 1px 4px rgba(128, 0, 32, 0.06), 0 4px 16px rgba(0,0,0,0.04);
+  color: var(--eotc-text, #1F2937);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--eotc-burgundy, #800020), var(--eotc-gold, #D4AF37));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(128, 0, 32, 0.12), 0 8px 24px rgba(0,0,0,0.07);
+  border-color: var(--eotc-gold, #D4AF37);
+  transform: translateY(-1px);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.title {
+  font-family: 'Playfair Display', Georgia, var(--font-secondary, serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.65rem;
+  color: var(--eotc-burgundy, #800020);
+  letter-spacing: 0.01em;
+}
+
+.content {
+  font-family: 'Outfit', 'Inter', var(--font-primary, sans-serif);
+  font-size: 0.9rem;
+  color: var(--eotc-text-muted, #6B7280);
+  line-height: 1.6;
+}

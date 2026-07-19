@@ -214,7 +214,11 @@ export async function settlePublicDonationWebhook(
   });
 
   // 3. Compute the canonical 90 / 10 split summary for audit response
-  const total = new Decimal(transaction.amount.toString());
+  // Prefer the Decimal `amount` field; fall back to legacy amountInCents (integer cents → ETB)
+  const rawAmount = (transaction as any).amount;
+  const total = rawAmount != null
+    ? new Decimal(rawAmount.toString())
+    : new Decimal(((transaction as any).amountInCents / 100).toString());
   const parishShare = total.mul(new Decimal('0.90'));
   const patriarchateShare = total.sub(parishShare);
 

@@ -16,14 +16,14 @@ export class AuditLogRepository {
     tx?: Prisma.TransactionClient,
   ): Promise<AuditLog> {
     const client = tx ?? prisma;
-    return client.auditLog.create({
+    return (client.auditLog as any).create({
       data: {
-        actorId: data.actorId,
-        institutionId: data.institutionId,
+        userId: data.actorId,
+        parishId: data.institutionId,
         action: data.action,
-        tableName: data.tableName,
+        tableAffected: data.tableName,
         recordId: data.recordId,
-        changes: data.changes,
+        newState: data.changes,
       },
     });
   }

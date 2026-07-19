@@ -22,6 +22,7 @@ enum EcclesiasticalRole {
   ARCHBISHOP
   METROPOLITAN
   BISHOP
+  ARCHPRIEST
   PRIEST
   DEACON
   LAITY
@@ -121,18 +122,25 @@ model Institution {
   createdAt           DateTime          @default(now()) @map("created_at")
   updatedAt           DateTime          @updatedAt @map("updated_at")
   institutionType     InstitutionType   @default(PARISH) @map("institution_type")
+  address             String?           @map("address")
+  phone               String?           @map("phone")
+  email               String?           @map("email")
+  description         String?           @map("description") @db.Text
+  logo                String?           @map("logo")
+  isActive            Boolean           @default(true) @map("is_active")
+
 
   parent                    Institution?              @relation("InstitutionHierarchy", fields: [parentId], references: [id])
   children                  Institution[]             @relation("InstitutionHierarchy")
   users                     User[]
   sacramentalRecords        SacramentalRecord[]
-  auditLogs                 AuditLog[]
   financialTransactions     FinancialTransaction[]
   ledgerSplitDestinations   LedgerSplitRecord[]       @relation("SplitDestination")
   clergyAssignments         ClergyAssignment[]
   fromInstitutionHistories  ClergyAssignmentHistory[] @relation("FromInstitutionHistories")
   toInstitutionHistories    ClergyAssignmentHistory[] @relation("ToInstitutionHistories")
   assignedClergy            ClergyProfile[]           @relation("CurrentAssignment")
+  auditLogInstitutions      AuditLogInstitution[]     @relation("InstitutionAuditLogs")
   contributions             EcclesiasticalTransaction[]
   supplyBatches             SupplyBatch[]
   outgoingTransfers         SupplyTransfer[]          @relation("OutgoingTransfers")
@@ -150,6 +158,12 @@ model Institution {
   artifacts                 Artifact[]                @relation("InstitutionArtifacts")
   monasticEstates           MonasticEstate[]           @relation("InstitutionMonasticEstates")
   mimens                    Mimen[]                   @relation("TenantMimens")
+  // Part 1 — Unified Payments Engine & Kale Awadi Governance
+  merchantConfiguration     MerchantConfiguration?
+  unifiedPaymentTransactions Transaction[]            @relation("InstitutionUnifiedPayments")
+  sebekaGubaeSeats          SebekaGubaeSeat[]         @relation("InstitutionSebekaGubaeSeats")
+  qaleGubaeMinutes          QaleGubae[]               @relation("InstitutionQaleGubaeMinutes")
+  dualAuthRequests          DualAuthorizationRequest[] @relation("InstitutionDualAuth")
 
   @@index([parentId, deletedAt])
   @@index([parentId, institutionType])
@@ -158,6 +172,66 @@ model Institution {
   @@index([id, nameGez])
   @@map("institutions")
 }
+
+// ── Unified Parishioner & Spiritual Profile Registry (Module 1) ───────────────────────────────────────
+model Parish {
+  id               String        @id @default(uuid())
+  nameAmharic      String
+  nameEnglish      String
+  dioceseId        String?
+  establishedDate  String?       // Ethiopian format DD/MM/YYYY
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  clergy           Clergy[]
+  parishioners     Parishioner[]
+  auditLogs        AuditLog[]    @relation("ParishAuditLogs")
+  financialTransactions FinancialTransaction[] @relation("ParishFinancialTransactions")
+}
+
+model Clergy {
+  id                  String        @id @default(uuid())
+  parishId            String
+  parish              Parish        @relation(fields: [parishId], references: [id])
+  secularFirstNameAm  String
+  secularLastNameAm   String
+  ordainedNameAm      String        // e.g., "አባ ወልደማርያም"
+  ordainedNameEn      String?       // e.g., "Abba Woldemariam"
+  rank                String        // e.g., "Priest", "Archpriest", "Deacon"
+  phoneNumber         String        @unique
+  isActive            Boolean       @default(true)
+  createdAt           DateTime      @default(now())
+  parishioners        Parishioner[] // Spiritual children linked to this Priest
+}
+
+model Parishioner {
+  id                     String      @id @default(uuid())
+  parishId               String
+  parish                 Parish      @relation(fields: [parishId], references: [id])
+  membershipIdNumber     String      @unique // Generated Format: [PARISH_CODE]-[REG_YEAR]-[SEQ]
+  firstNameAm            String
+  middleNameAm           String
+  lastNameAm             String
+  firstNameEn            String
+  middleNameEn           String
+  lastNameEn             String
+  christianNameAm        String?     // የክርስትና ስም (e.g., "ኃይለማርያም")
+  christianNameGeez      String?     // In Ge'ez characters
+  dateOfBirthGregorian   DateTime
+  dateOfBirthEthiopian   String      // Handled programmatically
+  gender                 String      // "Male" | "Female"
+  spiritualFatherId      String?
+  spiritualFather        Clergy?     @relation(fields: [spiritualFatherId], references: [id])
+  maritalStatus          String      // "Single" | "Married-Church" | "Married-Civil" | "Widowed" | "Divorced"
+  phoneNumber            String
+  email                  String?
+  residentialAddress     Json        // { region, city, subcity, wereda, kebele, houseNumber }
+  status                 String      @default("Active") // "Active" | "Inactive" | "Transferred" | "Deceased"
+  registeredAtEthiopian  String      // Converted at registration
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
+  financialTransactions  FinancialTransaction[] @relation("ParishionerFinancialTransactions")
+}
+
 
 model User {
   id                 String             @id @default(uuid())
@@ -178,14 +252,28 @@ model User {
   age                Int?               @map("age")
   location           String?            @map("location")
   spiritualFatherId  String?            @map("spiritual_father_id")
+  christianName      String?            @map("christian_name")
+  birthDate          DateTime?          @map("birth_date")
+  phoneNumber        String?            @map("phone_number")
+  region             String?            @map("region")
+  city               String?            @map("city")
+  address            String?            @map("address")
+  baptismStatus      String?            @map("baptism_status")
+  photoUrl           String?            @map("photo_url")
+  biography          String?            @map("biography") @db.Text
+  serviceStartDate   DateTime?          @map("service_start_date")
+  currentStatus      String?            @default("ACTIVE") @map("current_status")
   deletedAt          DateTime?          @map("deleted_at")
   createdAt          DateTime           @default(now()) @map("created_at")
   updatedAt          DateTime           @updatedAt @map("updated_at")
+
 
   institution          Institution         @relation(fields: [institutionId], references: [id])
   sacramentalRecords   SacramentalRecord[] @relation("SacramentTarget")
   celebratedSacraments SacramentalRecord[] @relation("SacramentCelebrant")
   auditLogs            AuditLog[]          @relation("AuditActor")
+  institutionAuditLogs AuditLogInstitution[] @relation("InstitutionAuditActor")
+  recordedFinancialTransactions FinancialTransaction[] @relation("FinancialRecorder")
   clergyAssignments    ClergyAssignment[]
   authorizedSeals      SacramentSeal[]     @relation("SealAuthorizer")
   clergyProfile        ClergyProfile?
@@ -215,6 +303,26 @@ model User {
   // Parish Financial Ledger
   parishLedgerEntries     ParishLedger[]            @relation("UserParishLedger")
   targetedGiftEntries     ParishLedger[]            @relation("PriestGiftLedger")
+  // Part 1 — Unified Payments Engine & Kale Awadi Governance
+  unifiedPaymentTransactions Transaction[]           @relation("UserUnifiedPayments")
+  sebekaGubaeSeats          SebekaGubaeSeat[]       @relation("UserSebekaGubaeSeats")
+  recordedQaleGubaeMinutes  QaleGubae[]             @relation("QaleGubaeRecorder")
+  // Kale Awadi board relations
+  familyHeadedFamilies SpiritualFamily[] @relation("FamilyHead")
+  childRelations SpiritualChildRelation[] @relation("Child")
+  fatherRelations SpiritualChildRelation[] @relation("Father")
+  confessionParishionerRecords ConfessionRecord[] @relation("ConfessionParishioner")
+  confessionFatherRecords ConfessionRecord[] @relation("ConfessionFather")
+  dualAuthChairApprovals DualAuthorizationRequest[] @relation("DualAuthChair")
+  dualAuthDeputyApprovals DualAuthorizationRequest[] @relation("DualAuthDeputy")
+  // Spiritual Appointments (ቀጠሮ)
+  followerAppointments    SpiritualAppointment[]    @relation("AppointmentFollower")
+  priestAppointments      SpiritualAppointment[]    @relation("AppointmentPriest")
+  memberRequests          PriestAssignmentRequest[] @relation("MemberRequests")
+  priestRequests          PriestAssignmentRequest[] @relation("PriestRequests")
+  historyChanges          AppointmentHistory[]      @relation("HistoryChangedBy")
+  notifications           Notification[]            @relation("UserNotifications")
+
 
   @@index([institutionId, deletedAt])
   @@index([id, nameAm])
@@ -222,6 +330,30 @@ model User {
   @@index([institutionId, spiritualFatherId])
   @@map("users")
 }
+
+model PriestAssignmentRequest {
+  id          String        @id @default(uuid())
+  memberId    String        @map("member_id")
+  priestId    String        @map("priest_id")
+  status      RequestStatus @default(PENDING)
+  notes       String?       @map("notes") @db.Text
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  member      User          @relation("MemberRequests", fields: [memberId], references: [id])
+  priest      User          @relation("PriestRequests", fields: [priestId], references: [id])
+
+  @@index([memberId, status])
+  @@index([priestId, status])
+  @@map("priest_assignment_requests")
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 
 model SacramentalRecord {
   id                  String          @id @default(uuid())
@@ -250,17 +382,30 @@ model SacramentalRecord {
 
 model AuditLog {
   id            String    @id @default(uuid())
-  actorId       String    @map("actor_id")
+  parishId      String
+  userId        String
+  action        String    // "CREATE", "UPDATE", "DELETE"
+  tableAffected String
+  recordId      String
+  oldState      Json?
+  newState      Json?
+  timestamp     DateTime  @default(now())
+  parish        Parish    @relation("ParishAuditLogs", fields: [parishId], references: [id])
+  user          User      @relation("AuditActor", fields: [userId], references: [id])
+}
+
+model AuditLogInstitution {
+  id            String    @id @default(uuid())
   institutionId String    @map("institution_id")
-  action        String
+  actorId       String    @map("actor_id")
   tableName     String    @map("table_name")
   recordId      String    @map("record_id")
   changes       Json
   timestamp     DateTime  @default(now())
   deletedAt     DateTime? @map("deleted_at")
 
-  actor       User        @relation("AuditActor", fields: [actorId], references: [id])
-  institution Institution @relation(fields: [institutionId], references: [id])
+  actor       User        @relation("InstitutionAuditActor", fields: [actorId], references: [id])
+  institution Institution @relation("InstitutionAuditLogs", fields: [institutionId], references: [id])
 
   @@index([institutionId, deletedAt])
   @@index([actorId, timestamp])
@@ -271,8 +416,17 @@ model AuditLog {
 model FinancialTransaction {
   id            String            @id @default(uuid())
   institutionId String            @map("institution_id")
-  amount        Decimal           @db.Decimal(19, 4)
+  parishId      String            @map("parish_id")
+  parishionerId String?           @map("parishioner_id")
+  amountInCents Int               @map("amount_in_cents") // amount * 100
   currency      String
+  category      ParishLedgerCategory @map("category")
+  paymentMethod ParishPaymentMethod @map("payment_method")
+  referenceNumber String?        @map("reference_number")
+  transactionDateGreg DateTime? @map("transaction_date_greg")
+  transactionDateEth String?   @map("transaction_date_eth")
+  notes         String?         @map("notes")
+  recordedById  String?         @map("recorded_by_id")
   type          TransactionType
   gateway       PaymentGateway
   referenceId   String            @unique @map("reference_id")
@@ -281,13 +435,17 @@ model FinancialTransaction {
   createdAt     DateTime          @default(now()) @map("created_at")
   updatedAt     DateTime          @updatedAt @map("updated_at")
 
-  institution  Institution         @relation(fields: [institutionId], references: [id])
-  ledgerSplits LedgerSplitRecord[]
+  institution   Institution @relation(fields: [institutionId], references: [id])
+  parish        Parish      @relation("ParishFinancialTransactions", fields: [parishId], references: [id])
+  parishioner   Parishioner? @relation("ParishionerFinancialTransactions", fields: [parishionerId], references: [id])
+  recordedBy    User?       @relation("FinancialRecorder", fields: [recordedById], references: [id])
+  ledgerSplits  LedgerSplitRecord[]
 
   @@index([institutionId, deletedAt])
   @@index([status, institutionId])
   @@map("financial_transactions")
 }
+
 
 model LedgerSplitRecord {
   id                       String   @id @default(uuid())
@@ -1040,4 +1198,315 @@ model ParishLedger {
   @@index([userId, category, createdAt])
   @@index([targetPriestId])
   @@map("parish_ledgers")
+}
+
+// ── Part 1: Unified Payments Engine & Kale Awadi Governance (Sprint) ─────────
+
+/// Payment gateway identifiers for the Unified Payments Engine.
+/// Distinct from legacy PaymentGateway to preserve backward compatibility.
+enum PaymentProvider {
+  TELEBIRR
+  CBE_BIRR
+  STRIPE
+  CHAPA
+}
+
+/// Lifecycle states for unified payment transactions.
+enum PaymentStatus {
+  PENDING
+  SUCCESSFUL
+  FAILED
+  REFUNDED
+}
+
+/// EOTC Parish Council officer roles per Kale Awadi 4th Edition (ቃለ ዓዋዲ).
+enum CouncilRole {
+  LIQE_MENBER
+  MEK_LIQE_MENBER
+  WANA_TSEHAFI
+  GENZEB_YAZHI
+  HISAB_SHUM
+}
+
+/// EOTC parish work-unit departments (12 canonical work units + statistics).
+enum DepartmentType {
+  EVANGELICAL_SERVICE
+  SPIRITUAL_EDUCATION
+  CLERGY_SERVICE
+  SUNDAY_SCHOOL
+  PLANNING_AND_DEVELOPMENT
+  CHARITY_WORK
+  LEGAL_AFFAIRS
+  HERITAGE_AND_ECCLESIASTICAL_PROP
+  FINANCE
+  TREASURY
+  SUPERVISION
+  CONSTRUCTION_AND_MAINTENANCE
+  STATISTICS
+}
+
+/// Encrypted API credential store for a tenant parish payment gateway.
+/// One configuration row per institution (credentials may cover multiple providers via configPayload).
+model MerchantConfiguration {
+  id            String          @id @default(uuid())
+  institutionId String          @unique @map("institution_id")
+  provider      PaymentProvider
+  isActive      Boolean         @default(true) @map("is_active")
+  configPayload Json            @map("config_payload")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  institution Institution @relation(fields: [institutionId], references: [id])
+
+  @@index([institutionId, isActive])
+  @@map("merchant_configurations")
+}
+
+/// Immutable unified payment ledger entry for the FinTech engine.
+model Transaction {
+  id            String          @id @default(uuid())
+  institutionId String          @map("institution_id")
+  userId        String?         @map("user_id")
+  amount        Decimal         @db.Decimal(19, 4)
+  currency      String          @default("ETB")
+  provider      PaymentProvider
+  providerRef   String          @unique @map("provider_ref")
+  status        PaymentStatus   @default(PENDING)
+  metadata      Json?
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  institution Institution @relation("InstitutionUnifiedPayments", fields: [institutionId], references: [id])
+  user        User?       @relation("UserUnifiedPayments", fields: [userId], references: [id])
+
+  @@index([institutionId, status])
+  @@map("unified_payment_transactions")
+}
+
+/// Active parish council (Sebeka Gubae) seat assignment for a council term.
+model SebekaGubaeSeat {
+  id            String      @id @default(uuid())
+  institutionId String      @map("institution_id")
+  userId        String      @map("user_id")
+  role          CouncilRole
+  termStart     DateTime    @map("term_start")
+  termEnd       DateTime    @map("term_end")
+  isActive      Boolean     @default(true) @map("is_active")
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  institution Institution @relation("InstitutionSebekaGubaeSeats", fields: [institutionId], references: [id])
+  user        User        @relation("UserSebekaGubaeSeats", fields: [userId], references: [id])
+
+  // Partial unique (institution_id, role) WHERE is_active = true is enforced via
+  // prisma/migrations/20260713_kale_awadi_partial_unique/migration.sql
+  @@index([institutionId, role, isActive])
+  @@index([institutionId, isActive])
+  @@index([userId, isActive])
+  @@map("sebeka_gubae_seats")
+}
+
+/// Immutable Qale Gubae (council meeting minutes) ledger entry.
+model QaleGubae {
+  id                 String   @id @default(uuid())
+  institutionId      String   @map("institution_id")
+  minuteNumber       String   @map("minute_number")
+  meetingDate        DateTime @map("meeting_date")
+  discussionTopic    String   @map("discussion_topic")
+  resolutionsPassed  String   @map("resolutions_passed") @db.Text
+  recordedById       String   @map("recorded_by_id")
+  signatureHash      String   @map("signature_hash")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  institution Institution @relation("InstitutionQaleGubaeMinutes", fields: [institutionId], references: [id])
+  recordedBy  User        @relation("QaleGubaeRecorder", fields: [recordedById], references: [id])
+
+  @@index([institutionId, meetingDate])
+  @@index([recordedById])
+  @@map("qale_gubae_minutes")
+}
+
+// ── SRM Models ────────────────────────────────────────────────────────
+model SpiritualFamily {
+  id                String   @id @default(uuid())
+  tenantId          String   @map("tenant_id")
+  familyName        String
+  headOfHouseholdId String   @map("head_of_household_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  headOfHousehold   User     @relation("FamilyHead", fields: [headOfHouseholdId], references: [id])
+
+  @@index([tenantId])
+}
+
+model SpiritualChildRelation {
+  id                String   @id @default(uuid())
+  tenantId          String   @map("tenant_id")
+  parishionerId     String   @unique @map("parishioner_id")
+  spiritualFatherId String   @map("spiritual_father_id")
+  status            String
+  establishedDate   DateTime @map("established_date")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  parishioner       User     @relation("Child", fields: [parishionerId], references: [id])
+  spiritualFather   User     @relation("Father", fields: [spiritualFatherId], references: [id])
+
+  @@index([tenantId])
+}
+
+model ConfessionRecord {
+  id                String   @id @default(uuid())
+  tenantId          String   @map("tenant_id")
+  parishionerId     String   @map("parishioner_id")
+  spiritualFatherId String   @map("spiritual_father_id")
+  confessionDate    DateTime @default(now()) @map("confession_date")
+  penanceStatus     String   @map("penance_status")
+  penanceCategory   String?  @map("penance_category")
+  penanceDurationDays Int?   @map("penance_duration_days")
+  completedAt       DateTime? @map("completed_at")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  parishioner       User     @relation("ConfessionParishioner", fields: [parishionerId], references: [id])
+  spiritualFather   User     @relation("ConfessionFather", fields: [spiritualFatherId], references: [id])
+
+  @@index([tenantId])
+  @@map("confession_records")
+}
+
+enum AppointmentType {
+  CONFESSION
+  COUNSELING
+  ASRAT_REVIEW
+  GENERAL
+  EMERGENCY
+}
+
+enum AppointmentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  RESCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+/// Follower-to-priest appointment booking (ቀጠሮ).
+/// A follower requests a meeting with their spiritual father;
+/// the priest approves, rejects, or reschedules.
+model SpiritualAppointment {
+  id                 String            @id @default(uuid())
+  tenantId           String            @map("tenant_id")
+  followerId         String            @map("follower_id")
+  priestId           String            @map("priest_id")
+  appointmentType    AppointmentType   @default(GENERAL) @map("appointment_type")
+  status             AppointmentStatus @default(PENDING)
+  requestedDate      DateTime          @map("requested_date")
+  confirmedDate      DateTime?         @map("confirmed_date")
+  requestedDateEth   String?           @map("requested_date_eth")   // e.g. "10/11/2016"
+  followerNote       String?           @map("follower_note")         // message from follower
+  priestNote         String?           @map("priest_note")           // response from priest
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+
+  follower           User              @relation("AppointmentFollower", fields: [followerId], references: [id])
+  priest             User              @relation("AppointmentPriest", fields: [priestId], references: [id])
+  histories          AppointmentHistory[]
+
+  @@index([priestId, status])
+  @@index([followerId])
+  @@index([tenantId, requestedDate])
+  @@map("spiritual_appointments")
+}
+
+model AppointmentHistory {
+  id            String             @id @default(uuid())
+  appointmentId String             @map("appointment_id")
+  status        AppointmentStatus
+  changedById   String             @map("changed_by_id")
+  notes         String?            @map("notes")
+  createdAt     DateTime           @default(now()) @map("created_at")
+
+  appointment   SpiritualAppointment @relation(fields: [appointmentId], references: [id])
+  changedBy     User                 @relation("HistoryChangedBy", fields: [changedById], references: [id])
+
+  @@index([appointmentId])
+  @@index([changedById])
+  @@map("appointment_histories")
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  title       String
+  body        String
+  isRead      Boolean  @default(false) @map("is_read")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User     @relation("UserNotifications", fields: [userId], references: [id])
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+
+
+
+enum DualAuthorizationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXECUTED
+}
+
+/// Dual-authorization workflow request for sensitive actions (bank transfers > 50,000 ETB, etc.).
+/// Both Chairperson and Deputy Chairperson must approve before the request status becomes APPROVED.
+model DualAuthorizationRequest {
+  id               String                     @id @default(uuid())
+  institutionId    String                     @map("institution_id")
+  payloadType      String                     @map("payload_type")  // e.g., "BANK_WITHDRAWAL", "CLERGY_ASSIGNMENT"
+  payloadJson      Json                       @map("payload_json")   // Serialized action payload
+  status           DualAuthorizationStatus    @default(PENDING)
+  chairApproved    Boolean                    @default(false) @map("chair_approved")
+  deputyApproved   Boolean                    @default(false) @map("deputy_approved")
+  chairApprovedAt  DateTime?                  @map("chair_approved_at")
+  deputyApprovedAt DateTime?                  @map("deputy_approved_at")
+  chairApprovedBy  String?                    @map("chair_approved_by_id")
+  deputyApprovedBy String?                    @map("deputy_approved_by_id")
+  rejectedReason   String?                    @map("rejected_reason")
+  executedAt       DateTime?                  @map("executed_at")
+  createdAt        DateTime                   @default(now()) @map("created_at")
+  updatedAt        DateTime                   @updatedAt @map("updated_at")
+
+  institution Institution                    @relation("InstitutionDualAuth", fields: [institutionId], references: [id])
+  chairApprover   User?                      @relation("DualAuthChair", fields: [chairApprovedBy], references: [id])
+  deputyApprover  User?                      @relation("DualAuthDeputy", fields: [deputyApprovedBy], references: [id])
+
+  @@index([institutionId, status])
+  @@index([institutionId, createdAt])
+  @@map("dual_authorization_requests")
+}
+
+// ── Phase 1 Public Website ────────────────────────────────────────────────────
+
+enum PrayerRequestStatus {
+  PENDING
+  APPROVED
+  COMPLETED
+}
+
+/// Public prayer request submitted via the Phase 1 website form.
+/// No authentication required to create — admin reviews via portal.
+model PrayerRequest {
+  id          String              @id @default(cuid())
+  fullName    String              @map("full_name")
+  phoneNumber String?             @map("phone_number")
+  requestText String              @map("request_text") @db.Text
+  status      PrayerRequestStatus @default(PENDING)
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  @@index([status, createdAt])
+  @@map("prayer_requests")
 }

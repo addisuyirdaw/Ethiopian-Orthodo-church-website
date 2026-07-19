@@ -276,17 +276,17 @@ export class CanonicalCourtService {
         // 4. Write immutable audit trail entry.
         await tx.auditLog.create({
           data: {
-            actorId: bishopUserId,
-            institutionId: bishop.institutionId,
+            userId: bishopUserId,
+            parishId: bishop.institutionId,
             action: 'MUTATE_CLERGY_STANDING',
-            tableName: 'canonical_status_logs',
+            tableAffected: 'canonical_status_logs',
             recordId: statusLog.id,
-            changes: {
+            newState: {
               targetUserId: payload.targetUserId,
               newStanding: payload.newStanding,
               reason: payload.reason,
             },
-          },
+          } as any,
         });
 
         return {

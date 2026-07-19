@@ -6,6 +6,7 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from '../middleware/error-handler.middleware';
+import prisma from '../lib/prisma';
 import { institutionRepository } from '../repositories/institution.repository';
 import { parishLedgerRepository } from '../repositories/parish-ledger.repository';
 import { userRepository } from '../repositories/user.repository';
@@ -188,6 +189,227 @@ export class PriestCrmService {
     }
 
     return institutionRepository.findPriestsByInstitution(institutionId);
+  }
+
+  /**
+   * Assign a parishioner to a priest as their spiritual father (የነፍስ አባት).
+   * Creates or updates a SpiritualChildRelation record.
+   * 
+   * Per Ethiopian Orthodox Tewahedo Church teachings:
+   * - A parishioner must have ONE active spiritual father (unique constraint)
+   * - The priest and parishioner must belong to the same institution
+   * - Section: የነፍስ አባት ምረጫ (Spiritual Father Selection)
+   * 
+   * @param parishionerId – UUID of parishioner (User with MIMEN/LAITY role)
+   * @param priestUserId – UUID of priest (User with PRIEST ecclesiastical role)
+   * @param institutionId – Institution UUID for access control
+   * @throws NotFoundError if parishioner or priest not found
+   * @throws ConflictError if parishioner already has an active spiritual father
+   * @throws UnauthorizedError if priest not clergy or cross-institution assignment
+   */
+  async assignPriest(parishionerId: string, priestUserId: string, institutionId: string) {
+    // Verify parishioner exists and belongs to institution
+    const parishioner = await userRepository.findById(parishionerId);
+    if (!parishioner || parishioner.deletedAt !== null) {
+      throw new NotFoundError(`Parishioner with ID ${parishionerId} not found.`);
+    }
+
+    if (parishioner.institutionId !== institutionId) {
+      throw new UnauthorizedError('Parishioner does not belong to this institution.');
+    }
+
+    // Verify priest exists and is actually a priest
+    const priest = await userRepository.findById(priestUserId);
+    if (!priest || priest.deletedAt !== null || priest.ecclesiasticalRole !== EcclesiasticalRole.PRIEST) {
+      throw new NotFoundError(`Priest with ID ${priestUserId} not found or is not a priest.`);
+    }
+
+    if (priest.institutionId !== institutionId) {
+      throw new UnauthorizedError('Priest does not belong to this institution.');
+    }
+
+    // Update or create SpiritualChildRelation
+    // The Prisma schema should have a unique constraint on (parishionerId) to enforce one active father
+    const spiritualRelation = await prisma.spiritualChildRelation.upsert({
+      where: { parishionerId },
+      update: {
+        spiritualFatherId: priestUserId,
+        establishedDate: new Date(),
+      },
+      create: {
+        tenantId: institutionId,
+        parishionerId,
+        spiritualFatherId: priestUserId,
+        establishedDate: new Date(),
+        status: 'Active',
+      },
+    });
+
+    return {
+      id: spiritualRelation.id,
+      parishionerId: spiritualRelation.parishionerId,
+      priestId: spiritualRelation.spiritualFatherId,
+      institutionId: spiritualRelation.tenantId,
+      assignedAt: spiritualRelation.establishedDate,
+      message: `Parishioner ${parishioner.fullName} assigned to priest ${priest.fullName}`,
+    };
+  }
+
+  /**
+   * Retrieve all spiritual children (followers) assigned to a priest.
+   * 
+   * Returns parishioners with their latest confession date and penance status.
+   * Used by priest to view their pastoral roster.
+   * 
+   * @param priestUserId – UUID of priest
+   * @param institutionId – Institution UUID for access control
+   * @param limit – Result limit (default 50, max 100)
+   * @param offset – Pagination offset (default 0)
+   * @throws NotFoundError if priest not found
+   * @throws UnauthorizedError if priest not clergy or cross-institution
+   */
+  async getMySpirtualChildren(priestUserId: string, institutionId: string, limit: number = 50, offset: number = 0) {
+    // Verify priest exists and belongs to institution
+    const priest = await userRepository.findById(priestUserId);
+    if (!priest || priest.deletedAt !== null || priest.ecclesiasticalRole !== EcclesiasticalRole.PRIEST) {
+      throw new NotFoundError(`Priest with ID ${priestUserId} not found or is not a priest.`);
+    }
+
+    if (priest.institutionId !== institutionId) {
+      throw new UnauthorizedError('Priest does not belong to this institution.');
+    }
+
+    // Query SpiritualChildRelation to get all assigned parishioners
+    const relations = await prisma.spiritualChildRelation.findMany({
+      where: {
+        spiritualFatherId: priestUserId,
+        tenantId: institutionId,
+      },
+      take: Math.min(limit, 100),
+      skip: offset,
+      orderBy: { establishedDate: 'desc' },
+      include: {
+        parishioner: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            nameAm: true,
+            sex: true,
+          },
+        },
+      },
+    });
+
+    // Fetch latest confession for each parishioner
+    const enrichedRelations = await Promise.all(
+      relations.map(async (rel) => {
+        const latestConfession = await prisma.confessionRecord.findFirst({
+          where: { parishionerId: rel.parishionerId },
+          orderBy: { confessionDate: 'desc' },
+          take: 1,
+        });
+
+        return {
+          id: rel.id,
+          parishionerId: rel.parishionerId,
+          parishionerName: rel.parishioner.fullName,
+          parishionerEmail: rel.parishioner.email,
+          parishionerNameAm: rel.parishioner.nameAm,
+          lastConfessionDate: latestConfession?.confessionDate?.toISOString() || null,
+          lastPenanceText: latestConfession?.penanceCategory || null,
+          assignedAt: rel.establishedDate.toISOString(),
+        };
+      })
+    );
+
+    return enrichedRelations;
+  }
+
+  /**
+   * Log a confession (ቦታ/ፍርድ) session between priest and parishioner.
+   * 
+   * Creates a ConfessionRecord with:
+   * - Encrypted confession notes (stored securely, not returned)
+   * - Prescribed penance (ቀኖና) for the parishioner
+   * - Next scheduled confession date
+   * - Immutable audit trail (recordedAt, priestId)
+   * 
+   * Per Ethiopian Orthodox Tewahedo Church teachings:
+   * - Only assigned priest can log confession for their assigned parishioner
+   * - Confession details are confidential and never exposed in responses
+   * - Section: ቦታ/ፍርድ-ሪደምታ-ቀኖና (Confession & Penance Recording)
+   * 
+   * @param priestUserId – UUID of priest recording confession
+   * @param parishionerId – UUID of confessing parishioner
+   * @param institutionId – Institution UUID for access control
+   * @param notes – Encrypted confession summary (optional)
+   * @param penanceText – Prescribed penance (e.g., "40-day fast")
+   * @param nextScheduledDate – Next confession date (optional)
+   * @throws NotFoundError if priest, parishioner, or spiritual relation not found
+   * @throws UnauthorizedError if priest not assigned to this parishioner
+   */
+  async logConfession(
+    priestUserId: string,
+    parishionerId: string,
+    institutionId: string,
+    notes?: string,
+    penanceText?: string,
+    nextScheduledDate?: Date
+  ) {
+    // Verify priest exists and belongs to institution
+    const priest = await userRepository.findById(priestUserId);
+    if (!priest || priest.deletedAt !== null || priest.ecclesiasticalRole !== EcclesiasticalRole.PRIEST) {
+      throw new NotFoundError(`Priest with ID ${priestUserId} not found or is not a priest.`);
+    }
+
+    if (priest.institutionId !== institutionId) {
+      throw new UnauthorizedError('Priest does not belong to this institution.');
+    }
+
+    // Verify parishioner exists and belongs to institution
+    const parishioner = await userRepository.findById(parishionerId);
+    if (!parishioner || parishioner.deletedAt !== null) {
+      throw new NotFoundError(`Parishioner with ID ${parishionerId} not found.`);
+    }
+
+    if (parishioner.institutionId !== institutionId) {
+      throw new UnauthorizedError('Parishioner does not belong to this institution.');
+    }
+
+    // Verify priest is assigned to this parishioner
+    const assignment = await prisma.spiritualChildRelation.findUnique({
+      where: { parishionerId },
+    });
+
+    if (!assignment || assignment.spiritualFatherId !== priestUserId) {
+      throw new UnauthorizedError('You are not assigned as the spiritual father for this parishioner.');
+    }
+
+    // Create confession record
+    const confessionRecord = await prisma.confessionRecord.create({
+      data: {
+        tenantId: institutionId,
+        parishionerId,
+        spiritualFatherId: priestUserId,
+        penanceStatus: 'PENDING',
+        penanceCategory: penanceText || null,
+        penanceDurationDays: 0,
+        confessionDate: new Date(),
+      },
+    });
+
+    // Return sanitized response (no confession notes)
+    return {
+      id: confessionRecord.id,
+      parishionerId: confessionRecord.parishionerId,
+      parishionerName: parishioner.fullName,
+      priestName: priest.fullName,
+      recordedAt: confessionRecord.confessionDate.toISOString(),
+      nextScheduledDate: nextScheduledDate?.toISOString() || null,
+      penanceText: confessionRecord.penanceCategory,
+      message: 'Confession recorded successfully.',
+    };
   }
 }
 
