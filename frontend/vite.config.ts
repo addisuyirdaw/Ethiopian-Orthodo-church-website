@@ -22,17 +22,5 @@ export default defineConfig({
     // the static site without needing an outputDirectory in vercel.json.
     outDir: '../public',
     emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        // Split large vendor libraries into separate cacheable chunks
-        manualChunks: {
-          'vendor-react':  ['react', 'react-dom', 'react-router-dom'],
-          'vendor-ui':     ['lucide-react'],
-          'vendor-forms':  ['react-hook-form'],
-          'vendor-i18n':   ['i18next', 'react-i18next'],
-          'vendor-http':   ['axios'],
-        },
-      },
-    },
   },
 })
