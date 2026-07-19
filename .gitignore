@@ -31,3 +31,8 @@ Thumbs.db
 
 # Scratch files
 scratch/
+
+# Compiled frontend assets
+public/assets/
+public/index.html
+
