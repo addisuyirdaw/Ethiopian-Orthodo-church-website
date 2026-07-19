@@ -18,7 +18,9 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'dist',
+    // Output to the root /public folder so Vercel automatically serves
+    // the static site without needing an outputDirectory in vercel.json.
+    outDir: '../public',
     emptyOutDir: true,
   },
 })
