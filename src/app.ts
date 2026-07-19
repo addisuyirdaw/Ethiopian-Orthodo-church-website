@@ -93,6 +93,31 @@ export function createApp(): Application {
     }
   });
 
+  // Temporary route to debug which files are actually copied to the Vercel deployment folder
+  app.get('/debug-files', (_req: Request, res: Response) => {
+    try {
+      const fs = require('fs');
+      const publicPath = path.join(process.cwd(), 'public');
+      const assetsPath = path.join(publicPath, 'assets');
+      
+      const publicFiles = fs.readdirSync(publicPath);
+      let assetsFiles = [];
+      try {
+        assetsFiles = fs.readdirSync(assetsPath);
+      } catch (e: any) {
+        assetsFiles = ['Error: ' + e.message];
+      }
+      
+      res.status(200).json({
+        cwd: process.cwd(),
+        publicFiles,
+        assetsFiles
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   app.use('/api/v1', apiRoutes);
 
   // SPA catch-all — serve index.html for any route not matched above
